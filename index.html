@@ -9,21 +9,26 @@
     <script src="script.js"></script>
     <style>
         body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Chiều cao 100% cửa sổ */
+            background-color: #0758B8; /* Màu nền */
             font-family: Arial, sans-serif;
-            margin: 20px;
         }
         button {
             padding: 10px 20px;
             font-size: 16px;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-        }
-        #status {
-            margin-top: 20px;
-            color: green;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
         }
     </style>
 </head>
-<body bgcolor="#0758B8">
+<body>
     <button id="refreshButton">Reload</button>
 </body>
 </html>
