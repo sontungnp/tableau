@@ -1,5 +1,31 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Button to Refresh Data</title>
+    <!-- <script src="https://tableau.github.io/extensions-api/lib/tableau-extensions-1.latest.js"></script>-->
+	<!-- Extensions Library (this will be hosted on a CDN eventually) -->
+    <script src="./lib/tableau.extensions.1.latest.js"></script>
+    <script src="script.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #status {
+            margin-top: 20px;
+            color: green;
+        }
+    </style>
+</head>
 <body>
-tungnps xin chào các bạn
+    <h3>Update and Refresh Data</h3>
+    <button id="refreshButton">Refresh Data</button>
+    <div id="status">Ready</div>
 </body>
-<html>
+</html>

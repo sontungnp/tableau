@@ -1,0 +1,111 @@
+'use strict';
+
+document.addEventListener("DOMContentLoaded", () => {
+    tableau.extensions.initializeAsync().then(() => {
+        const dashboard = tableau.extensions.dashboardContent.dashboard;
+        const worksheets = dashboard.worksheets;
+
+        document.getElementById("refreshButton").addEventListener("click", () => {
+            updateAndRefreshData();
+        });
+
+        tableau.extensions.dashboardContent.dashboard.getParametersAsync().then(function (parameters) {
+            parameters.forEach(function (p) {
+              p.addEventListener(tableau.TableauEventType.ParameterChanged, onParameterChange);
+            });
+          });
+
+          function onParameterChange (parameterChangeEvent) {
+            parameterChangeEvent.getParameterAsync().then(function (param) {
+                console.log("Change parameter");
+            });
+          }
+
+        // Add filter change listener to all worksheets in the dashboard
+        worksheets.forEach(worksheet => {
+            worksheet.addEventListener(tableau.TableauEventType.FilterChanged, event => {
+                console.log(`Filter changed on worksheet: ${event.worksheet.name}`);
+                applyFiltersToOtherSheets(event.worksheet, event.filtersChanged);
+            });
+        });
+
+        // Function to apply filters from one worksheet to others
+        async function applyFiltersToOtherSheets(sourceWorksheet, filtersChanged) {
+            try {
+                const filterInfo = await sourceWorksheet.getFiltersAsync();
+
+                worksheets.forEach(async worksheet => {
+                    if (worksheet.name === sourceWorksheet.name) {
+                        for (const filter of filterInfo) {
+                            await worksheet.applyFilterAsync(
+                                filter.fieldName,
+                                filter.appliedValues.map(v => v.value),
+                                tableau.FilterUpdateType.Replace
+                            );
+                        }
+                        worksheet.refreshDataAsync();
+                    }
+                });
+
+                console.log(`Filters from ${sourceWorksheet.name} applied to other sheets.`);
+            } catch (err) {
+                console.error('Error applying filters:', err.message);
+            }
+        }
+
+        function updateAndRefreshData() {
+            //const dashboard = tableau.extensions.dashboardContent.dashboard;
+
+            // Get the parameters P_FROM_DATE and P_TO_DATE
+            dashboard.getParametersAsync().then(parameters => {
+                const fromDateParam = parameters.find(param => param.name === 'P_FROM_DATE');
+                const toDateParam = parameters.find(param => param.name === 'P_TO_DATE');
+				const fdParam = parameters.find(param => param.name === "P_FD");
+				const tdParam = parameters.find(param => param.name === "P_TD");
+				
+                if (!fromDateParam || !toDateParam) {
+                    document.getElementById('status').innerText = "Missing parameters: P_FROM_DATE or P_TO_DATE.";
+                    return;
+                }
+
+                const fromDate = fromDateParam.currentValue.value;
+                const toDate = toDateParam.currentValue.value;
+				
+				// Cập nhật P_FD bằng giá trị của P_FROM_DATE
+				fdParam.changeValueAsync(fromDate).then(() => {
+                                console.log('thay doi tham so FD');
+                                
+                            });
+				tdParam.changeValueAsync(toDate).then(() => {
+                                console.log('thay doi tham so TD');
+                                
+                            });
+
+                
+                // Get datasource ABC
+                worksheets.forEach(worksheet => {
+                   worksheet.getDataSourcesAsync().then(dataSources => {
+                       const dataSource = dataSources.find(ds => ds.name === 'ABC');
+                
+                       if (!dataSource) {
+                           document.getElementById('status').innerText = "Datasource 'ABC' not found.";
+                           return;
+                       }
+                
+                       // Update datasource with new parameters
+                       
+						dataSource.refreshAsync().then(() => {
+							document.getElementById('status').innerText = "Data refreshed successfully!";
+						}).catch(err => {
+							document.getElementById('status').innerText = "Error refreshing data.";
+							console.error(err);
+						});
+                   });
+                });
+            }).catch(err => {
+                document.getElementById('status').innerText = "Error fetching parameters.";
+                console.error(err);
+            });
+        }
+    });
+});
