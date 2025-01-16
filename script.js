@@ -28,12 +28,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Get the parameters P_FROM_DATE and P_TO_DATE
             dashboard.getParametersAsync().then(parameters => {
-                const fromDateParam = parameters.find(param => param.name === 'P_FROM_DATE');
-                const toDateParam = parameters.find(param => param.name === 'P_TO_DATE');
-				const fdtdParam = parameters.find(param => param.name === 'P_FD_TD');
+                const fromDateParam = parameters.find(param => param.name === 'P_From_Date');
+                const toDateParam = parameters.find(param => param.name === 'P_To_Date');
+		const fdtdParam = parameters.find(param => param.name === 'P_Fd_Td');
 				
                 if (!fromDateParam || !toDateParam) {
-                    document.getElementById('status').innerText = "Missing parameters: P_FROM_DATE or P_TO_DATE.";
+                    document.getElementById('status').innerText = "Missing parameters: P_From_Date or P_To_Date.";
                     return;
                 }
 
