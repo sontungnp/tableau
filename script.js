@@ -46,8 +46,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                 console.log('thay doi tham so P_Fd_Td');
                             });
             }).catch(err => {
-                alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String). P_Fd_Td = " + fromDateToDate);
-		console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String). P_Fd_Td = " + fromDateToDate);
+                console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String).");
+                alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String)");
+                console.error("P_Fd_Td = " + fromDateToDate);
+                alert("P_Fd_Td = " + fromDateToDate);
                 console.error(err);
             });
         }
