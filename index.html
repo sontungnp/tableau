@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Button to Refresh Data</title>
-    <!-- <script src="https://tableau.github.io/extensions-api/lib/tableau-extensions-1.latest.js"></script>-->
-	<!-- Extensions Library (this will be hosted on a CDN eventually) -->
     <script src="./lib/tableau.extensions.1.latest.js"></script>
     <script src="script.js"></script>
     <style>
@@ -17,7 +15,13 @@
             background-color: #0758B8; /* Màu nền */
             font-family: Arial, sans-serif;
         }
-        button {
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Khoảng cách giữa các phần tử */
+        }
+        .container input[type="date"],
+        .container button {
             padding: 10px 20px;
             font-size: 16px;
             border: none;
@@ -26,9 +30,24 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s ease;
         }
+        .container input[type="date"] {
+            background-color: #fff;
+            color: #000;
+        }
+        .container button {
+            background-color: #fff;
+            color: #000;
+        }
+        .container button:hover {
+            background-color: #ddd;
+        }
     </style>
 </head>
 <body>
-    <button id="refreshButton">Reload</button>
+    <div class="container">
+        <input type="date" id="startDate" placeholder="Từ ngày">
+        <input type="date" id="endDate" placeholder="Đến ngày">
+        <button id="refreshButton">Reload</button>
+    </div>
 </body>
 </html>
