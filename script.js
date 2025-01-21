@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const parameterName = "P_Fd_Td"; // Replace with your parameter's name
         const defaultValue = "1000-01-01,1000-01-01"; // Replace with your default value
 
-        init();
+        // init();
 
         document.getElementById("refreshButton").addEventListener("click", () => {
             updateAndRefreshData();
@@ -24,8 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log("Change parameter");
             });
         }
-
-
 
         function updateAndRefreshData() {
             const startDate = document.getElementById('startDate').value;
