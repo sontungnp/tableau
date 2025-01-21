@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Button to Refresh Data</title>
+    <script src="../../lib/tableau.extensions.1.latest.js"></script>
+    <script src="script.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Chiều cao 100% cửa sổ */
+            background-color: #0758B8; /* Màu nền */
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Khoảng cách giữa các phần tử */
+            width: 90%; /* Đảm bảo container chiếm 90% chiều rộng màn hình */
+            max-width: 600px; /* Giới hạn chiều rộng tối đa */
+        }
+        .container input[type="date"],
+        .container button {
+            flex: 1; /* Chia đều không gian cho các phần tử */
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            min-width: 50px;  /* Đảm bảo phần tử không co nhỏ quá mức */
+        }
+        .container input[type="date"] {
+            background-color: #fff;
+            color: #000;
+            min-width: 20px; 
+        }
+        .container button {
+            background-color: #fff;
+            color: #000;
+        }
+        .container button:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="date" id="startDate" placeholder="Từ ngày">
+        <input type="date" id="endDate" placeholder="Đến ngày">
+        <button id="refreshButton">Reload</button>
+    </div>
+</body>
+</html>
