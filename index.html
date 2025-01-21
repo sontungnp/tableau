@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,11 +15,13 @@
             background-color: #0758B8; /* Màu nền */
             font-family: Arial, sans-serif;
         }
+
         .container {
             display: flex;
             align-items: center;
             gap: 10px; /* Khoảng cách giữa các phần tử */
         }
+
         .container input[type="date"],
         .container button {
             padding: 10px 20px;
@@ -28,18 +30,46 @@
             border-radius: 5px;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, font-size 0.3s ease, padding 0.3s ease;
         }
+
         .container input[type="date"] {
             background-color: #fff;
             color: #000;
         }
+
         .container button {
             background-color: #fff;
             color: #000;
         }
+
         .container button:hover {
             background-color: #ddd;
+        }
+
+        /* Responsive Design: Khi chiều rộng < 768px */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column; /* Chuyển đổi từ hàng ngang sang hàng dọc */
+                gap: 5px; /* Giảm khoảng cách giữa các phần tử */
+            }
+
+            .container input[type="date"],
+            .container button {
+                width: 90%; /* Đặt chiều rộng gần bằng toàn bộ màn hình */
+                font-size: 14px; /* Giảm kích thước font */
+                padding: 8px 16px; /* Giảm padding */
+            }
+        }
+
+        /* Responsive Design: Khi chiều rộng < 480px */
+        @media (max-width: 480px) {
+            .container input[type="date"],
+            .container button {
+                width: 100%; /* Đặt chiều rộng 100% */
+                font-size: 12px; /* Giảm kích thước font hơn nữa */
+                padding: 6px 12px; /* Giảm padding */
+            }
         }
     </style>
 </head>
