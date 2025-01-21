@@ -54,11 +54,11 @@ document.addEventListener("DOMContentLoaded", () => {
             // Get the parameters P_FROM_DATE and P_TO_DATE
             dashboard.getParametersAsync().then(parameters => {
             	const fromDateToDate = '1000-01-01,1000-01-01';
-				
-				// Cập nhật P_FD bằng giá trị của P_From_Date + ',' + P_To_Date
-				fdtdParam.changeValueAsync(fromDateToDate).then(() => {
-                                console.log('thay doi tham so P_Fd_Td');
-                            });
+		const fdtdParam = parameters.find(param => param.name === 'P_Fd_Td');
+		// Cập nhật P_FD bằng giá trị của P_From_Date + ',' + P_To_Date
+			fdtdParam.changeValueAsync(fromDateToDate).then(() => {
+                	console.log('thay doi tham so P_Fd_Td');
+                });
             }).catch(err => {
                 console.error("Đã có lỗi xảy ra. Khi init dữ liệu");
             });
