@@ -4,8 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         const dashboard = tableau.extensions.dashboardContent.dashboard;
         const worksheets = dashboard.worksheets;
+	const parameterName = "P_Fd_Td"; // Replace with your parameter's name
+  	const defaultValue = "1000-01-01,1000-01-01"; // Replace with your default value
 
-	init();
+	// init();
 
         document.getElementById("refreshButton").addEventListener("click", () => {
             updateAndRefreshData();
@@ -63,5 +65,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error("Đã có lỗi xảy ra. Khi init dữ liệu");
             });
         }
+
+	// Register the unload event to reset the parameter
+	  window.addEventListener("beforeunload", () => {
+	    const dashboard = tableau.extensions.dashboardContent.dashboard;
+	
+	    // Find and set the parameter
+	    dashboard.findParameterAsync(parameterName).then((parameter) => {
+	      if (parameter) {
+	        parameter.changeValueAsync(defaultValue).then(() => {
+	          console.log(`Parameter ${parameterName} reset to default: ${defaultValue}`);
+	        });
+	      } else {
+	        console.error(`Parameter ${parameterName} not found`);
+	      }
+	    });
+	  });
     });
 });
