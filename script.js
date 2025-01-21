@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const dashboard = tableau.extensions.dashboardContent.dashboard;
         const worksheets = dashboard.worksheets;
 
+	init();
+
         document.getElementById("refreshButton").addEventListener("click", () => {
             updateAndRefreshData();
         });
@@ -45,6 +47,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 // console.error("P_Fd_Td = " + fromDateToDate);
                 // alert("P_Fd_Td = " + fromDateToDate);
                 console.error(err);
+            });
+        }
+
+	function init() {
+            // Get the parameters P_FROM_DATE and P_TO_DATE
+            dashboard.getParametersAsync().then(parameters => {
+            	const fromDateToDate = '1000-01-01,1000-01-01';
+				
+				// Cập nhật P_FD bằng giá trị của P_From_Date + ',' + P_To_Date
+				fdtdParam.changeValueAsync(fromDateToDate).then(() => {
+                                console.log('thay doi tham so P_Fd_Td');
+                            });
+            }).catch(err => {
+                console.error("Đã có lỗi xảy ra. Khi init dữ liệu");
             });
         }
     });
