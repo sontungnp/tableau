@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 fdtdParam.changeValueAsync(fromDateToDate).then(() => {
                     console.log('thay doi tham so P_Fd_Td');
                     setCursorLoading(false); // Tắt con trỏ loading sau khi hoàn thành
+                    setLoading(false); // Kết thúc loading
                 });
             }).catch(err => {
                 setCursorLoading(false); // Tắt con trỏ loading nếu không tìm thấy tham số
