@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function updateAndRefreshData() {
+            setCursorLoading(true); // Hiển thị con trỏ loading
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             // Chuyển giá trị sang định dạng yyyy-mm-dd
@@ -40,10 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Cập nhật P_FD bằng giá trị của fromDateToDate
                 fdtdParam.changeValueAsync(fromDateToDate).then(() => {
                     console.log('thay doi tham so P_Fd_Td');
-                    showLoadingIndicator();
-                    monitorDataSource(); // Lắng nghe sự kiện datasource
+                    setCursorLoading(false); // Tắt con trỏ loading sau khi hoàn thành
                 });
             }).catch(err => {
+                setCursorLoading(false); // Tắt con trỏ loading nếu không tìm thấy tham số
                 console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String).");
                 alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String)");
                 // console.error("P_Fd_Td = " + fromDateToDate);
@@ -90,23 +91,12 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        function showLoadingIndicator() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-        }
-        
-        function hideLoadingIndicator() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }
-
-        function monitorDataSource() {
-            tableau.extensions.dashboardContent.dashboard.getDataSourcesAsync().then((dataSources) => {
-                dataSources.forEach((dataSource) => {
-                    dataSource.addEventListener(tableau.TableauEventType.DataChanged, () => {
-                        console.log("Data source finished loading.");
-                        hideLoadingIndicator();
-                    });
-                });
-            });
+        function setCursorLoading(isLoading) {
+            if (isLoading) {
+                document.body.style.cursor = 'wait'; // Thay đổi con trỏ chuột sang "loading"
+            } else {
+                document.body.style.cursor = 'default'; // Trả lại trạng thái bình thường
+            }
         }
     });
 });
