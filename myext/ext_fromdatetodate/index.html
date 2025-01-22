@@ -64,6 +64,37 @@
                 font-size: 16px;
             }
         }
+
+        /* Ẩn nội dung nút khi đang loading */
+        #refreshButton.loading span {
+            visibility: hidden;
+        }
+
+        /* Biểu tượng loading */
+        #refreshButton.loading:before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin-top: -10px;
+            margin-left: -10px;
+            border: 2px solid #ccc;
+            border-top-color: #007bff; /* Màu chính của mũi tên xoay */
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Hiệu ứng xoay tròn */
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>

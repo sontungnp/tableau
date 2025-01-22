@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function updateAndRefreshData() {
             setCursorLoading(true); // Hiển thị con trỏ loading
+            setLoading(true); // Bắt đầu loading
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             // Chuyển giá trị sang định dạng yyyy-mm-dd
@@ -45,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }).catch(err => {
                 setCursorLoading(false); // Tắt con trỏ loading nếu không tìm thấy tham số
+                setLoading(false); // Kết thúc loading
                 console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String).");
                 alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String)");
                 // console.error("P_Fd_Td = " + fromDateToDate);
@@ -96,6 +98,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.body.style.cursor = 'wait'; // Thay đổi con trỏ chuột sang "loading"
             } else {
                 document.body.style.cursor = 'default'; // Trả lại trạng thái bình thường
+            }
+        }
+
+        // Thêm trạng thái loading
+        function setLoading(isLoading) {
+            if (isLoading) {
+                refreshButton.classList.add('loading'); // Thêm class loading
+                refreshButton.disabled = true; // Vô hiệu hóa nút khi đang loading
+            } else {
+                refreshButton.classList.remove('loading'); // Bỏ class loading
+                refreshButton.disabled = false; // Kích hoạt lại nút
             }
         }
     });
