@@ -40,6 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Cập nhật P_FD bằng giá trị của fromDateToDate
                 fdtdParam.changeValueAsync(fromDateToDate).then(() => {
                     console.log('thay doi tham so P_Fd_Td');
+                    showLoadingIndicator();
+                    monitorDataSource(); // Lắng nghe sự kiện datasource
                 });
             }).catch(err => {
                 console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String).");
@@ -87,5 +89,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         });
+
+        function showLoadingIndicator() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+        
+        function hideLoadingIndicator() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function monitorDataSource() {
+            tableau.extensions.dashboardContent.dashboard.getDataSourcesAsync().then((dataSources) => {
+                dataSources.forEach((dataSource) => {
+                    dataSource.addEventListener(tableau.TableauEventType.DataChanged, () => {
+                        console.log("Data source finished loading.");
+                        hideLoadingIndicator();
+                    });
+                });
+            });
+        }
     });
 });
