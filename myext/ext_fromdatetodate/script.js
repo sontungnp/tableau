@@ -3,9 +3,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         const dashboard = tableau.extensions.dashboardContent.dashboard;
-        const worksheets = dashboard.worksheets;
-        const parameterName = "P_Fd_Td"; // Replace with your parameter's name
-        const defaultValue = "1000-01-01,1000-01-01"; // Replace with your default value
 
         // init();
 
@@ -26,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function updateAndRefreshData() {
-            setCursorLoading(true); // Hiển thị con trỏ loading
             setLoading(true); // Bắt đầu loading
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
@@ -42,11 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Cập nhật P_FD bằng giá trị của fromDateToDate
                 fdtdParam.changeValueAsync(fromDateToDate).then(() => {
                     console.log('thay doi tham so P_Fd_Td');
-                    setCursorLoading(false); // Tắt con trỏ loading sau khi hoàn thành
                     setLoading(false); // Kết thúc loading
                 });
             }).catch(err => {
-                setCursorLoading(false); // Tắt con trỏ loading nếu không tìm thấy tham số
                 setLoading(false); // Kết thúc loading
                 console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String).");
                 alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String)");
@@ -78,36 +72,14 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // Register the unload event to reset the parameter
-        window.addEventListener("beforeunload", () => {
-            const dashboard = tableau.extensions.dashboardContent.dashboard;
-
-            // Find and set the parameter
-            dashboard.findParameterAsync(parameterName).then((parameter) => {
-                if (parameter) {
-                    parameter.changeValueAsync(defaultValue).then(() => {
-                        console.log(`Parameter ${parameterName} reset to default: ${defaultValue}`);
-                    });
-                } else {
-                    console.error(`Parameter ${parameterName} not found`);
-                }
-            });
-        });
-
-        function setCursorLoading(isLoading) {
-            if (isLoading) {
-                document.body.style.cursor = 'wait'; // Thay đổi con trỏ chuột sang "loading"
-            } else {
-                document.body.style.cursor = 'default'; // Trả lại trạng thái bình thường
-            }
-        }
-
         // Thêm trạng thái loading
         function setLoading(isLoading) {
             if (isLoading) {
+                document.body.style.cursor = 'wait'; // Thay đổi con trỏ chuột sang "loading"
                 refreshButton.classList.add('loading'); // Thêm class loading
                 refreshButton.disabled = true; // Vô hiệu hóa nút khi đang loading
             } else {
+                document.body.style.cursor = 'default'; // Trả lại trạng thái bình thường
                 refreshButton.classList.remove('loading'); // Bỏ class loading
                 refreshButton.disabled = false; // Kích hoạt lại nút
             }
