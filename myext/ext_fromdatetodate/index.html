@@ -10,7 +10,7 @@
             margin: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: start;
             height: 100vh; /* Chiều cao 100% cửa sổ */
             background-color: #0758B8; /* Màu nền */
             font-family: Arial, sans-serif;
@@ -27,7 +27,7 @@
         .container input[type="date"],
         .container button {
             flex: 1; /* Chia đều không gian cho các phần tử */
-            padding: 6px;
+            padding: 8px;
             font-size: 16px;
             border: none;
             border-radius: 5px;
@@ -49,6 +49,7 @@
             background-color: #fff;
             color: #000;
             overflow: hidden; /* Đảm bảo biểu tượng loading không vượt ra ngoài nút */
+            margin-top: 4px;
         }
 
         .container button.loading span {
@@ -94,12 +95,46 @@
                 font-size: 16px;
             }
         }
+
+        .input-group {
+            display: flex;
+            flex: 2; 
+            flex-direction: column;
+            gap: 1px; /* Khoảng cách giữa tiêu đề và ô nhập */
+        }
+
+        .input-group label {
+            font-family: "Tableau Medium", Tableau, Arial, sans-serif;
+            /* color: #ffffff;  */
+            font-size: 12px;
+            line-height: 18px;
+            color: rgb(255, 255, 255); /* Màu chữ */
+            font-weight: bold;
+            font-style: normal;
+            text-decoration: none;
+        }
+
+        .input-group input[type="date"] {
+            padding: 1px;
+            font-size: 13px;
+            border: none;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <input type="date" id="startDate" placeholder="Từ ngày">
-        <input type="date" id="endDate" placeholder="Đến ngày">
+        <div class="input-group">
+            <label for="startDate">From date</label>
+            <input type="date" id="startDate">
+        </div>
+        <div class="input-group">
+            <label for="endDate">To date</label>
+            <input type="date" id="endDate">
+        </div>
         <button id="refreshButton">Run</button>
     </div>
 </body>
