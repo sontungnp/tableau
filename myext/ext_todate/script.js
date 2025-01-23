@@ -11,8 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
         function updateAndRefreshData() {
             setLoading(true); // Bắt đầu loading
             const endDate = document.getElementById('endDate').value;
-            // Chuyển giá trị sang định dạng yyyy-mm-dd
-            const formattedEndDate = new Date(endDate).toISOString().split('T')[0];
+            // Chuyển giá trị sang định dạng yyyymmdd
+            const date = new Date(endDate);
+            const formattedEndDate = date.getFullYear().toString() +
+                (date.getMonth() + 1).toString().padStart(2, '0') +
+                date.getDate().toString().padStart(2, '0');
             // Nối hai giá trị với dấu phẩy
             const fromDateToDate = `${formattedEndDate}`;
 
