@@ -41,7 +41,7 @@
             flex: 2; /* Ô nhập liệu chiếm 2 phần */
             background-color: #fff;
             color: #000;
-            min-width: 20px;
+            min-width: 10px;
         }
 
         .container button {
@@ -84,15 +84,28 @@
             background-color: #ddd;
         }
 
-        /* Khi chiều rộng container dưới 400px, ẩn chữ "Reload" */
+        /* Khi chiều rộng container dưới 400px, ẩn chữ "Go..." */
         @media (max-width: 400px) {
             #refreshButton {
                 font-size: 0; /* Ẩn chữ */
             }
 
             #refreshButton::before {
+                content: "▶"; /* Thay bằng biểu tượng chạy */
+                font-size: 16px;
+            }
+
+            #resetButton {
+                font-size: 0; /* Ẩn chữ */
+            }
+
+            #resetButton::before {
                 content: "⟳"; /* Thay bằng biểu tượng */
                 font-size: 16px;
+            }
+
+            .input-group label {
+                display: none; /* Ẩn nhãn From date và To date */
             }
         }
 
@@ -101,6 +114,7 @@
             flex: 2; 
             flex-direction: column;
             gap: 1px; /* Khoảng cách giữa tiêu đề và ô nhập */
+            min-width: 10px;
         }
 
         .input-group label {
@@ -112,6 +126,7 @@
             font-weight: bold;
             font-style: normal;
             text-decoration: none;
+            min-width: 10px;
         }
 
         .input-group input[type="date"] {
@@ -122,6 +137,7 @@
             background-color: #fff;
             color: #000;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 10px;
         }
     </style>
 </head>
@@ -131,7 +147,7 @@
             <label for="endDate">To date</label>
             <input type="date" id="endDate">
         </div>
-        <button id="refreshButton">Run</button>
+        <button id="refreshButton">Go...</button>
         <button id="resetButton">Reset</button>
     </div>
 </body>
