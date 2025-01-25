@@ -8,6 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
             updateAndRefreshData();
         });
 
+        document.getElementById("resetButton").addEventListener("click", () => {
+            resetData();
+        });
+
         function updateAndRefreshData() {
             setLoading(true); // Bắt đầu loading
             const endDate = document.getElementById('endDate').value;
@@ -19,6 +23,29 @@ document.addEventListener("DOMContentLoaded", () => {
             // Nối hai giá trị với dấu phẩy
             const fromDateToDate = `${formattedEndDate}`;
 
+            // Get the parameters P_Fd_Td
+            dashboard.getParametersAsync().then(parameters => {
+                const fdtdParam = parameters.find(param => param.name === 'P_Fd_Td');
+                // Cập nhật P_FD bằng giá trị của fromDateToDate
+                fdtdParam.changeValueAsync(fromDateToDate).then(() => {
+                    console.log('thay doi tham so P_Fd_Td');
+                    setLoading(false); // Kết thúc loading
+                });
+            }).catch(err => {
+                setLoading(false); // Kết thúc loading
+                console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String).");
+                alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String)");
+                // console.error("P_Fd_Td = " + fromDateToDate);
+                // alert("P_Fd_Td = " + fromDateToDate);
+                console.error(err);
+            });
+        }
+
+        function resetData() {
+            document.getElementById('startDate').value = null;
+            document.getElementById('endDate').value = null;
+            
+            const fromDateToDate = '1000-01-01,1000-01-01';
             // Get the parameters P_Fd_Td
             dashboard.getParametersAsync().then(parameters => {
                 const fdtdParam = parameters.find(param => param.name === 'P_Fd_Td');

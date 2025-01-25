@@ -69,8 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }).catch(err => {
                 setLoading(false); // Kết thúc loading
-                console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String).");
-                alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_From_Date (date), P_To_Date (Date), P_Fd_Td (String)");
+                console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String).");
+                alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String)");
                 // console.error("P_Fd_Td = " + fromDateToDate);
                 // alert("P_Fd_Td = " + fromDateToDate);
                 console.error(err);
