@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function resetData() {
+            setLoading(false); // Kết thúc loading
             document.getElementById('startDate').value = null;
             document.getElementById('endDate').value = null;
             
@@ -111,5 +112,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 refreshButton.disabled = false; // Kích hoạt lại nút
             }
         }
+    }).catch(err => {
+        console.error("Đã có lỗi xảy ra.");
+        setLoading(false); // Kết thúc loading
     });
 });
