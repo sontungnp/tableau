@@ -43,10 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function resetData() {
             setLoading(false); // Kết thúc loading
-            document.getElementById('startDate').value = null;
             document.getElementById('endDate').value = null;
             
-            const fromDateToDate = '1000-01-01,1000-01-01';
+            const fromDateToDate = 10000101;
             // Get the parameters P_Fd_Td
             dashboard.getParametersAsync().then(parameters => {
                 const fdtdParam = parameters.find(param => param.name === 'P_Fd_Td');
