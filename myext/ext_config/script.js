@@ -3,7 +3,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         let selectedNodes = new Set();
-
+        
         document.addEventListener("DOMContentLoaded", function () {
             tableau.extensions.initializeAsync().then(() => {
                 fetchData();
@@ -116,5 +116,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
             worksheet.applyFilterAsync("Category", Array.from(selectedNodes), tableau.FilterUpdateType.Replace);
         });
+
+        document.getElementById("search-box").addEventListener("focus", function () {
+            document.getElementById("tree-container").style.display = "block";
+        });
+
+        function filterTree() {
+            let searchText = document.getElementById("search-box").value.toLowerCase();
+            document.querySelectorAll(".node").forEach(node => {
+                let text = node.textContent.toLowerCase();
+                node.style.display = text.includes(searchText) ? "flex" : "none";
+            });
+        }
     });
 });
