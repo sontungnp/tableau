@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
             worksheet.getSummaryDataAsync().then(data => {
                 const treeData = transformDataToTree(data);
-                renderTree(treeData);
+                renderTree(treeData, document.getElementById("tree-container"));
             });
         }
 
@@ -36,33 +36,43 @@ document.addEventListener("DOMContentLoaded", () => {
             return Object.values(nodes).find(node => !node.parentId) || [];
         }
 
-        function renderTree(treeData) {
-            const container = document.getElementById("tree-container");
-            container.innerHTML = createTreeHtml(treeData);
+        function renderTree(node, container) {
+            if (!node) return;
+            let div = document.createElement("div");
+            div.classList.add("node");
+            div.innerHTML = `<input type='checkbox' data-name='${node.name}'>${node.name}`;
+            container.appendChild(div);
+            
+            let checkbox = div.querySelector("input");
+            checkbox.addEventListener("change", function () {
+                toggleChildren(checkbox, node.children, this.checked);
+                updateSelectedNodes();
+            });
+            
+            if (node.children.length) {
+                let childrenContainer = document.createElement("div");
+                childrenContainer.classList.add("children");
+                container.appendChild(childrenContainer);
+                node.children.forEach(child => renderTree(child, childrenContainer));
+            }
+        }
 
-            document.querySelectorAll(".node input").forEach(checkbox => {
-                checkbox.addEventListener("change", function () {
-                    if (this.checked) {
-                        selectedNodes.add(this.getAttribute("data-name"));
-                    } else {
-                        selectedNodes.delete(this.getAttribute("data-name"));
-                    }
-                    document.getElementById("apply-filter").disabled = selectedNodes.size === 0;
-                });
+        function toggleChildren(parentCheckbox, children, checked) {
+            children.forEach(child => {
+                let checkbox = document.querySelector(`input[data-name='${child.name}']`);
+                if (checkbox) {
+                    checkbox.checked = checked;
+                    toggleChildren(checkbox, child.children, checked);
+                }
             });
         }
 
-        function createTreeHtml(node) {
-            if (!node) return "";
-            let html = `<div class='node'><input type='checkbox' data-name='${node.name}'>${node.name}</div>`;
-            if (node.children.length) {
-                html += `<div style='margin-left:20px;'>`;
-                node.children.forEach(child => {
-                    html += createTreeHtml(child);
-                });
-                html += `</div>`;
-            }
-            return html;
+        function updateSelectedNodes() {
+            selectedNodes.clear();
+            document.querySelectorAll(".node input:checked").forEach(checkbox => {
+                selectedNodes.add(checkbox.getAttribute("data-name"));
+            });
+            document.getElementById("apply-filter").disabled = selectedNodes.size === 0;
         }
 
         document.getElementById("apply-filter").addEventListener("click", function () {
