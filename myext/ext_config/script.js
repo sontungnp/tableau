@@ -2,7 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
-        let selectedNode = null;
+        let selectedNodes = new Set();
 
         document.addEventListener("DOMContentLoaded", function () {
             tableau.extensions.initializeAsync().then(() => {
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let checkbox = div.querySelector("input");
             checkbox.addEventListener("change", function () {
                 toggleChildren(node, this.checked);
-                toggleParent(node);
+                updateParentState(node.parent);
                 updateSelectedNodes();
             });
             
@@ -64,19 +64,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 let checkbox = document.querySelector(`input[data-id='${child.id}']`);
                 if (checkbox) {
                     checkbox.checked = checked;
+                    checkbox.indeterminate = false;
                     toggleChildren(child, checked);
                 }
             });
         }
 
-        function toggleParent(node) {
-            if (!node.parent) return;
-            let parentCheckbox = document.querySelector(`input[data-id='${node.parent.id}']`);
-            if (parentCheckbox) {
-                let allChecked = node.parent.children.every(child => document.querySelector(`input[data-id='${child.id}']`).checked);
-                parentCheckbox.checked = allChecked;
-                toggleParent(node.parent);
-            }
+        function updateParentState(node) {
+            if (!node) return;
+            let parentCheckbox = document.querySelector(`input[data-id='${node.id}']`);
+            let childCheckboxes = node.children.map(child => document.querySelector(`input[data-id='${child.id}']`));
+            
+            let allChecked = childCheckboxes.every(checkbox => checkbox.checked);
+            let someChecked = childCheckboxes.some(checkbox => checkbox.checked || checkbox.indeterminate);
+            
+            parentCheckbox.checked = allChecked;
+            parentCheckbox.indeterminate = !allChecked && someChecked;
+            
+            updateParentState(node.parent);
         }
 
         function updateSelectedNodes() {
