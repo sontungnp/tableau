@@ -45,7 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
             let toggle = document.createElement("span");
             toggle.classList.add("toggle");
             toggle.textContent = node.children.length ? "▶" : "";
-            toggle.addEventListener("click", function () {
+            toggle.addEventListener("click", function (event) {
+                event.stopPropagation();
                 let parent = this.parentElement;
                 parent.classList.toggle("expanded");
                 this.textContent = parent.classList.contains("expanded") ? "▼" : "▶";
