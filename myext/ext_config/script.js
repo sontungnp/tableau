@@ -48,8 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {
             toggle.addEventListener("click", function (event) {
                 event.stopPropagation();
                 let parent = this.parentElement;
-                parent.classList.toggle("expanded");
-                this.textContent = parent.classList.contains("expanded") ? "▼" : "▶";
+                let childrenContainer = parent.nextElementSibling;
+                if (childrenContainer) {
+                    let isExpanded = childrenContainer.style.display === "block";
+                    childrenContainer.style.display = isExpanded ? "none" : "block";
+                    this.textContent = isExpanded ? "▶" : "▼";
+                }
             });
             
             let checkbox = document.createElement("input");
