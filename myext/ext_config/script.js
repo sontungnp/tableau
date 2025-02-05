@@ -40,17 +40,21 @@ document.addEventListener("DOMContentLoaded", () => {
             const container = document.getElementById("tree-container");
             container.innerHTML = createTreeHtml(treeData);
 
-            document.querySelectorAll(".node").forEach(node => {
-                node.addEventListener("click", function () {
-                    selectedNode = this.getAttribute("data-name");
-                    document.getElementById("apply-filter").disabled = false;
+            document.querySelectorAll(".node input").forEach(checkbox => {
+                checkbox.addEventListener("change", function () {
+                    if (this.checked) {
+                        selectedNodes.add(this.getAttribute("data-name"));
+                    } else {
+                        selectedNodes.delete(this.getAttribute("data-name"));
+                    }
+                    document.getElementById("apply-filter").disabled = selectedNodes.size === 0;
                 });
             });
         }
 
         function createTreeHtml(node) {
             if (!node) return "";
-            let html = `<div class='node' data-name='${node.name}'>${node.name}</div>`;
+            let html = `<div class='node'><input type='checkbox' data-name='${node.name}'>${node.name}</div>`;
             if (node.children.length) {
                 html += `<div style='margin-left:20px;'>`;
                 node.children.forEach(child => {
@@ -62,9 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         document.getElementById("apply-filter").addEventListener("click", function () {
-            if (!selectedNode) return;
+            if (selectedNodes.size === 0) return;
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
-            worksheet.applyFilterAsync("Category", selectedNode, tableau.FilterUpdateType.Replace);
+            worksheet.applyFilterAsync("Category", Array.from(selectedNodes), tableau.FilterUpdateType.Replace);
         });
     });
 });
