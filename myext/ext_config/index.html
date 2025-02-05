@@ -20,11 +20,18 @@
             display: flex;
             align-items: center;
         }
-        .node input {
+        .toggle {
             margin-right: 5px;
+            cursor: pointer;
+            width: 16px;
+            text-align: center;
         }
         .children {
             margin-left: 20px;
+            display: none;
+        }
+        .expanded > .children {
+            display: block;
         }
     </style>
 </head>

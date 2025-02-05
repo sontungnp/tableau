@@ -41,15 +41,29 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!node) return;
             let div = document.createElement("div");
             div.classList.add("node");
-            div.innerHTML = `<input type='checkbox' data-id='${node.id}'>${node.name}`;
-            container.appendChild(div);
             
-            let checkbox = div.querySelector("input");
+            let toggle = document.createElement("span");
+            toggle.classList.add("toggle");
+            toggle.textContent = node.children.length ? "▶" : "";
+            toggle.addEventListener("click", function () {
+                let parent = this.parentElement;
+                parent.classList.toggle("expanded");
+                this.textContent = parent.classList.contains("expanded") ? "▼" : "▶";
+            });
+            
+            let checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.dataset.id = node.id;
             checkbox.addEventListener("change", function () {
                 toggleChildren(node, this.checked);
                 updateParentState(node.parent);
                 updateSelectedNodes();
             });
+            
+            div.appendChild(toggle);
+            div.appendChild(checkbox);
+            div.appendChild(document.createTextNode(node.name));
+            container.appendChild(div);
             
             if (node.children.length) {
                 let childrenContainer = document.createElement("div");
