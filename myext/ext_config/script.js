@@ -27,25 +27,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 const parentId = row[1].value;
                 const label = row[2].value;
 
-                nodes[id] = nodes[id] || { id, name: label, children: [] };
+                nodes[id] = nodes[id] || { id, name: label, children: [], parent: null };
                 if (parentId !== null) {
-                    nodes[parentId] = nodes[parentId] || { id: parentId, name: "", children: [] };
+                    nodes[parentId] = nodes[parentId] || { id: parentId, name: "", children: [], parent: null };
                     nodes[parentId].children.push(nodes[id]);
+                    nodes[id].parent = nodes[parentId];
                 }
             });
-            return Object.values(nodes).find(node => !node.parentId) || [];
+            return Object.values(nodes).find(node => !node.parent) || [];
         }
 
         function renderTree(node, container) {
             if (!node) return;
             let div = document.createElement("div");
             div.classList.add("node");
-            div.innerHTML = `<input type='checkbox' data-name='${node.name}'>${node.name}`;
+            div.innerHTML = `<input type='checkbox' data-id='${node.id}'>${node.name}`;
             container.appendChild(div);
             
             let checkbox = div.querySelector("input");
             checkbox.addEventListener("change", function () {
-                toggleChildren(checkbox, node.children, this.checked);
+                toggleChildren(node, this.checked);
+                toggleParent(node);
                 updateSelectedNodes();
             });
             
@@ -57,20 +59,30 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        function toggleChildren(parentCheckbox, children, checked) {
-            children.forEach(child => {
-                let checkbox = document.querySelector(`input[data-name='${child.name}']`);
+        function toggleChildren(node, checked) {
+            node.children.forEach(child => {
+                let checkbox = document.querySelector(`input[data-id='${child.id}']`);
                 if (checkbox) {
                     checkbox.checked = checked;
-                    toggleChildren(checkbox, child.children, checked);
+                    toggleChildren(child, checked);
                 }
             });
+        }
+
+        function toggleParent(node) {
+            if (!node.parent) return;
+            let parentCheckbox = document.querySelector(`input[data-id='${node.parent.id}']`);
+            if (parentCheckbox) {
+                let allChecked = node.parent.children.every(child => document.querySelector(`input[data-id='${child.id}']`).checked);
+                parentCheckbox.checked = allChecked;
+                toggleParent(node.parent);
+            }
         }
 
         function updateSelectedNodes() {
             selectedNodes.clear();
             document.querySelectorAll(".node input:checked").forEach(checkbox => {
-                selectedNodes.add(checkbox.getAttribute("data-name"));
+                selectedNodes.add(checkbox.getAttribute("data-id"));
             });
             document.getElementById("apply-filter").disabled = selectedNodes.size === 0;
         }
