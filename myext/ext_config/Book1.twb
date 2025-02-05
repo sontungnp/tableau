@@ -3,11 +3,15 @@
 <!-- build 20243.24.1010.1014                               -->
 <workbook original-version='18.1' source-build='2024.3.0 (20243.24.1010.1014)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
   <document-format-change-manifest>
+    <AccessibleZoneTabOrder />
     <AnimationOnByDefault />
+    <AutoCreateAndUpdateDSDPhoneLayouts />
+    <Extensions />
     <MarkAnimation />
     <ObjectModelEncapsulateLegacy />
     <ObjectModelTableType />
     <SchemaViewerObjectModel />
+    <SetMembershipControl />
     <SheetIdentifierTracking />
     <WindowsPersistSimpleIdentifiers />
   </document-format-change-manifest>
@@ -153,8 +157,88 @@
       <simple-id uuid='{4EA9F8F6-3050-4A1C-961B-4BFDBFD77ACF}' />
     </worksheet>
   </worksheets>
+  <dashboards>
+    <dashboard enable-sort-zone-taborder='true' name='Dashboard 1'>
+      <style />
+      <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
+      <zones>
+        <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
+          <zone h='49000' id='3' name='Sheet 1' w='98400' x='800' y='50000'>
+            <zone-style>
+              <format attr='border-color' value='#000000' />
+              <format attr='border-style' value='none' />
+              <format attr='border-width' value='0' />
+              <format attr='margin' value='4' />
+            </zone-style>
+          </zone>
+          <zone forceUpdate='true' h='49000' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='98400' x='800' y='1000'>
+            <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_config/' extension-version='0.1.0' instance-id='FF38E883ACB74E68975063BD4AE61C29'>
+              <instance-settings />
+              <type-settings>
+                <dashboard />
+              </type-settings>
+            </add-in>
+            <zone-style>
+              <format attr='border-color' value='#000000' />
+              <format attr='border-style' value='none' />
+              <format attr='border-width' value='0' />
+              <format attr='margin' value='4' />
+            </zone-style>
+          </zone>
+          <zone-style>
+            <format attr='border-color' value='#000000' />
+            <format attr='border-style' value='none' />
+            <format attr='border-width' value='0' />
+            <format attr='margin' value='8' />
+          </zone-style>
+        </zone>
+      </zones>
+      <devicelayouts>
+        <devicelayout auto-generated='true' name='Phone'>
+          <size maxheight='700' minheight='700' sizing-mode='vscroll' />
+          <zones>
+            <zone h='100000' id='7' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98000' id='6' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+                <zone forceUpdate='true' h='49000' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='98400' x='800' y='1000'>
+                  <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_config/' extension-version='0.1.0' instance-id='FF38E883ACB74E68975063BD4AE61C29'>
+                    <instance-settings />
+                    <type-settings>
+                      <dashboard />
+                    </type-settings>
+                  </add-in>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone fixed-size='280' h='49000' id='3' is-fixed='true' name='Sheet 1' w='98400' x='800' y='50000'>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+              </zone>
+              <zone-style>
+                <format attr='border-color' value='#000000' />
+                <format attr='border-style' value='none' />
+                <format attr='border-width' value='0' />
+                <format attr='margin' value='8' />
+              </zone-style>
+            </zone>
+          </zones>
+        </devicelayout>
+      </devicelayouts>
+      <simple-id uuid='{502AF314-76A7-4AEC-9E61-6FA0221E62C4}' />
+    </dashboard>
+  </dashboards>
   <windows source-height='30'>
-    <window class='worksheet' maximized='true' name='Sheet 1'>
+    <window class='worksheet' name='Sheet 1'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -186,8 +270,64 @@
       </viewpoint>
       <simple-id uuid='{B76CCEF9-ED99-4097-809B-57EBF674D1D2}' />
     </window>
+    <window class='dashboard' maximized='true' name='Dashboard 1'>
+      <viewpoints>
+        <viewpoint name='Sheet 1' />
+      </viewpoints>
+      <active id='5' />
+      <simple-id uuid='{FDAF6D3E-C107-412E-A96E-4AA8592DC86B}' />
+    </window>
   </windows>
   <thumbnails>
+    <thumbnail height='192' name='Dashboard 1' width='192'>
+      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
+    </thumbnail>
     <thumbnail height='124' name='Sheet 1' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAAB8CAYAAAA/1L8JAAAACXBIWXMAAA7DAAAOwwHHb6hk
       AAAN7klEQVR4nO3df1xUdb7H8VcNjCRBAob8EDUSRVgMZfy54GquFP7ecDNlN2u1KO6qaepq
@@ -259,4 +399,24 @@
       DiBU7f8BghK04XWbqW8AAAAASUVORK5CYII=
     </thumbnail>
   </thumbnails>
+  <referenced-extensions>
+    <referenced-extension>
+      <manifest manifest-version='0.1'>
+        <dashboard-extension extension-version='0.1.0' id='com.example.extensions.name'>
+          <default-locale>en_US</default-locale>
+          <name resource-id='name' />
+          <description>Extension Description</description>
+          <author email='USER@example.com' name='USERNAME' organization='MyCo' website='https://www.example.com' />
+          <min-api-version>1.0</min-api-version>
+          <source-location>
+            <url>https://sontungnp.github.io/tableau/myext/ext_config/</url>
+          </source-location>
+          <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAlhJREFUOI2Nkt9vy1EYh5/3bbsvRSySCZbIxI+ZCKsN2TKtSFyIrV2WuRCJuBiJWxfuxCVXbvwFgiEtposgLFJElnbU1SxIZIIRJDKTrdu+53Uhra4mce7Oe57Pcz7JOULFisViwZ+29LAzOSjQYDgz1ZcCvWuXV11MJpN+OS/lm6179teqH0yDqxPTCyKSA8DcDsyOmOprnCaeP7459pdgy969i0LTC3IO/RQMyoHcQN+3cnljW3dNIFC47qDaK3g7BwdTkwBaBELT4ZPOUVWgKl4ZBnjxJPUlMDnTDrp0pmr6RHFeEjjcUUXPDGeSEwDN0Xg8sivxMhJNjGzbHd8PkM3eHRfkrBM5NkcQaY2vUnTlrDIA0NoaX+KLXFFlowr14tvVpqb2MICzmQcKqxvbumv+NAhZGCCIPwEw6QWXKYRL/VUXO0+rAUJiPwAk5MIlgVfwPjjHLCL1APmHN94ZdqeYN+NW/mn6I4BvwQYchcLnwFhJMDiYmlRxAzjpKWZkYkUCcZ2I61wi37tLbYyjiN0fHk5Oz3nGSLSzBbNHCF35R7f6K1/hN9PRhek11FrymfQQQKB4+Gl05P2qNRtmETlXW7e+b2z01dfycGNbfFMAbqNyKp9Jp4rzOT8RYFs0njJkc2iqsCObvTsOsDWWqA5C1uFy+Uz/oXJeKwVT4h0RmPUXhi79vuC0Ku6yOffTK3g9lfxfDQAisY516sg5kfOCiJk7HoLt2cf9b/9LANAc7dznm98PagG1fUOZ9IP5uMB8Q4CPoyNvausapkTt3rNMuvdf3C/o6+czhtdwmwAAAABJRU5ErkJggg==</icon>
+        </dashboard-extension>
+      </manifest>
+      <referenced-views>
+        <referenced-view instances='1' viewId='Dashboard 1' />
+      </referenced-views>
+    </referenced-extension>
+  </referenced-extensions>
 </workbook>

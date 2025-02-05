@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
+        fetchData();
+
         function fetchData() {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
             worksheet.getSummaryDataAsync().then(data => {
