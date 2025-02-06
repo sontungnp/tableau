@@ -1,0 +1,425 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20243.24.1010.1014                               -->
+<workbook original-version='18.1' source-build='2024.3.0 (20243.24.1010.1014)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <AccessibleZoneTabOrder />
+    <AnimationOnByDefault />
+    <AutoCreateAndUpdateDSDPhoneLayouts />
+    <Extensions />
+    <IntuitiveSorting />
+    <IntuitiveSorting_SP2 />
+    <MarkAnimation />
+    <ObjectModelEncapsulateLegacy />
+    <ObjectModelTableType />
+    <SchemaViewerObjectModel />
+    <SetMembershipControl />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource caption='Sheet1 (dstest)' inline='true' name='federated.017b7zr1fv1l2q19k0d410dnu9u6' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='dstest' name='excel-direct.00lz0nc0dm4cr71afubp60vfq8lf'>
+            <connection class='excel-direct' cleaning='no' compat='no' dataRefreshTime='' filename='D:/PROJECTS/OUT_PROJECT/FIS/GIT/tableau/myext/ext_config/dstest.xlsx' interpretationMode='0' password='' server='' validate='no' />
+          </named-connection>
+        </named-connections>
+        <relation connection='excel-direct.00lz0nc0dm4cr71afubp60vfq8lf' name='Sheet1' table='[Sheet1$]' type='table'>
+          <columns gridOrigin='A1:C6:no:A1:C6:0' header='yes' outcome='6'>
+            <column datatype='string' name='id' ordinal='0' />
+            <column datatype='string' name='parentid' ordinal='1' />
+            <column datatype='string' name='lable' ordinal='2' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[Sheet1]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='context'>0</attribute>
+              <attribute datatype='string' name='gridOrigin'>&quot;A1:C6:no:A1:C6:0&quot;</attribute>
+              <attribute datatype='boolean' name='header'>true</attribute>
+              <attribute datatype='integer' name='outcome'>6</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>id</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[id]</local-name>
+            <parent-name>[Sheet1]</parent-name>
+            <remote-alias>id</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+            <object-id>[Sheet1_E07D0D5A6EE54C4F857BBECC2F52B82F]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>parentid</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[parentid]</local-name>
+            <parent-name>[Sheet1]</parent-name>
+            <remote-alias>parentid</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+            <object-id>[Sheet1_E07D0D5A6EE54C4F857BBECC2F52B82F]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>lable</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[lable]</local-name>
+            <parent-name>[Sheet1]</parent-name>
+            <remote-alias>lable</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+            <object-id>[Sheet1_E07D0D5A6EE54C4F857BBECC2F52B82F]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column aggregation='Sum' caption='ord' datatype='integer' name='[Calculation_1014717334930796544]' role='dimension' type='ordinal'>
+        <calculation class='tableau' formula='if [id]=&apos;vn&apos; THEN 1 ELSEIF [id]=&apos;hn&apos; THEN 2 ELSEIF [id]=&apos;hcm&apos; THEN 3 ELSEIF [id]=&apos;q1&apos; THEN 4 ELSEIF  [id]=&apos;q2&apos; THEN 5 ELSE 0 END' />
+      </column>
+      <column caption='Sheet1' datatype='table' name='[__tableau_internal_object_id__].[Sheet1_E07D0D5A6EE54C4F857BBECC2F52B82F]' role='measure' type='quantitative' />
+      <column caption='Id' datatype='string' name='[id]' role='dimension' type='nominal' />
+      <column caption='Lable' datatype='string' name='[lable]' role='dimension' type='nominal' />
+      <column caption='Parentid' datatype='string' name='[parentid]' role='dimension' type='nominal' />
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='Sheet1' id='Sheet1_E07D0D5A6EE54C4F857BBECC2F52B82F'>
+            <properties context=''>
+              <relation connection='excel-direct.00lz0nc0dm4cr71afubp60vfq8lf' name='Sheet1' table='[Sheet1$]' type='table'>
+                <columns gridOrigin='A1:C6:no:A1:C6:0' header='yes' outcome='6'>
+                  <column datatype='string' name='id' ordinal='0' />
+                  <column datatype='string' name='parentid' ordinal='1' />
+                  <column datatype='string' name='lable' ordinal='2' />
+                </columns>
+              </relation>
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Sheet 1'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Sheet1 (dstest)' name='federated.017b7zr1fv1l2q19k0d410dnu9u6' />
+          </datasources>
+          <datasource-dependencies datasource='federated.017b7zr1fv1l2q19k0d410dnu9u6'>
+            <column aggregation='Sum' caption='ord' datatype='integer' name='[Calculation_1014717334930796544]' role='dimension' type='ordinal'>
+              <calculation class='tableau' formula='if [id]=&apos;vn&apos; THEN 1 ELSEIF [id]=&apos;hn&apos; THEN 2 ELSEIF [id]=&apos;hcm&apos; THEN 3 ELSEIF [id]=&apos;q1&apos; THEN 4 ELSEIF  [id]=&apos;q2&apos; THEN 5 ELSE 0 END' />
+            </column>
+            <column caption='Id' datatype='string' name='[id]' role='dimension' type='nominal' />
+            <column caption='Lable' datatype='string' name='[lable]' role='dimension' type='nominal' />
+            <column-instance column='[Calculation_1014717334930796544]' derivation='None' name='[none:Calculation_1014717334930796544:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[id]' derivation='None' name='[none:id:nk]' pivot='key' type='nominal' />
+            <column-instance column='[lable]' derivation='None' name='[none:lable:nk]' pivot='key' type='nominal' />
+            <column-instance column='[parentid]' derivation='None' name='[none:parentid:nk]' pivot='key' type='nominal' />
+            <column caption='Parentid' datatype='string' name='[parentid]' role='dimension' type='nominal' />
+          </datasource-dependencies>
+          <shelf-sorts>
+            <shelf-sort-v2 dimension-to-sort='[federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:id:nk]' direction='ASC' measure-to-sort-by='[federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:Calculation_1014717334930796544:ok]' shelf='rows' />
+          </shelf-sorts>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+        </panes>
+        <rows>([federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:id:nk] / ([federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:parentid:nk] / ([federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:lable:nk] / [federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:Calculation_1014717334930796544:ok])))</rows>
+        <cols />
+      </table>
+      <simple-id uuid='{4EA9F8F6-3050-4A1C-961B-4BFDBFD77ACF}' />
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard enable-sort-zone-taborder='true' name='Dashboard 1'>
+      <style />
+      <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
+      <zones>
+        <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
+          <zone h='78875' id='3' name='Sheet 1' w='98400' x='800' y='20125'>
+            <zone-style>
+              <format attr='border-color' value='#000000' />
+              <format attr='border-style' value='none' />
+              <format attr='border-width' value='0' />
+              <format attr='margin' value='4' />
+            </zone-style>
+          </zone>
+          <zone forceUpdate='true' h='19125' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='98400' x='800' y='1000'>
+            <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_config/' extension-version='0.1.0' instance-id='FF38E883ACB74E68975063BD4AE61C29'>
+              <instance-settings />
+              <type-settings>
+                <dashboard />
+              </type-settings>
+            </add-in>
+            <zone-style>
+              <format attr='border-color' value='#000000' />
+              <format attr='border-style' value='none' />
+              <format attr='border-width' value='0' />
+              <format attr='margin' value='4' />
+            </zone-style>
+          </zone>
+          <zone-style>
+            <format attr='border-color' value='#000000' />
+            <format attr='border-style' value='none' />
+            <format attr='border-width' value='0' />
+            <format attr='margin' value='8' />
+          </zone-style>
+        </zone>
+      </zones>
+      <devicelayouts>
+        <devicelayout auto-generated='true' name='Phone'>
+          <size maxheight='700' minheight='700' sizing-mode='vscroll' />
+          <zones>
+            <zone h='100000' id='15' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98000' id='14' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+                <zone forceUpdate='true' h='19125' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='98400' x='800' y='1000'>
+                  <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_config/' extension-version='0.1.0' instance-id='FF38E883ACB74E68975063BD4AE61C29'>
+                    <instance-settings />
+                    <type-settings>
+                      <dashboard />
+                    </type-settings>
+                  </add-in>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone fixed-size='280' h='78875' id='3' is-fixed='true' name='Sheet 1' w='98400' x='800' y='20125'>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+              </zone>
+              <zone-style>
+                <format attr='border-color' value='#000000' />
+                <format attr='border-style' value='none' />
+                <format attr='border-width' value='0' />
+                <format attr='margin' value='8' />
+              </zone-style>
+            </zone>
+          </zones>
+        </devicelayout>
+      </devicelayouts>
+      <simple-id uuid='{502AF314-76A7-4AEC-9E61-6FA0221E62C4}' />
+    </dashboard>
+  </dashboards>
+  <windows source-height='30'>
+    <window class='worksheet' name='Sheet 1'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:Calculation_1014717334930796544:ok]</field>
+            <field>[federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:id:nk]</field>
+            <field>[federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:lable:nk]</field>
+            <field>[federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:parentid:nk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{B76CCEF9-ED99-4097-809B-57EBF674D1D2}' />
+    </window>
+    <window class='dashboard' maximized='true' name='Dashboard 1'>
+      <viewpoints>
+        <viewpoint name='Sheet 1' />
+      </viewpoints>
+      <active id='-1' />
+      <simple-id uuid='{FDAF6D3E-C107-412E-A96E-4AA8592DC86B}' />
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='192' name='Dashboard 1' width='192'>
+      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
+      AInGAEi0/wHnNXOC0/9BfAAAAABJRU5ErkJggg==
+    </thumbnail>
+    <thumbnail height='124' name='Sheet 1' width='192'>
+      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
+      NLekA4gAAAAASUVORK5CYII=
+    </thumbnail>
+  </thumbnails>
+  <referenced-extensions>
+    <referenced-extension>
+      <manifest manifest-version='0.1'>
+        <dashboard-extension extension-version='0.1.0' id='com.example.extensions.name'>
+          <default-locale>en_US</default-locale>
+          <name resource-id='name' />
+          <description>Extension Description</description>
+          <author email='USER@example.com' name='USERNAME' organization='MyCo' website='https://www.example.com' />
+          <min-api-version>1.0</min-api-version>
+          <source-location>
+            <url>https://sontungnp.github.io/tableau/myext/ext_config/</url>
+          </source-location>
+          <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAlhJREFUOI2Nkt9vy1EYh5/3bbsvRSySCZbIxI+ZCKsN2TKtSFyIrV2WuRCJuBiJWxfuxCVXbvwFgiEtposgLFJElnbU1SxIZIIRJDKTrdu+53Uhra4mce7Oe57Pcz7JOULFisViwZ+29LAzOSjQYDgz1ZcCvWuXV11MJpN+OS/lm6179teqH0yDqxPTCyKSA8DcDsyOmOprnCaeP7459pdgy969i0LTC3IO/RQMyoHcQN+3cnljW3dNIFC47qDaK3g7BwdTkwBaBELT4ZPOUVWgKl4ZBnjxJPUlMDnTDrp0pmr6RHFeEjjcUUXPDGeSEwDN0Xg8sivxMhJNjGzbHd8PkM3eHRfkrBM5NkcQaY2vUnTlrDIA0NoaX+KLXFFlowr14tvVpqb2MICzmQcKqxvbumv+NAhZGCCIPwEw6QWXKYRL/VUXO0+rAUJiPwAk5MIlgVfwPjjHLCL1APmHN94ZdqeYN+NW/mn6I4BvwQYchcLnwFhJMDiYmlRxAzjpKWZkYkUCcZ2I61wi37tLbYyjiN0fHk5Oz3nGSLSzBbNHCF35R7f6K1/hN9PRhek11FrymfQQQKB4+Gl05P2qNRtmETlXW7e+b2z01dfycGNbfFMAbqNyKp9Jp4rzOT8RYFs0njJkc2iqsCObvTsOsDWWqA5C1uFy+Uz/oXJeKwVT4h0RmPUXhi79vuC0Ku6yOffTK3g9lfxfDQAisY516sg5kfOCiJk7HoLt2cf9b/9LANAc7dznm98PagG1fUOZ9IP5uMB8Q4CPoyNvausapkTt3rNMuvdf3C/o6+czhtdwmwAAAABJRU5ErkJggg==</icon>
+        </dashboard-extension>
+      </manifest>
+      <referenced-views>
+        <referenced-view instances='1' viewId='Dashboard 1' />
+      </referenced-views>
+    </referenced-extension>
+  </referenced-extensions>
+</workbook>

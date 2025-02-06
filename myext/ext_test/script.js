@@ -2,25 +2,30 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
-        let selectedValue = "Ch?n giá tr?";
+        let selectedValue = "Chọn giá trị";
         const button = document.getElementById("combo-button");
-        const popup = document.getElementById("combo-popup");
-        const overlay = document.getElementById("overlay");
         const selectedDisplay = document.getElementById("selected-value");
         
-        button.addEventListener("click", function () {
+        const popup = document.createElement("div");
+        popup.id = "combo-popup";
+        popup.className = "combo-popup";
+        document.body.appendChild(popup);
+        
+        button.addEventListener("click", function (event) {
+            const rect = button.getBoundingClientRect();
+            popup.style.top = `${rect.bottom + window.scrollY}px`;
+            popup.style.left = `${rect.left + window.scrollX}px`;
             popup.style.display = "block";
-            overlay.style.display = "block";
         });
         
-        overlay.addEventListener("click", function () {
-            popup.style.display = "none";
-            overlay.style.display = "none";
+        document.addEventListener("click", function (event) {
+            if (!button.contains(event.target) && !popup.contains(event.target)) {
+                popup.style.display = "none";
+            }
         });
         
         function fetchData() {
-            // D? li?u m?u d? test
-            let fieldValues = ["Giá tr? 1", "Giá tr? 2", "Giá tr? 3", "Giá tr? 4", "Giá tr? 5"];
+            let fieldValues = ["Giá trị 1", "Giá trị 2", "Giá trị 3", "Giá trị 4", "Giá trị 5"];
             popup.innerHTML = "";
             fieldValues.forEach(value => {
                 let item = document.createElement("div");
@@ -29,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     selectedValue = value;
                     selectedDisplay.textContent = selectedValue;
                     popup.style.display = "none";
-                    overlay.style.display = "none";
                 });
                 popup.appendChild(item);
             });
