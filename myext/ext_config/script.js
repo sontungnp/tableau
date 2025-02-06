@@ -1,5 +1,10 @@
 'use strict';
 
+function toggleDropdown() {
+    let container = document.getElementById("tree-container");
+    container.style.display = container.style.display === "block" ? "none" : "block";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         let selectedNodes = new Set();
@@ -77,11 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 container.appendChild(childrenContainer);
                 node.children.forEach(child => renderTree(child, childrenContainer));
             }
-        }
-
-        function toggleDropdown() {
-            let container = document.getElementById("tree-container");
-            container.style.display = container.style.display === "block" ? "none" : "block";
         }
 
         function filterTree() {
