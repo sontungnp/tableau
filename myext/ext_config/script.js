@@ -4,12 +4,13 @@ document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         let selectedNodes = new Set();
         let treeData = [];
-        let popupWindow = window.open('', '', 'width=800,height=600');
 
         fetchData();
 
         document.getElementById("dropdown-toggle").addEventListener("click", function () {
             // Mở cửa sổ mới khi click vào combo box
+            let popupWindow = window.open('', '', 'width=800,height=600');
+            
             popupWindow.document.write(`
                 <html>
                     <head>
@@ -46,21 +47,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     <body>
                         <h2>Tree Filter</h2>
                         <div id="tree-container"></div>
-                        <script src="https://cdnjs.cloudflare.com/ajax/libs/tableau-api/2.3.0/tableau.min.js"></script>
-                        <script>
-                            // Nhúng code JavaScript từ script.js vào popup
-                            ${fetchData.toString()}
-                            ${transformDataToTree.toString()}
-                            ${renderTree.toString()}
-
-                            fetchData(); // Gọi hàm để tải dữ liệu và render tree
-                        </script>
                     </body>
                 </html>
             `);
+
+            // Sau khi popupWindow đã được tạo, gọi hàm fetchData() để lấy dữ liệu và render tree
+            fetchData(popupWindow);
         });
 
-        function fetchData() {
+        function fetchData(popupWindow) {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
             worksheet.getSummaryDataAsync().then(data => {
                 treeData = transformDataToTree(data);
