@@ -1,12 +1,9 @@
 'use strict';
-
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         let selectedNodes = new Set();
         let treeData = [];
-
         fetchData();
-
         document.getElementById("dropdown-toggle").addEventListener("click", function () {
             let container = document.getElementById("tree-container");
             container.style.display = container.style.display === "block" ? "none" : "block";
@@ -21,14 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 renderTree(treeData, document.getElementById("tree-container"));
             });
         }
-
         function transformDataToTree(data) {
             const nodes = {};
             data.data.forEach(row => {
                 const id = row[0].value;
                 const parentId = row[1].value;
                 const label = row[2].value;
-
                 nodes[id] = nodes[id] || { id, name: label, children: [], parent: null };
                 if (parentId !== null) {
                     nodes[parentId] = nodes[parentId] || { id: parentId, name: "", children: [], parent: null };
@@ -38,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             return Object.values(nodes).find(node => !node.parent) || [];
         }
-
         function renderTree(node, container) {
             if (!node) return;
             let div = document.createElement("div");
@@ -79,7 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 node.children.forEach(child => renderTree(child, childrenContainer));
             }
         }
-
         function filterTree() {
             let query = document.getElementById("search-box").value.toLowerCase();
             document.querySelectorAll(".node").forEach(node => {
@@ -87,7 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 node.style.display = text.includes(query) ? "flex" : "none";
             });
         }
-
         function toggleChildren(node, checked) {
             node.children.forEach(child => {
                 let checkbox = document.querySelector(`input[data-id='${child.id}']`);
@@ -98,7 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         }
-
         function updateParentState(node) {
             if (!node) return;
             let parentCheckbox = document.querySelector(`input[data-id='${node.id}']`);
