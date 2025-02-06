@@ -8,18 +8,63 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchData();
 
         document.getElementById("dropdown-toggle").addEventListener("click", function () {
-            let container = document.getElementById("tree-container");
-            // Toggle sự hiển thị của cây phân cấp
-            container.style.display = container.style.display === "block" ? "none" : "block";
-        });
+            // Mở cửa sổ mới khi click vào combo box
+            let popupWindow = window.open('', '', 'width=800,height=600');
+            popupWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Tableau Tree Filter</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                padding: 20px;
+                            }
+                            .node {
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                padding: 2px 5px;
+                                cursor: pointer;
+                            }
+                            .toggle {
+                                cursor: pointer;
+                                width: 18px;
+                                text-align: center;
+                            }
+                            .checkbox {
+                                margin-right: 10px;
+                            }
+                            .children {
+                                margin-left: 20px;
+                                display: none;
+                            }
+                            .expanded > .children {
+                                display: block;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h2>Tree Filter</h2>
+                        <div id="tree-container"></div>
+                        <script src="https://cdnjs.cloudflare.com/ajax/libs/tableau-api/2.3.0/tableau.min.js"></script>
+                        <script>
+                            // Nhúng code JavaScript từ script.js vào popup
+                            ${fetchData.toString()}
+                            ${transformDataToTree.toString()}
+                            ${renderTree.toString()}
 
-        document.getElementById("search-box").addEventListener("input", filterTree);
+                            fetchData(); // Gọi hàm để tải dữ liệu và render tree
+                        </script>
+                    </body>
+                </html>
+            `);
+        });
 
         function fetchData() {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
             worksheet.getSummaryDataAsync().then(data => {
                 treeData = transformDataToTree(data);
-                renderTree(treeData, document.getElementById("tree-container"));
+                renderTree(treeData, popupWindow.document.getElementById("tree-container"));
             });
         }
 
@@ -80,14 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 container.appendChild(childrenContainer);
                 node.children.forEach(child => renderTree(child, childrenContainer));
             }
-        }
-
-        function filterTree() {
-            let query = document.getElementById("search-box").value.toLowerCase();
-            document.querySelectorAll(".node").forEach(node => {
-                let text = node.textContent.toLowerCase();
-                node.style.display = text.includes(query) ? "flex" : "none";
-            });
         }
 
         function toggleChildren(node, checked) {

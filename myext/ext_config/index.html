@@ -9,12 +9,10 @@
         body {
             font-family: Arial, sans-serif;
         }
-
         .combobox {
             position: relative;
             width: 300px;
         }
-
         .combobox input {
             width: 100%;
             padding: 8px;
@@ -22,7 +20,6 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
-
         .combobox .arrow {
             position: absolute;
             right: 10px;
@@ -30,58 +27,13 @@
             transform: translateY(-50%);
             cursor: pointer;
         }
-
-        #tree-container {
-            display: none; /* Ban đầu ẩn popup */
-            position: absolute;
-            top: 100%; /* Đưa cây phân cấp xuống dưới combo box */
-            width: 400px; /* Điều chỉnh chiều rộng của tree */
-            height: 800px; /* Điều chỉnh chiều cao của tree */
-            max-height: 800px; /* Giới hạn chiều cao */
-            border: 1px solid #ccc;
-            background: white;
-            overflow-y: auto; /* Cuộn dọc */
-            z-index: 1000;
-            padding: 10px;
-            box-sizing: border-box;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Thêm hiệu ứng bóng cho popup */
-            border-radius: 4px; /* Bo góc cho popup */
-        }
-
-        .node {
-            display: flex;
-            align-items: center;
-            gap: 10px; /* Rút ngắn khoảng cách giữa các phần tử */
-            padding: 2px 5px;
-            cursor: pointer;
-        }
-
-        .toggle {
-            cursor: pointer;
-            width: 18px; /* Tăng kích thước icon toggle */
-            text-align: center;
-        }
-
-        .checkbox {
-            margin-right: 10px; /* Giảm khoảng cách giữa checkbox và tên node */
-        }
-
-        .children {
-            margin-left: 20px;
-            display: none;
-        }
-
-        .expanded > .children {
-            display: block;
-        }
     </style>
 </head>
 <body>
     <h2>Tableau Tree Filter</h2>
     <div class="combobox">
-        <input type="text" id="search-box" class="checkbox" placeholder="Search...">
+        <input type="text" id="search-box" placeholder="Search...">
         <span class="arrow" id="dropdown-toggle">▼</span>
-        <div id="tree-container"></div>
     </div>
     <button id="apply-filter" disabled>Apply Filter</button>
 </body>
