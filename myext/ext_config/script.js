@@ -11,55 +11,51 @@ document.addEventListener("DOMContentLoaded", () => {
             // Mở cửa sổ mới khi click vào combo box
             let popupWindow = window.open('', '', 'width=800,height=600');
 
-            if (popupWindow) {
-                popupWindow.document.write(`
-                    <html>
-                        <head>
-                            <title>Tableau Tree Filter</title>
-                            <style>
-                                body {
-                                    font-family: Arial, sans-serif;
-                                    padding: 20px;
-                                }
-                                .node {
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 10px;
-                                    padding: 2px 5px;
-                                    cursor: pointer;
-                                }
-                                .toggle {
-                                    cursor: pointer;
-                                    width: 18px;
-                                    text-align: center;
-                                }
-                                .checkbox {
-                                    margin-right: 10px;
-                                }
-                                .children {
-                                    margin-left: 20px;
-                                    display: none;
-                                }
-                                .expanded > .children {
-                                    display: block;
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            <h2>Tree Filter</h2>
-                            <div id="tree-container"></div>
-                        </body>
-                    </html>
-                `);
+            popupWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Tableau Tree Filter</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                padding: 20px;
+                            }
+                            .node {
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                padding: 2px 5px;
+                                cursor: pointer;
+                            }
+                            .toggle {
+                                cursor: pointer;
+                                width: 18px;
+                                text-align: center;
+                            }
+                            .checkbox {
+                                margin-right: 10px;
+                            }
+                            .children {
+                                margin-left: 20px;
+                                display: none;
+                            }
+                            .expanded > .children {
+                                display: block;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h2>Tree Filter</h2>
+                        <div id="tree-container"></div>
+                    </body>
+                </html>
+            `);
 
-                // Sau khi popupWindow đã được tạo, gọi hàm renderTree() để lấy dữ liệu và render tree
-                if (popupWindow && popupWindow.document) {
-                    renderTree(treeData, popupWindow.document.getElementById("tree-container"));
-                } else {
-                    console.error("Popup window is not ready.");
-                }
+            // Sau khi popupWindow đã được tạo, gọi hàm renderTree() để lấy dữ liệu và render tree
+            if (popupWindow && popupWindow.document) {
+                renderTree(treeData, popupWindow.document.getElementById("tree-container"));
             } else {
-                alert("Popup window could not be opened. Please check your popup blocker settings.");
+                console.error("Popup window is not ready.");
             }
         });
 
