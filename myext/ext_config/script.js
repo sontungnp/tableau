@@ -1,5 +1,12 @@
 'use strict';
 
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("dropdown-toggle").addEventListener("click", function () {
+        let container = document.getElementById("tree-container");
+        container.style.display = container.style.display === "block" ? "none" : "block";
+    });
+});
+
 document.addEventListener("DOMContentLoaded", () => {
 
     tableau.extensions.initializeAsync().then(() => {
@@ -11,14 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 fetchData();
             });
         });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("dropdown-toggle").addEventListener("click", function () {
-                let container = document.getElementById("tree-container");
-                container.style.display = container.style.display === "block" ? "none" : "block";
-            });
-        });
-        
 
         fetchData();
 
