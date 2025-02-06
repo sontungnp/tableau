@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById("dropdown-toggle").addEventListener("click", function () {
             let container = document.getElementById("tree-container");
+            // Toggle sự hiển thị của cây phân cấp
             container.style.display = container.style.display === "block" ? "none" : "block";
         });
 
@@ -43,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!node) return;
             let div = document.createElement("div");
             div.classList.add("node");
-            
+
             let toggle = document.createElement("span");
             toggle.classList.add("toggle");
             toggle.textContent = node.children.length ? "▶" : "";
@@ -57,21 +58,22 @@ document.addEventListener("DOMContentLoaded", () => {
                     this.textContent = isExpanded ? "▶" : "▼";
                 }
             });
-            
+
             let checkbox = document.createElement("input");
             checkbox.type = "checkbox";
+            checkbox.classList.add("checkbox");
             checkbox.dataset.id = node.id;
             checkbox.addEventListener("change", function () {
                 toggleChildren(node, this.checked);
                 updateParentState(node.parent);
                 updateSelectedNodes();
             });
-            
+
             div.appendChild(toggle);
             div.appendChild(checkbox);
             div.appendChild(document.createTextNode(node.name));
             container.appendChild(div);
-            
+
             if (node.children.length) {
                 let childrenContainer = document.createElement("div");
                 childrenContainer.classList.add("children");
@@ -103,13 +105,13 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!node) return;
             let parentCheckbox = document.querySelector(`input[data-id='${node.id}']`);
             let childCheckboxes = node.children.map(child => document.querySelector(`input[data-id='${child.id}']`));
-            
+
             let allChecked = childCheckboxes.every(checkbox => checkbox.checked);
             let someChecked = childCheckboxes.some(checkbox => checkbox.checked || checkbox.indeterminate);
-            
+
             parentCheckbox.checked = allChecked;
             parentCheckbox.indeterminate = !allChecked && someChecked;
-            
+
             updateParentState(node.parent);
         }
     });

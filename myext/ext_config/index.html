@@ -32,18 +32,20 @@
         }
 
         #tree-container {
-            display: none;
+            display: none; /* Ban đầu ẩn popup */
             position: absolute;
-            top: 40px;
+            top: 100%; /* Đưa cây phân cấp xuống dưới combo box */
             width: 400px; /* Điều chỉnh chiều rộng của tree */
             height: 800px; /* Điều chỉnh chiều cao của tree */
-            max-height: 800px; /* Đảm bảo chiều cao không vượt quá */
+            max-height: 800px; /* Giới hạn chiều cao */
             border: 1px solid #ccc;
             background: white;
-            overflow-y: auto; /* Chỉ cho phép cuộn dọc */
+            overflow-y: auto; /* Cuộn dọc */
             z-index: 1000;
             padding: 10px;
             box-sizing: border-box;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Thêm hiệu ứng bóng cho popup */
+            border-radius: 4px; /* Bo góc cho popup */
         }
 
         .node {
