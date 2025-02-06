@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        function fetchData() {
+        async function fetchData() {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
             worksheet.getSummaryDataAsync().then(data => {
                 treeData = transformDataToTree(data);
