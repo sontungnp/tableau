@@ -6,43 +6,25 @@
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
     <script src="script.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .combo-box {
-            position: relative;
-            display: inline-block;
-        }
-        .combo-button {
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            cursor: pointer;
-        }
-        .combo-popup {
+        #popup {
             display: none;
-            position: absolute;
-            background: white;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
             border: 1px solid #ccc;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            width: 250px;
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 999999;
-            padding: 10px;
-        }
-        .combo-popup div {
-            padding: 10px;
-            cursor: pointer;
-        }
-        .combo-popup div:hover {
-            background-color: #f0f0f0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
-    <div class="combo-box">
-        <button id="combo-button" class="combo-button"><span id="selected-value">Chọn giá trị</span></button>
+    <div id="popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); z-index: 1000;">
+        <input type="date" id="popupDate">
+        <button onclick="closePopup()">Đóng</button>
     </div>
+    <button id="openPopupButton">Mở Popup</button>
 </body>
 </html>
