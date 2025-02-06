@@ -2,29 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Button to Refresh Data</title>
-    <script src="../../lib/tableau.extensions.1.latest.js"></script>
-    <script src="script.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Popup Extension</title>
     <style>
         #popup {
             display: none;
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: white;
             padding: 20px;
+            background-color: #f1f1f1;
             border: 1px solid #ccc;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             z-index: 1000;
         }
+        #popup.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
-    <div id="popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); z-index: 1000;">
-        <input type="date" id="popupDate">
-        <button onclick="closePopup()">Đóng</button>
-    </div>
-    <button id="openPopupButton">Mở Popup</button>
+    <button id="helloButton">Click Me!</button>
+    <div id="popup">Xin chào!</div>
+
+    <script>
+        document.getElementById('helloButton').addEventListener('click', function() {
+            const popup = document.getElementById('popup');
+            popup.classList.toggle('show');
+
+            // Đặt vị trí của popup tại vị trí bất kỳ
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+        });
+    </script>
 </body>
 </html>

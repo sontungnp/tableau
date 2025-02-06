@@ -16,6 +16,7 @@
     <SetMembershipControl />
     <SheetIdentifierTracking />
     <WindowsPersistSimpleIdentifiers />
+    <WorksheetBackgroundTransparency />
   </document-format-change-manifest>
   <preferences>
     <preference name='ui.encoding.shelf.height' value='24' />
@@ -175,7 +176,7 @@
       <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
       <zones>
         <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
-          <zone h='24000' id='3' name='Sheet 1' w='98400' x='800' y='75000'>
+          <zone h='76250' id='3' name='Sheet 1' w='98400' x='800' y='22750'>
             <zone-style>
               <format attr='border-color' value='#000000' />
               <format attr='border-style' value='none' />
@@ -183,7 +184,7 @@
               <format attr='margin' value='4' />
             </zone-style>
           </zone>
-          <zone forceUpdate='true' h='74000' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='37200' x='800' y='1000'>
+          <zone forceUpdate='true' h='21750' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='37200' x='800' y='1000'>
             <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_config/' extension-version='0.1.0' instance-id='FF38E883ACB74E68975063BD4AE61C29'>
               <instance-settings />
               <type-settings>
@@ -197,21 +198,7 @@
               <format attr='margin' value='4' />
             </zone-style>
           </zone>
-          <zone forceUpdate='true' h='74000' id='16' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/]' type-v2='dashboard-object' w='30600' x='38000' y='1000'>
-            <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/' extension-version='0.1.0' instance-id='11B8DD2BE07D42738D4882866D5F2D66'>
-              <instance-settings />
-              <type-settings>
-                <dashboard />
-              </type-settings>
-            </add-in>
-            <zone-style>
-              <format attr='border-color' value='#000000' />
-              <format attr='border-style' value='none' />
-              <format attr='border-width' value='0' />
-              <format attr='margin' value='4' />
-            </zone-style>
-          </zone>
-          <zone forceUpdate='true' h='74000' id='19' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_todate/]' type-v2='dashboard-object' w='30600' x='68600' y='1000'>
+          <zone forceUpdate='true' h='21750' id='19' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_todate/]' type-v2='dashboard-object' w='61200' x='38000' y='1000'>
             <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_todate/' extension-version='0.1.0' instance-id='35F74E0E8D6D4D11AE386757F70BEC69'>
               <instance-settings />
               <type-settings>
@@ -231,6 +218,14 @@
             <format attr='border-width' value='0' />
             <format attr='margin' value='8' />
           </zone-style>
+        </zone>
+        <zone forceUpdate='true' h='21750' id='16' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/]' type-v2='dashboard-object' w='30600' x='35500' y='4125'>
+          <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/' extension-version='0.1.0' instance-id='11B8DD2BE07D42738D4882866D5F2D66'>
+            <instance-settings />
+            <type-settings>
+              <dashboard />
+            </type-settings>
+          </add-in>
         </zone>
       </zones>
       <devicelayouts>
@@ -329,16 +324,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:Calculation_1014717334930796544:ok]</field>
-            <field>[federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:id:nk]</field>
-            <field>[federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:lable:nk]</field>
-            <field>[federated.017b7zr1fv1l2q19k0d410dnu9u6].[none:parentid:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{B76CCEF9-ED99-4097-809B-57EBF674D1D2}' />
     </window>
     <window class='dashboard' maximized='true' name='Dashboard 1'>
@@ -349,117 +334,6 @@
       <simple-id uuid='{FDAF6D3E-C107-412E-A96E-4AA8592DC86B}' />
     </window>
   </windows>
-  <thumbnails>
-    <thumbnail height='192' name='Dashboard 1' width='192'>
-      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
-    </thumbnail>
-    <thumbnail height='124' name='Sheet 1' width='192'>
-      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
-      NLekA4gAAAAASUVORK5CYII=
-    </thumbnail>
-  </thumbnails>
   <referenced-extensions>
     <referenced-extension>
       <manifest manifest-version='0.1'>
