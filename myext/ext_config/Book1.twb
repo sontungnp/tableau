@@ -175,7 +175,7 @@
       <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
       <zones>
         <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
-          <zone h='54875' id='3' name='Sheet 1' w='98400' x='800' y='44125'>
+          <zone h='78875' id='3' name='Sheet 1' w='98400' x='800' y='20125'>
             <zone-style>
               <format attr='border-color' value='#000000' />
               <format attr='border-style' value='none' />
@@ -183,7 +183,7 @@
               <format attr='margin' value='4' />
             </zone-style>
           </zone>
-          <zone forceUpdate='true' h='43125' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='98400' x='800' y='1000'>
+          <zone forceUpdate='true' h='19125' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='98400' x='800' y='1000'>
             <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_config/' extension-version='0.1.0' instance-id='FF38E883ACB74E68975063BD4AE61C29'>
               <instance-settings />
               <type-settings>
@@ -209,9 +209,9 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='13' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98000' id='12' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
-                <zone forceUpdate='true' h='43125' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='98400' x='800' y='1000'>
+            <zone h='100000' id='15' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98000' id='14' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+                <zone forceUpdate='true' h='19125' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='98400' x='800' y='1000'>
                   <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_config/' extension-version='0.1.0' instance-id='FF38E883ACB74E68975063BD4AE61C29'>
                     <instance-settings />
                     <type-settings>
@@ -226,7 +226,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='280' h='54875' id='3' is-fixed='true' name='Sheet 1' w='98400' x='800' y='44125'>
+                <zone fixed-size='280' h='78875' id='3' is-fixed='true' name='Sheet 1' w='98400' x='800' y='20125'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -298,9 +298,6 @@
       9o/IRXpRabeNsk1gG0LCIRwNxgewjQePx8fpRZYklHVifMBJfs/nzoh53zH4a8/rmbGYpmmC
       SCjroHeAaJAYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyA
       RGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyA
-      RGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyA
-      RGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyA
-      RGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyA
       RGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEi0MwHUqzq+X/weRb2C
       3cTehQYymw2kM9me7hxRv50J4JtvH2D+k9swTjQkErtYfbaEol5FVdew9HwNJoBcJomtxAHy
       2ST+9ve/IpnNAwA21lfxeOG/g3gORB07E8Dc1AQePniAolFDqXiM8alZLD5+hH89+A7XRhX8
@@ -340,7 +337,10 @@
       AInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEY
       AInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEY
       AInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEY
-      AInGAEi0/wFEYHOCBgw1ZgAAAABJRU5ErkJggg==
+      AInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEY
+      AInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEY
+      AInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEYAInGAEg0BkCiMQASjQGQaAyARGMAJBoDINEY
+      AInGAEi0/wHnNXOC0/9BfAAAAABJRU5ErkJggg==
     </thumbnail>
     <thumbnail height='124' name='Sheet 1' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAAB8CAYAAAA/1L8JAAAACXBIWXMAAA7DAAAOwwHHb6hk
