@@ -8,15 +8,13 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-
     tableau.extensions.initializeAsync().then(() => {
         let selectedNodes = new Set();
         let treeData = [];
-        
-        document.addEventListener("DOMContentLoaded", function () {
-            tableau.extensions.initializeAsync().then(() => {
-                fetchData();
-            });
+
+        document.getElementById("dropdown-toggle").addEventListener("click", function () {
+            let container = document.getElementById("tree-container");
+            container.style.display = container.style.display === "block" ? "none" : "block";
         });
 
         fetchData();
