@@ -1,23 +1,16 @@
 'use strict';
 
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("dropdown-toggle").addEventListener("click", function () {
-        let container = document.getElementById("tree-container");
-        container.style.display = container.style.display === "block" ? "none" : "block";
-    });
-});
-
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         let selectedNodes = new Set();
         let treeData = [];
 
+        fetchData();
+
         document.getElementById("dropdown-toggle").addEventListener("click", function () {
             let container = document.getElementById("tree-container");
             container.style.display = container.style.display === "block" ? "none" : "block";
         });
-
-        fetchData();
 
         function fetchData() {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
