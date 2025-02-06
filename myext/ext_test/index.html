@@ -2,41 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello Popup Extension</title>
+    <title>Button to Refresh Data</title>
+    <script src="../../lib/tableau.extensions.1.latest.js"></script>
+    <script src="script.js"></script>
     <style>
-        #popup {
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .combobox {
+            position: relative;
+            width: 300px;
+        }
+        .combobox input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .combobox .arrow {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        #tree-container {
             display: none;
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            background-color: #f1f1f1;
+            top: 40px;
+            width: 100%;
+            max-height: 300px;
             border: 1px solid #ccc;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: white;
+            overflow: auto;
             z-index: 1000;
+            padding: 5px;
         }
-        #popup.show {
+        .node {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 5px;
+        }
+        .toggle {
+            cursor: pointer;
+            width: 16px;
+            text-align: center;
+        }
+        .children {
+            margin-left: 20px;
+            display: none;
+        }
+        .expanded > .children {
             display: block;
         }
     </style>
 </head>
 <body>
-    <button id="helloButton">Click Me!</button>
-    <div id="popup">Xin chào!</div>
-
-    <script>
-        document.getElementById('helloButton').addEventListener('click', function() {
-            const popup = document.getElementById('popup');
-            popup.classList.toggle('show');
-
-            // Đặt vị trí của popup tại vị trí bất kỳ
-            const x = Math.random() * window.innerWidth;
-            const y = Math.random() * window.innerHeight;
-            popup.style.left = `${x}px`;
-            popup.style.top = `${y}px`;
-        });
-    </script>
+    <h2>Tableau Tree Filter</h2>
+    <div class="combobox">
+        <input type="text" id="search-box" placeholder="Search...">
+        <span class="arrow" id="dropdown-toggle">▼</span>
+        <div id="tree-container"></div>
+    </div>
+    <button id="apply-filter" disabled>Apply Filter</button>
 </body>
 </html>
