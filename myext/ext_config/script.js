@@ -4,10 +4,12 @@ document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         let selectedNodes = new Set();
         let treeData = [];
+        let popupWindow = window.open('', '', 'width=800,height=600');
+
+        fetchData();
 
         document.getElementById("dropdown-toggle").addEventListener("click", function () {
             // Mở cửa sổ mới khi click vào combo box
-            let popupWindow = window.open('', '', 'width=800,height=600');
             popupWindow.document.write(`
                 <html>
                     <head>
@@ -57,8 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 </html>
             `);
         });
-
-        fetchData();
 
         function fetchData() {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
