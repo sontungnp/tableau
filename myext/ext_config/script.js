@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
         let selectedNodes = new Set();
         let treeData = [];
 
+        fetchData();
+
         document.getElementById("dropdown-toggle").addEventListener("click", function () {
             // Mở cửa sổ mới khi click vào combo box
             let popupWindow = window.open('', '', 'width=800,height=600');
@@ -50,24 +52,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     </html>
                 `);
 
-                // Sau khi popupWindow đã được tạo, gọi hàm fetchData() để lấy dữ liệu và render tree
-                fetchData(popupWindow);
-            } else {
-                alert("Popup window could not be opened. Please check your popup blocker settings.");
-            }
-        });
-
-        fetchData();
-
-        function fetchData(popupWindow) {
-            const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
-            worksheet.getSummaryDataAsync().then(data => {
-                treeData = transformDataToTree(data);
+                // Sau khi popupWindow đã được tạo, gọi hàm renderTree() để lấy dữ liệu và render tree
                 if (popupWindow && popupWindow.document) {
                     renderTree(treeData, popupWindow.document.getElementById("tree-container"));
                 } else {
                     console.error("Popup window is not ready.");
                 }
+            } else {
+                alert("Popup window could not be opened. Please check your popup blocker settings.");
+            }
+        });
+
+        function fetchData() {
+            const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
+            worksheet.getSummaryDataAsync().then(data => {
+                treeData = transformDataToTree(data);
             }).catch(error => {
                 console.error("Error fetching data:", error);
             });
