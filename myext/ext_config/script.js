@@ -3,6 +3,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         let selectedNodes = new Set();
+        let treeData = [];
         
         document.addEventListener("DOMContentLoaded", function () {
             tableau.extensions.initializeAsync().then(() => {
@@ -15,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
         function fetchData() {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
             worksheet.getSummaryDataAsync().then(data => {
-                const treeData = transformDataToTree(data);
+                treeData = transformDataToTree(data);
                 renderTree(treeData, document.getElementById("tree-container"));
             });
         }
@@ -78,6 +79,19 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        function toggleDropdown() {
+            let container = document.getElementById("tree-container");
+            container.style.display = container.style.display === "block" ? "none" : "block";
+        }
+
+        function filterTree() {
+            let query = document.getElementById("search-box").value.toLowerCase();
+            document.querySelectorAll(".node").forEach(node => {
+                let text = node.textContent.toLowerCase();
+                node.style.display = text.includes(query) ? "flex" : "none";
+            });
+        }
+
         function toggleChildren(node, checked) {
             node.children.forEach(child => {
                 let checkbox = document.querySelector(`input[data-id='${child.id}']`);
@@ -101,32 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
             parentCheckbox.indeterminate = !allChecked && someChecked;
             
             updateParentState(node.parent);
-        }
-
-        function updateSelectedNodes() {
-            selectedNodes.clear();
-            document.querySelectorAll(".node input:checked").forEach(checkbox => {
-                selectedNodes.add(checkbox.getAttribute("data-id"));
-            });
-            document.getElementById("apply-filter").disabled = selectedNodes.size === 0;
-        }
-
-        document.getElementById("apply-filter").addEventListener("click", function () {
-            if (selectedNodes.size === 0) return;
-            const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
-            worksheet.applyFilterAsync("Category", Array.from(selectedNodes), tableau.FilterUpdateType.Replace);
-        });
-
-        document.getElementById("search-box").addEventListener("focus", function () {
-            document.getElementById("tree-container").style.display = "block";
-        });
-
-        function filterTree() {
-            let searchText = document.getElementById("search-box").value.toLowerCase();
-            document.querySelectorAll(".node").forEach(node => {
-                let text = node.textContent.toLowerCase();
-                node.style.display = text.includes(searchText) ? "flex" : "none";
-            });
         }
     });
 });
