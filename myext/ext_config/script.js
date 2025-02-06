@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
             container.style.display = container.style.display === "block" ? "none" : "block";
         });
 
+        document.getElementById("search-box").addEventListener("input", filterTree);
+
         function fetchData() {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
             worksheet.getSummaryDataAsync().then(data => {
