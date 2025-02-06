@@ -27,15 +27,11 @@
             transform: translateY(-50%);
             cursor: pointer;
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> parent of 5730420 (chỉnh css tree)
         #tree-container {
             display: none;
             position: absolute;
             top: 40px;
+            width: 100%;
             max-height: 300px;
             border: 1px solid #ccc;
             background: white;
@@ -61,7 +57,6 @@
         .expanded > .children {
             display: block;
         }
->>>>>>> parent of 5730420 (chỉnh css tree)
     </style>
 </head>
 <body>
@@ -69,6 +64,7 @@
     <div class="combobox">
         <input type="text" id="search-box" placeholder="Search...">
         <span class="arrow" id="dropdown-toggle">▼</span>
+        <div id="tree-container"></div>
     </div>
     <button id="apply-filter" disabled>Apply Filter</button>
 </body>
