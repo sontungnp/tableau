@@ -18,7 +18,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     function renderTree(node, container, parent = null) {
         if (!node) return;
-        node.parent = parent; // Gán parent cho mỗi node
+        node.parent = parent; // Gán parent cho node
     
         let div = document.createElement("div");
         div.classList.add("node");
@@ -26,16 +26,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         let toggle = document.createElement("span");
         toggle.classList.add("toggle");
         toggle.textContent = node.children.length ? "▶" : "";
-        toggle.addEventListener("click", function (event) {
-            event.stopPropagation();
-            let parent = this.parentElement;
-            let childrenContainer = parent.nextElementSibling;
-            if (childrenContainer) {
-                let isExpanded = childrenContainer.style.display === "block";
-                childrenContainer.style.display = isExpanded ? "none" : "block";
-                this.textContent = isExpanded ? "▶" : "▼";
-            }
-        });
     
         let checkbox = document.createElement("input");
         checkbox.type = "checkbox";
@@ -53,10 +43,29 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         if (node.children.length) {
             let childrenContainer = document.createElement("div");
             childrenContainer.classList.add("children");
+    
+            // Nếu là cấp 2 (con của root), thì hiển thị mặc định
+            if (parent !== null && parent.parent === null) {
+                childrenContainer.style.display = "block"; 
+                toggle.textContent = "▼";  // Cập nhật icon toggle
+            }
+    
             container.appendChild(childrenContainer);
-            node.children.forEach(child => renderTree(child, childrenContainer, node)); // Truyền node cha vào
+            node.children.forEach(child => renderTree(child, childrenContainer, node));
         }
+    
+        // Toggle khi click
+        toggle.addEventListener("click", function (event) {
+            event.stopPropagation();
+            let isExpanded = this.textContent === "▼";
+            let childrenContainer = div.nextElementSibling;
+            if (childrenContainer) {
+                childrenContainer.style.display = isExpanded ? "none" : "block";
+                this.textContent = isExpanded ? "▶" : "▼";
+            }
+        });
     }
+    
 
     function filterTree() {
         let query = document.getElementById("search-box").value.toLowerCase();
