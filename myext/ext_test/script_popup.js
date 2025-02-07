@@ -11,6 +11,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
 
     document.getElementById("loadData").addEventListener("click", () => {
         console.log("Load Data");
+        renderTree(treeData, document.getElementById("tree-container"));
     });
 
     let selectedNodes = new Set();
