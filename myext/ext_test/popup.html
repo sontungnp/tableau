@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popup</title>
+    <script src="https://public.tableau.com/javascripts/api/tableau.extensions.1.latest.js"></script>
+</head>
+<body>
+    <h2>Đây là popup ngoài iframe</h2>
+    <button id="closePopup">Đóng Popup</button>
+
+    <script>
+        tableau.extensions.initializeDialogAsync().then(() => {
+            console.log("Popup mở thành công!");
+
+            document.getElementById("closePopup").addEventListener("click", () => {
+                tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
+            });
+        });
+    </script>
+</body>
+</html>
