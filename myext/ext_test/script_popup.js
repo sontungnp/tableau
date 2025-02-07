@@ -49,7 +49,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
         checkbox.addEventListener("change", function () {
             toggleChildren(node, this.checked);
             updateParentState(node.parent);
-            updateSelectedNodes();
         });
         
         div.appendChild(toggle);
