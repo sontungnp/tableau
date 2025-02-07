@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Button to Refresh Data</title>
+    <script src="../../lib/tableau.extensions.1.latest.js"></script>
+    <script src="script.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .combobox {
+            position: relative;
+            width: 300px;
+        }
+        .combobox input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .combobox .arrow {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        #tree-container {
+            display: none;
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            max-height: 300px;
+            border: 1px solid #ccc;
+            background: white;
+            overflow: auto;
+            z-index: 1000;
+            padding: 5px;
+        }
+        .node {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 5px;
+        }
+        .toggle {
+            cursor: pointer;
+            width: 16px;
+            text-align: center;
+        }
+        .children {
+            margin-left: 20px;
+            display: none;
+        }
+        .expanded > .children {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <button id="resizeButton">Thay đổi kích thước</button>
+</body>
+</html>
