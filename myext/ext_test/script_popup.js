@@ -3,6 +3,8 @@
 tableau.extensions.initializeDialogAsync().then(payload => {
     console.log("Popup mở thành công!");
 
+    console.log(payload);
+
     document.getElementById("closePopup").addEventListener("click", () => {
         tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
     });
