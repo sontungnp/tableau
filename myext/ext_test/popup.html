@@ -5,20 +5,156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Popup</title>
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
-    <script src="script.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .combobox {
+            position: relative;
+            width: 300px;
+        }
+        .combobox input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .combobox .arrow {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        #tree-container {
+            display: none;
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            max-height: 300px;
+            border: 1px solid #ccc;
+            background: white;
+            overflow: auto;
+            z-index: 1000;
+            padding: 5px;
+        }
+        .node {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 5px;
+        }
+        .toggle {
+            cursor: pointer;
+            width: 16px;
+            text-align: center;
+        }
+        .children {
+            margin-left: 20px;
+            display: none;
+        }
+        .expanded > .children {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <h2>Đây là popup ngoài iframe</h2>
     <button id="closePopup">Đóng Popup</button>
-    <div id="tree-container"></div>
-    <!-- <script>
-        tableau.extensions.initializeDialogAsync().then(() => {
+    <div class="combobox">
+        <input type="text" id="search-box" placeholder="Search...">
+        <span class="arrow" id="dropdown-toggle">▼</span>
+        <div id="tree-container"></div>
+    </div>
+    <script>
+        tableau.extensions.initializeDialogAsync().then(payload => {
             console.log("Popup mở thành công!");
 
             document.getElementById("closePopup").addEventListener("click", () => {
                 tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
             });
+
+            let selectedNodes = new Set();
+            let treeData = [];
+            // Nhận treeData từ trang chính (payload được truyền vào từ `displayDialogAsync`)
+            treeData = JSON.parse(payload);
+
+            renderTree(treeData, document.getElementById("tree-container"));
+
+            function renderTree(node, container) {
+                if (!node) return;
+                let div = document.createElement("div");
+                div.classList.add("node");
+                
+                let toggle = document.createElement("span");
+                toggle.classList.add("toggle");
+                toggle.textContent = node.children.length ? "▶" : "";
+                toggle.addEventListener("click", function (event) {
+                    event.stopPropagation();
+                    let parent = this.parentElement;
+                    let childrenContainer = parent.nextElementSibling;
+                    if (childrenContainer) {
+                        let isExpanded = childrenContainer.style.display === "block";
+                        childrenContainer.style.display = isExpanded ? "none" : "block";
+                        this.textContent = isExpanded ? "▶" : "▼";
+                    }
+                });
+                
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.dataset.id = node.id;
+                checkbox.addEventListener("change", function () {
+                    toggleChildren(node, this.checked);
+                    updateParentState(node.parent);
+                    updateSelectedNodes();
+                });
+                
+                div.appendChild(toggle);
+                div.appendChild(checkbox);
+                div.appendChild(document.createTextNode(node.name));
+                container.appendChild(div);
+                
+                if (node.children.length) {
+                    let childrenContainer = document.createElement("div");
+                    childrenContainer.classList.add("children");
+                    container.appendChild(childrenContainer);
+                    node.children.forEach(child => renderTree(child, childrenContainer));
+                }
+            }
+
+            function filterTree() {
+                let query = document.getElementById("search-box").value.toLowerCase();
+                document.querySelectorAll(".node").forEach(node => {
+                    let text = node.textContent.toLowerCase();
+                    node.style.display = text.includes(query) ? "flex" : "none";
+                });
+            }
+            function toggleChildren(node, checked) {
+                node.children.forEach(child => {
+                    let checkbox = document.querySelector(`input[data-id='${child.id}']`);
+                    if (checkbox) {
+                        checkbox.checked = checked;
+                        checkbox.indeterminate = false;
+                        toggleChildren(child, checked);
+                    }
+                });
+            }
+
+            function updateParentState(node) {
+                if (!node) return;
+                let parentCheckbox = document.querySelector(`input[data-id='${node.id}']`);
+                let childCheckboxes = node.children.map(child => document.querySelector(`input[data-id='${child.id}']`));
+                
+                let allChecked = childCheckboxes.every(checkbox => checkbox.checked);
+                let someChecked = childCheckboxes.some(checkbox => checkbox.checked || checkbox.indeterminate);
+                
+                parentCheckbox.checked = allChecked;
+                parentCheckbox.indeterminate = !allChecked && someChecked;
+                
+                updateParentState(node.parent);
+            }
         });
-    </script> -->
+    </script>
 </body>
 </html>

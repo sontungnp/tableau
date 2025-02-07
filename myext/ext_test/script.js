@@ -4,6 +4,17 @@ document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         console.log("Extension initialized");
 
+        let selectedNodes = new Set();
+        let treeData = [];
+        fetchData();
+
+        function fetchData() {
+            const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
+            worksheet.getSummaryDataAsync().then(data => {
+                treeData = transformDataToTree(data);
+            });
+        }
+        
         document.getElementById("dropdown-toggle").addEventListener("click", () => {
             let popupUrl = window.location.origin + "/tableau/myext/ext_test/popup.html"; // URL của file popup
             tableau.extensions.ui.displayDialogAsync(popupUrl, "", { width: 400, height: 300 })
