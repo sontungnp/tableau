@@ -183,8 +183,8 @@
               <format attr='margin' value='4' />
             </zone-style>
           </zone>
-          <zone forceUpdate='true' h='98000' id='24' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/]' type-v2='dashboard-object' w='49200' x='800' y='1000'>
-            <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/' extension-version='0.1.0' instance-id='364469795CC548018CB02AAFC1481BA4'>
+          <zone forceUpdate='true' h='98000' id='31' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/main.html]' type-v2='dashboard-object' w='49200' x='800' y='1000'>
+            <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/main.html' extension-version='0.1.0' instance-id='64A5248FF9724F108D2BF7635E36EA4D'>
               <instance-settings />
               <type-settings>
                 <dashboard />
@@ -209,10 +209,10 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='30' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98000' id='29' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
-                <zone forceUpdate='true' h='98000' id='24' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/]' type-v2='dashboard-object' w='49200' x='800' y='1000'>
-                  <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/' extension-version='0.1.0' instance-id='364469795CC548018CB02AAFC1481BA4'>
+            <zone h='100000' id='33' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98000' id='32' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+                <zone forceUpdate='true' h='98000' id='31' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/main.html]' type-v2='dashboard-object' w='49200' x='800' y='1000'>
+                  <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/main.html' extension-version='0.1.0' instance-id='64A5248FF9724F108D2BF7635E36EA4D'>
                     <instance-settings />
                     <type-settings>
                       <dashboard />
@@ -287,7 +287,7 @@
       <viewpoints>
         <viewpoint name='Sheet 1' />
       </viewpoints>
-      <active id='-1' />
+      <active id='31' />
       <simple-id uuid='{FDAF6D3E-C107-412E-A96E-4AA8592DC86B}' />
     </window>
   </windows>
@@ -403,7 +403,7 @@
           <author email='USER@example.com' name='USERNAME' organization='MyCo' website='https://www.example.com' />
           <min-api-version>1.0</min-api-version>
           <source-location>
-            <url>https://sontungnp.github.io/tableau/myext/ext_test/</url>
+            <url>https://sontungnp.github.io/tableau/myext/ext_test/main.html</url>
           </source-location>
           <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAlhJREFUOI2Nkt9vy1EYh5/3bbsvRSySCZbIxI+ZCKsN2TKtSFyIrV2WuRCJuBiJWxfuxCVXbvwFgiEtposgLFJElnbU1SxIZIIRJDKTrdu+53Uhra4mce7Oe57Pcz7JOULFisViwZ+29LAzOSjQYDgz1ZcCvWuXV11MJpN+OS/lm6179teqH0yDqxPTCyKSA8DcDsyOmOprnCaeP7459pdgy969i0LTC3IO/RQMyoHcQN+3cnljW3dNIFC47qDaK3g7BwdTkwBaBELT4ZPOUVWgKl4ZBnjxJPUlMDnTDrp0pmr6RHFeEjjcUUXPDGeSEwDN0Xg8sivxMhJNjGzbHd8PkM3eHRfkrBM5NkcQaY2vUnTlrDIA0NoaX+KLXFFlowr14tvVpqb2MICzmQcKqxvbumv+NAhZGCCIPwEw6QWXKYRL/VUXO0+rAUJiPwAk5MIlgVfwPjjHLCL1APmHN94ZdqeYN+NW/mn6I4BvwQYchcLnwFhJMDiYmlRxAzjpKWZkYkUCcZ2I61wi37tLbYyjiN0fHk5Oz3nGSLSzBbNHCF35R7f6K1/hN9PRhek11FrymfQQQKB4+Gl05P2qNRtmETlXW7e+b2z01dfycGNbfFMAbqNyKp9Jp4rzOT8RYFs0njJkc2iqsCObvTsOsDWWqA5C1uFy+Uz/oXJeKwVT4h0RmPUXhi79vuC0Ku6yOffTK3g9lfxfDQAisY516sg5kfOCiJk7HoLt2cf9b/9LANAc7dznm98PagG1fUOZ9IP5uMB8Q4CPoyNvausapkTt3rNMuvdf3C/o6+czhtdwmwAAAABJRU5ErkJggg==</icon>
         </dashboard-extension>
