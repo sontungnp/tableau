@@ -4,12 +4,15 @@ document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         console.log("Extension initialized");
 
-        document.getElementById("resizeButton").addEventListener("click", () => {
-            let newWidth = 600; // Đổi sang kích thước mong muốn
-            let newHeight = 400;
-            
-            tableau.extensions.ui.dashboardContent.setFrameSize(newWidth, newHeight);
-            console.log(`Đã đổi kích thước: ${newWidth}x${newHeight}`);
+        document.getElementById("openPopup").addEventListener("click", () => {
+            let popupUrl = window.location.origin + "/popup.html"; // URL của file popup
+            tableau.extensions.ui.displayDialogAsync(popupUrl, "", { width: 400, height: 300 })
+                .then((payload) => {
+                    console.log("Popup đóng với dữ liệu: " + payload);
+                })
+                .catch((error) => {
+                    console.log("Lỗi khi mở popup: " + error.message);
+                });
         });
     });
 });
