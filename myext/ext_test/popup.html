@@ -10,24 +10,6 @@
         body {
             font-family: Arial, sans-serif;
         }
-        .combobox {
-            position: relative;
-            width: 300px;
-        }
-        .combobox input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .combobox .arrow {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-        }
         #tree-container {
             display: none;
             position: absolute;
@@ -63,10 +45,8 @@
 <body>
     <h2>Đây là popup ngoài iframe</h2>
     <button id="closePopup">Đóng Popup</button>
-    <div class="combobox">
-        <input type="text" id="search-box" placeholder="Search...">
-        <span class="arrow" id="dropdown-toggle">▼</span>
-        <div id="tree-container"></div>
+    
+    <div id="tree-container"></div>
     </div>
 </body>
 </html>
