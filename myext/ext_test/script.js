@@ -2,12 +2,14 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
-        document.getElementById('openPopupButton').addEventListener('click', function() {
-            document.getElementById('popup').style.display = 'block';
+        console.log("Extension initialized");
+
+        document.getElementById("resizeButton").addEventListener("click", () => {
+            let newWidth = 600; // Đổi sang kích thước mong muốn
+            let newHeight = 400;
+            
+            tableau.extensions.ui.dashboardContent.setFrameSize(newWidth, newHeight);
+            console.log(`Đã đổi kích thước: ${newWidth}x${newHeight}`);
         });
-        
-        function closePopup() {
-            document.getElementById('popup').style.display = 'none';
-        }
     });
 });

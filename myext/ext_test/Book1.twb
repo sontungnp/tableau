@@ -16,7 +16,6 @@
     <SetMembershipControl />
     <SheetIdentifierTracking />
     <WindowsPersistSimpleIdentifiers />
-    <WorksheetBackgroundTransparency />
   </document-format-change-manifest>
   <preferences>
     <preference name='ui.encoding.shelf.height' value='24' />
@@ -176,7 +175,7 @@
       <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
       <zones>
         <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
-          <zone h='76250' id='3' name='Sheet 1' w='98400' x='800' y='22750'>
+          <zone h='98000' id='3' name='Sheet 1' w='49200' x='50000' y='1000'>
             <zone-style>
               <format attr='border-color' value='#000000' />
               <format attr='border-style' value='none' />
@@ -184,22 +183,8 @@
               <format attr='margin' value='4' />
             </zone-style>
           </zone>
-          <zone forceUpdate='true' h='21750' id='19' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_todate/]' type-v2='dashboard-object' w='30600' x='68600' y='1000'>
-            <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_todate/' extension-version='0.1.0' instance-id='35F74E0E8D6D4D11AE386757F70BEC69'>
-              <instance-settings />
-              <type-settings>
-                <dashboard />
-              </type-settings>
-            </add-in>
-            <zone-style>
-              <format attr='border-color' value='#000000' />
-              <format attr='border-style' value='none' />
-              <format attr='border-width' value='0' />
-              <format attr='margin' value='4' />
-            </zone-style>
-          </zone>
-          <zone forceUpdate='true' h='21750' id='16' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/]' type-v2='dashboard-object' w='67800' x='800' y='1000'>
-            <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/' extension-version='0.1.0' instance-id='11B8DD2BE07D42738D4882866D5F2D66'>
+          <zone forceUpdate='true' h='98000' id='24' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/]' type-v2='dashboard-object' w='49200' x='800' y='1000'>
+            <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/' extension-version='0.1.0' instance-id='364469795CC548018CB02AAFC1481BA4'>
               <instance-settings />
               <type-settings>
                 <dashboard />
@@ -219,23 +204,15 @@
             <format attr='margin' value='8' />
           </zone-style>
         </zone>
-        <zone forceUpdate='true' h='21625' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='38000' x='57600' y='40625'>
-          <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_config/' extension-version='0.1.0' instance-id='FF38E883ACB74E68975063BD4AE61C29'>
-            <instance-settings />
-            <type-settings>
-              <dashboard />
-            </type-settings>
-          </add-in>
-        </zone>
       </zones>
       <devicelayouts>
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='23' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98000' id='22' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
-                <zone forceUpdate='true' h='21750' id='16' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/]' type-v2='dashboard-object' w='67800' x='800' y='1000'>
-                  <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/' extension-version='0.1.0' instance-id='11B8DD2BE07D42738D4882866D5F2D66'>
+            <zone h='100000' id='28' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98000' id='27' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+                <zone forceUpdate='true' h='98000' id='24' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/]' type-v2='dashboard-object' w='49200' x='800' y='1000'>
+                  <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/' extension-version='0.1.0' instance-id='364469795CC548018CB02AAFC1481BA4'>
                     <instance-settings />
                     <type-settings>
                       <dashboard />
@@ -249,37 +226,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone forceUpdate='true' h='21750' id='19' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_todate/]' type-v2='dashboard-object' w='30600' x='68600' y='1000'>
-                  <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_todate/' extension-version='0.1.0' instance-id='35F74E0E8D6D4D11AE386757F70BEC69'>
-                    <instance-settings />
-                    <type-settings>
-                      <dashboard />
-                    </type-settings>
-                  </add-in>
-                  <zone-style>
-                    <format attr='border-color' value='#000000' />
-                    <format attr='border-style' value='none' />
-                    <format attr='border-width' value='0' />
-                    <format attr='margin' value='4' />
-                    <format attr='padding' value='0' />
-                  </zone-style>
-                </zone>
-                <zone fixed-size='280' h='76250' id='3' is-fixed='true' name='Sheet 1' w='98400' x='800' y='22750'>
-                  <zone-style>
-                    <format attr='border-color' value='#000000' />
-                    <format attr='border-style' value='none' />
-                    <format attr='border-width' value='0' />
-                    <format attr='margin' value='4' />
-                    <format attr='padding' value='0' />
-                  </zone-style>
-                </zone>
-                <zone forceUpdate='true' h='21625' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='38000' x='57600' y='40625'>
-                  <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_config/' extension-version='0.1.0' instance-id='FF38E883ACB74E68975063BD4AE61C29'>
-                    <instance-settings />
-                    <type-settings>
-                      <dashboard />
-                    </type-settings>
-                  </add-in>
+                <zone fixed-size='280' h='98000' id='3' is-fixed='true' name='Sheet 1' w='49200' x='50000' y='1000'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -347,52 +294,44 @@
   <thumbnails>
     <thumbnail height='192' name='Dashboard 1' width='192'>
       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
-      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
-      Eo0BkGj/A4YRhdTFrj/zAAAAAElFTkSuQmCC
+      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
     </thumbnail>
     <thumbnail height='124' name='Sheet 1' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAAB8CAYAAAA/1L8JAAAACXBIWXMAAA7DAAAOwwHHb6hk
@@ -464,43 +403,7 @@
           <author email='USER@example.com' name='USERNAME' organization='MyCo' website='https://www.example.com' />
           <min-api-version>1.0</min-api-version>
           <source-location>
-            <url>https://sontungnp.github.io/tableau/myext/ext_config/</url>
-          </source-location>
-          <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAlhJREFUOI2Nkt9vy1EYh5/3bbsvRSySCZbIxI+ZCKsN2TKtSFyIrV2WuRCJuBiJWxfuxCVXbvwFgiEtposgLFJElnbU1SxIZIIRJDKTrdu+53Uhra4mce7Oe57Pcz7JOULFisViwZ+29LAzOSjQYDgz1ZcCvWuXV11MJpN+OS/lm6179teqH0yDqxPTCyKSA8DcDsyOmOprnCaeP7459pdgy969i0LTC3IO/RQMyoHcQN+3cnljW3dNIFC47qDaK3g7BwdTkwBaBELT4ZPOUVWgKl4ZBnjxJPUlMDnTDrp0pmr6RHFeEjjcUUXPDGeSEwDN0Xg8sivxMhJNjGzbHd8PkM3eHRfkrBM5NkcQaY2vUnTlrDIA0NoaX+KLXFFlowr14tvVpqb2MICzmQcKqxvbumv+NAhZGCCIPwEw6QWXKYRL/VUXO0+rAUJiPwAk5MIlgVfwPjjHLCL1APmHN94ZdqeYN+NW/mn6I4BvwQYchcLnwFhJMDiYmlRxAzjpKWZkYkUCcZ2I61wi37tLbYyjiN0fHk5Oz3nGSLSzBbNHCF35R7f6K1/hN9PRhek11FrymfQQQKB4+Gl05P2qNRtmETlXW7e+b2z01dfycGNbfFMAbqNyKp9Jp4rzOT8RYFs0njJkc2iqsCObvTsOsDWWqA5C1uFy+Uz/oXJeKwVT4h0RmPUXhi79vuC0Ku6yOffTK3g9lfxfDQAisY516sg5kfOCiJk7HoLt2cf9b/9LANAc7dznm98PagG1fUOZ9IP5uMB8Q4CPoyNvausapkTt3rNMuvdf3C/o6+czhtdwmwAAAABJRU5ErkJggg==</icon>
-        </dashboard-extension>
-      </manifest>
-      <referenced-views>
-        <referenced-view instances='1' viewId='Dashboard 1' />
-      </referenced-views>
-    </referenced-extension>
-    <referenced-extension>
-      <manifest manifest-version='0.1'>
-        <dashboard-extension extension-version='0.1.0' id='com.example.extensions.name'>
-          <default-locale>en_US</default-locale>
-          <name resource-id='name' />
-          <description>Extension Description</description>
-          <author email='USER@example.com' name='USERNAME' organization='MyCo' website='https://www.example.com' />
-          <min-api-version>1.0</min-api-version>
-          <source-location>
             <url>https://sontungnp.github.io/tableau/myext/ext_test/</url>
-          </source-location>
-          <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAlhJREFUOI2Nkt9vy1EYh5/3bbsvRSySCZbIxI+ZCKsN2TKtSFyIrV2WuRCJuBiJWxfuxCVXbvwFgiEtposgLFJElnbU1SxIZIIRJDKTrdu+53Uhra4mce7Oe57Pcz7JOULFisViwZ+29LAzOSjQYDgz1ZcCvWuXV11MJpN+OS/lm6179teqH0yDqxPTCyKSA8DcDsyOmOprnCaeP7459pdgy969i0LTC3IO/RQMyoHcQN+3cnljW3dNIFC47qDaK3g7BwdTkwBaBELT4ZPOUVWgKl4ZBnjxJPUlMDnTDrp0pmr6RHFeEjjcUUXPDGeSEwDN0Xg8sivxMhJNjGzbHd8PkM3eHRfkrBM5NkcQaY2vUnTlrDIA0NoaX+KLXFFlowr14tvVpqb2MICzmQcKqxvbumv+NAhZGCCIPwEw6QWXKYRL/VUXO0+rAUJiPwAk5MIlgVfwPjjHLCL1APmHN94ZdqeYN+NW/mn6I4BvwQYchcLnwFhJMDiYmlRxAzjpKWZkYkUCcZ2I61wi37tLbYyjiN0fHk5Oz3nGSLSzBbNHCF35R7f6K1/hN9PRhek11FrymfQQQKB4+Gl05P2qNRtmETlXW7e+b2z01dfycGNbfFMAbqNyKp9Jp4rzOT8RYFs0njJkc2iqsCObvTsOsDWWqA5C1uFy+Uz/oXJeKwVT4h0RmPUXhi79vuC0Ku6yOffTK3g9lfxfDQAisY516sg5kfOCiJk7HoLt2cf9b/9LANAc7dznm98PagG1fUOZ9IP5uMB8Q4CPoyNvausapkTt3rNMuvdf3C/o6+czhtdwmwAAAABJRU5ErkJggg==</icon>
-        </dashboard-extension>
-      </manifest>
-      <referenced-views>
-        <referenced-view instances='1' viewId='Dashboard 1' />
-      </referenced-views>
-    </referenced-extension>
-    <referenced-extension>
-      <manifest manifest-version='0.1'>
-        <dashboard-extension extension-version='0.1.0' id='com.example.extensions.name'>
-          <default-locale>en_US</default-locale>
-          <name resource-id='name' />
-          <description>Extension Description</description>
-          <author email='USER@example.com' name='USERNAME' organization='MyCo' website='https://www.example.com' />
-          <min-api-version>1.0</min-api-version>
-          <source-location>
-            <url>https://sontungnp.github.io/tableau/myext/ext_todate/</url>
           </source-location>
           <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAlhJREFUOI2Nkt9vy1EYh5/3bbsvRSySCZbIxI+ZCKsN2TKtSFyIrV2WuRCJuBiJWxfuxCVXbvwFgiEtposgLFJElnbU1SxIZIIRJDKTrdu+53Uhra4mce7Oe57Pcz7JOULFisViwZ+29LAzOSjQYDgz1ZcCvWuXV11MJpN+OS/lm6179teqH0yDqxPTCyKSA8DcDsyOmOprnCaeP7459pdgy969i0LTC3IO/RQMyoHcQN+3cnljW3dNIFC47qDaK3g7BwdTkwBaBELT4ZPOUVWgKl4ZBnjxJPUlMDnTDrp0pmr6RHFeEjjcUUXPDGeSEwDN0Xg8sivxMhJNjGzbHd8PkM3eHRfkrBM5NkcQaY2vUnTlrDIA0NoaX+KLXFFlowr14tvVpqb2MICzmQcKqxvbumv+NAhZGCCIPwEw6QWXKYRL/VUXO0+rAUJiPwAk5MIlgVfwPjjHLCL1APmHN94ZdqeYN+NW/mn6I4BvwQYchcLnwFhJMDiYmlRxAzjpKWZkYkUCcZ2I61wi37tLbYyjiN0fHk5Oz3nGSLSzBbNHCF35R7f6K1/hN9PRhek11FrymfQQQKB4+Gl05P2qNRtmETlXW7e+b2z01dfycGNbfFMAbqNyKp9Jp4rzOT8RYFs0njJkc2iqsCObvTsOsDWWqA5C1uFy+Uz/oXJeKwVT4h0RmPUXhi79vuC0Ku6yOffTK3g9lfxfDQAisY516sg5kfOCiJk7HoLt2cf9b/9LANAc7dznm98PagG1fUOZ9IP5uMB8Q4CPoyNvausapkTt3rNMuvdf3C/o6+czhtdwmwAAAABJRU5ErkJggg==</icon>
         </dashboard-extension>

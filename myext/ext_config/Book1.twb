@@ -191,7 +191,7 @@
             <format attr='margin' value='8' />
           </zone-style>
         </zone>
-        <zone forceUpdate='true' h='52625' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='33300' x='60100' y='2375'>
+        <zone forceUpdate='true' h='29750' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='35200' x='60100' y='18375'>
           <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_config/' extension-version='0.1.0' instance-id='FF38E883ACB74E68975063BD4AE61C29'>
             <instance-settings />
             <type-settings>
@@ -204,8 +204,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='17' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98000' id='16' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+            <zone h='100000' id='19' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98000' id='18' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
                 <zone fixed-size='280' h='98000' id='3' is-fixed='true' name='Sheet 1' w='98400' x='800' y='1000'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -215,7 +215,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone forceUpdate='true' h='52625' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='33300' x='60100' y='2375'>
+                <zone forceUpdate='true' h='29750' id='5' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_config/]' type-v2='dashboard-object' w='35200' x='60100' y='18375'>
                   <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_config/' extension-version='0.1.0' instance-id='FF38E883ACB74E68975063BD4AE61C29'>
                     <instance-settings />
                     <type-settings>
