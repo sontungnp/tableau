@@ -1,6 +1,6 @@
 'use strict';
 
-tableau.extensions.initializeDialogAsync().then(payload => {
+tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử dụng async ở đây
     console.log("Popup mở thành công!");
 
     console.log(payload);
@@ -9,23 +9,23 @@ tableau.extensions.initializeDialogAsync().then(payload => {
         tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
     });
 
-    let selectedNodes = new Set();
-    // Nhận treeData từ trang chính (payload được truyền vào từ `displayDialogAsync`)
-    // let treeData = [];
-    // treeData = JSON.parse(payload);
+    document.getElementById("loadData").addEventListener("click", () => {
+        console.log("Load Data");
+    });
 
+    let selectedNodes = new Set();
     let treeData = [];
-    fetchData();
-    
+
+    await fetchData(); // Đợi fetchData chạy xong trước khi tiếp tục
+
     console.log(treeData);
 
     renderTree(treeData, document.getElementById("tree-container"));
 
-    function fetchData() {
+    async function fetchData() {
         const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
-        worksheet.getSummaryDataAsync().then(data => {
-            treeData = transformDataToTree(data);
-        });
+        const data = await worksheet.getSummaryDataAsync(); // Đợi dữ liệu được lấy về
+        treeData = transformDataToTree(data);
     }
 
     function transformDataToTree(data) {
@@ -92,6 +92,7 @@ tableau.extensions.initializeDialogAsync().then(payload => {
             node.style.display = text.includes(query) ? "flex" : "none";
         });
     }
+
     function toggleChildren(node, checked) {
         node.children.forEach(child => {
             let checkbox = document.querySelector(`input[data-id='${child.id}']`);
