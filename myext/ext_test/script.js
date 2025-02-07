@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
         console.log("Extension initialized");
 
-        document.getElementById("openPopup").addEventListener("click", () => {
-            let popupUrl = window.location.origin + "/tableau/myext/ext_config/popup.html"; // URL của file popup
+        document.getElementById("dropdown-toggle").addEventListener("click", () => {
+            let popupUrl = window.location.origin + "/tableau/myext/ext_test/popup.html"; // URL của file popup
             tableau.extensions.ui.displayDialogAsync(popupUrl, "", { width: 400, height: 300 })
                 .then((payload) => {
                     console.log("Popup đóng với dữ liệu: " + payload);
