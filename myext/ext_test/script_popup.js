@@ -16,9 +16,9 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     container.style.display = container.style.display === "block" ? "none" : "block";
     
 
-    function renderTree(node, container, parent = null) {
+    function renderTree(node, container, parent = null, level = 0) {
         if (!node) return;
-        node.parent = parent; // Gán parent cho node
+        node.parent = parent; // Gán node cha
     
         let div = document.createElement("div");
         div.classList.add("node");
@@ -40,21 +40,21 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         div.appendChild(document.createTextNode(node.name));
         container.appendChild(div);
     
+        let childrenContainer = document.createElement("div");
+        childrenContainer.classList.add("children");
+        container.appendChild(childrenContainer);
+    
         if (node.children.length) {
-            let childrenContainer = document.createElement("div");
-            childrenContainer.classList.add("children");
-    
-            // Nếu là cấp 2 (con của root), thì hiển thị mặc định
-            if (parent !== null && parent.parent === null) {
-                childrenContainer.style.display = "block"; 
-                toggle.textContent = "▼";  // Cập nhật icon toggle
-            }
-    
-            container.appendChild(childrenContainer);
-            node.children.forEach(child => renderTree(child, childrenContainer, node));
+            node.children.forEach(child => renderTree(child, childrenContainer, node, level + 1));
         }
     
-        // Toggle khi click
+        // **Mặc định mở rộng level 2**
+        if (level === 1) {
+            childrenContainer.style.display = "block";  // Hiển thị con của root
+            toggle.textContent = "▼";  // Cập nhật icon toggle
+        }
+    
+        // **Thêm sự kiện toggle**
         toggle.addEventListener("click", function (event) {
             event.stopPropagation();
             let isExpanded = this.textContent === "▼";
@@ -65,7 +65,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             }
         });
     }
-    
 
     function filterTree() {
         let query = document.getElementById("search-box").value.toLowerCase();
