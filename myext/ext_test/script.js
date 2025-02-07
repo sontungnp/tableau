@@ -33,6 +33,15 @@ document.addEventListener("DOMContentLoaded", () => {
         
         document.getElementById("dropdown-toggle").addEventListener("click", () => {
             let popupUrl = window.location.origin + "/tableau/myext/ext_test/popup.html"; // URL của file popup
+
+            function removeParentRefs(node) {
+                if (!node) return;
+                node.children.forEach(child => removeParentRefs(child));
+                delete node.parent; // ❌ Xóa thuộc tính parent
+            }
+        
+            removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
+            
             tableau.extensions.ui.displayDialogAsync(popupUrl, JSON.stringify(treeData), { width: 400, height: 300 })
                 .then((payload) => {
                     console.log("Popup đóng với dữ liệu: " + payload);
