@@ -17,36 +17,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         container.style.display = container.style.display === "block" ? "none" : "block";
     });
 
-    let selectedNodes = new Set();
-    let treeData = [];
-
-    await fetchData(); // Đợi fetchData chạy xong trước khi tiếp tục
-
-    console.log(treeData);
+    let treeData = JSON.parse(payload);
 
     renderTree(treeData, document.getElementById("tree-container"));
-
-    async function fetchData() {
-        const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
-        const data = await worksheet.getSummaryDataAsync(); // Đợi dữ liệu được lấy về
-        treeData = transformDataToTree(data);
-    }
-
-    function transformDataToTree(data) {
-        const nodes = {};
-        data.data.forEach(row => {
-            const id = row[0].value;
-            const parentId = row[1].value;
-            const label = row[2].value;
-            nodes[id] = nodes[id] || { id, name: label, children: [], parent: null };
-            if (parentId !== null) {
-                nodes[parentId] = nodes[parentId] || { id: parentId, name: "", children: [], parent: null };
-                nodes[parentId].children.push(nodes[id]);
-                nodes[id].parent = nodes[parentId];
-            }
-        });
-        return Object.values(nodes).find(node => !node.parent) || [];
-    }
+    let container = document.getElementById("tree-container");
+    container.style.display = container.style.display === "block" ? "none" : "block";
+    
 
     function renderTree(node, container) {
         if (!node) return;
