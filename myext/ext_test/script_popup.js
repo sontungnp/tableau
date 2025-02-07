@@ -18,6 +18,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     function renderTree(node, container) {
         if (!node) return;
+        
         let div = document.createElement("div");
         div.classList.add("node");
         
@@ -34,7 +35,10 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
                 this.textContent = isExpanded ? "▶" : "▼";
             }
         });
-        
+    
+        let parentIcon = document.createElement("span");
+        parentIcon.classList.add("parent-checkbox");
+    
         let checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.dataset.id = node.id;
@@ -42,8 +46,9 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             toggleChildren(node, this.checked);
             updateParentState(node.parent);
         });
-        
+    
         div.appendChild(toggle);
+        div.appendChild(parentIcon); // Thêm icon vào đây
         div.appendChild(checkbox);
         div.appendChild(document.createTextNode(node.name));
         container.appendChild(div);
@@ -77,15 +82,24 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     function updateParentState(node) {
         if (!node) return;
+        
         let parentCheckbox = document.querySelector(`input[data-id='${node.id}']`);
+        let parentIcon = parentCheckbox?.previousElementSibling; // Biểu tượng của node cha
+    
         let childCheckboxes = node.children.map(child => document.querySelector(`input[data-id='${child.id}']`));
         
         let allChecked = childCheckboxes.every(checkbox => checkbox.checked);
         let someChecked = childCheckboxes.some(checkbox => checkbox.checked || checkbox.indeterminate);
-        
+    
         parentCheckbox.checked = allChecked;
         parentCheckbox.indeterminate = !allChecked && someChecked;
         
+        if (someChecked && !allChecked) {
+            parentIcon.classList.add("partial-selected");
+        } else {
+            parentIcon.classList.remove("partial-selected");
+        }
+    
         updateParentState(node.parent);
     }
 });

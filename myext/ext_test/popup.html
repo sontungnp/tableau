@@ -40,6 +40,16 @@
         .expanded > .children {
             display: block;
         }
+        .parent-checkbox::before {
+            content: "☑"; /* Icon mặc định khi tất cả con đều được chọn */
+            font-size: 16px;
+            color: green;
+        }
+        .partial-selected::before {
+            content: "◉"; /* Icon khi chỉ có một số con được chọn */
+            font-size: 16px;
+            color: orange;
+        }
     </style>
 </head>
 <body>
