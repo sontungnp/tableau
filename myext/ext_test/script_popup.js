@@ -16,9 +16,10 @@ tableau.extensions.initializeDialogAsync().then(payload => {
 
     let treeData = [];
     fetchData();
-    renderTree(treeData, document.getElementById("tree-container"));
-
+    
     console.log(treeData);
+
+    renderTree(treeData, document.getElementById("tree-container"));
 
     function fetchData() {
         const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
