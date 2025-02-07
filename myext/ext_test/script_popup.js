@@ -16,12 +16,13 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     container.style.display = container.style.display === "block" ? "none" : "block";
     
 
-    function renderTree(node, container) {
+    function renderTree(node, container, parent = null) {
         if (!node) return;
-        
+        node.parent = parent; // Gán parent cho mỗi node
+    
         let div = document.createElement("div");
         div.classList.add("node");
-        
+    
         let toggle = document.createElement("span");
         toggle.classList.add("toggle");
         toggle.textContent = node.children.length ? "▶" : "";
@@ -36,9 +37,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             }
         });
     
-        let parentIcon = document.createElement("span");
-        parentIcon.classList.add("parent-checkbox");
-    
         let checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.dataset.id = node.id;
@@ -48,16 +46,15 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         });
     
         div.appendChild(toggle);
-        div.appendChild(parentIcon); // Thêm icon vào đây
         div.appendChild(checkbox);
         div.appendChild(document.createTextNode(node.name));
         container.appendChild(div);
-        
+    
         if (node.children.length) {
             let childrenContainer = document.createElement("div");
             childrenContainer.classList.add("children");
             container.appendChild(childrenContainer);
-            node.children.forEach(child => renderTree(child, childrenContainer));
+            node.children.forEach(child => renderTree(child, childrenContainer, node)); // Truyền node cha vào
         }
     }
 
@@ -74,7 +71,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             let checkbox = document.querySelector(`input[data-id='${child.id}']`);
             if (checkbox) {
                 checkbox.checked = checked;
-                checkbox.indeterminate = false;
+                checkbox.indeterminate = false; // Bổ sung để đảm bảo không có trạng thái trung gian
                 toggleChildren(child, checked);
             }
         });
@@ -82,23 +79,14 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     function updateParentState(node) {
         if (!node) return;
-        
         let parentCheckbox = document.querySelector(`input[data-id='${node.id}']`);
-        let parentIcon = parentCheckbox?.previousElementSibling; // Biểu tượng của node cha
+        let childCheckboxes = node.children.map(child => document.querySelector(`input[data-id='${child.id}']`)).filter(checkbox => checkbox !== null);
     
-        let childCheckboxes = node.children.map(child => document.querySelector(`input[data-id='${child.id}']`));
-        
-        let allChecked = childCheckboxes.every(checkbox => checkbox.checked);
+        let allChecked = childCheckboxes.length > 0 && childCheckboxes.every(checkbox => checkbox.checked);
         let someChecked = childCheckboxes.some(checkbox => checkbox.checked || checkbox.indeterminate);
     
         parentCheckbox.checked = allChecked;
         parentCheckbox.indeterminate = !allChecked && someChecked;
-        
-        if (someChecked && !allChecked) {
-            parentIcon.classList.add("partial-selected");
-        } else {
-            parentIcon.classList.remove("partial-selected");
-        }
     
         updateParentState(node.parent);
     }
