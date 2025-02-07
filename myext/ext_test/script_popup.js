@@ -9,14 +9,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
     });
 
-    document.getElementById("loadData").addEventListener("click", () => {
-        console.log("Load Data");
-        // renderTree(treeData, document.getElementById("tree-container"));
-        renderTree(JSON.parse(payload), document.getElementById("tree-container"));
-        let container = document.getElementById("tree-container");
-        container.style.display = container.style.display === "block" ? "none" : "block";
-    });
-
     let treeData = JSON.parse(payload);
 
     renderTree(treeData, document.getElementById("tree-container"));
