@@ -14,5 +14,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log("Lỗi khi mở popup: " + error.message);
                 });
         });
+
+        tableau.extensions.initializeDialogAsync().then(() => {
+            console.log("Popup mở thành công!");
+
+            document.getElementById("closePopup").addEventListener("click", () => {
+                tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
+            });
+        });
     });
 });
