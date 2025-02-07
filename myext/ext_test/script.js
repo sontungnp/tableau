@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
             removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
             
-            tableau.extensions.ui.displayDialogAsync(popupUrl, JSON.stringify(treeData), { width: 400, height: 300 })
+            tableau.extensions.ui.displayDialogAsync(popupUrl, treeData, { width: 400, height: 300 }) // JSON.stringify(treeData)
                 .then((payload) => {
                     console.log("Popup đóng với dữ liệu: " + payload);
                 })
