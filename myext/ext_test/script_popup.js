@@ -16,9 +16,9 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     container.style.display = container.style.display === "block" ? "none" : "block";
     
 
-    function renderTree(node, container, parent = null, level = 0) {
+    function renderTree(node, container, parent = null) {
         if (!node) return;
-        node.parent = parent; // Gán node cha
+        node.parent = parent; // Gán parent cho mỗi node
     
         let div = document.createElement("div");
         div.classList.add("node");
@@ -26,6 +26,16 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         let toggle = document.createElement("span");
         toggle.classList.add("toggle");
         toggle.textContent = node.children.length ? "▶" : "";
+        toggle.addEventListener("click", function (event) {
+            event.stopPropagation();
+            let parent = this.parentElement;
+            let childrenContainer = parent.nextElementSibling;
+            if (childrenContainer) {
+                let isExpanded = childrenContainer.style.display === "block";
+                childrenContainer.style.display = isExpanded ? "none" : "block";
+                this.textContent = isExpanded ? "▶" : "▼";
+            }
+        });
     
         let checkbox = document.createElement("input");
         checkbox.type = "checkbox";
@@ -40,30 +50,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         div.appendChild(document.createTextNode(node.name));
         container.appendChild(div);
     
-        let childrenContainer = document.createElement("div");
-        childrenContainer.classList.add("children");
-        container.appendChild(childrenContainer);
-    
         if (node.children.length) {
-            node.children.forEach(child => renderTree(child, childrenContainer, node, level + 1));
+            let childrenContainer = document.createElement("div");
+            childrenContainer.classList.add("children");
+            container.appendChild(childrenContainer);
+            node.children.forEach(child => renderTree(child, childrenContainer, node)); // Truyền node cha vào
         }
-    
-        // **Mặc định mở rộng level 2**
-        if (level === 1) {
-            childrenContainer.style.display = "block";  // Hiển thị con của root
-            toggle.textContent = "▼";  // Cập nhật icon toggle
-        }
-    
-        // **Thêm sự kiện toggle**
-        toggle.addEventListener("click", function (event) {
-            event.stopPropagation();
-            let isExpanded = this.textContent === "▼";
-            let childrenContainer = div.nextElementSibling;
-            if (childrenContainer) {
-                childrenContainer.style.display = isExpanded ? "none" : "block";
-                this.textContent = isExpanded ? "▶" : "▼";
-            }
-        });
     }
 
     function filterTree() {
