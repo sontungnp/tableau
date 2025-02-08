@@ -19,14 +19,27 @@
             background: #f9f9f9;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
+
         #popup-button {
             display: flex;
-            flex-direction: row; /* Sắp xếp các phần tử theo chiều ngang */
-            gap: 10px; /* Tạo khoảng cách giữa các phần tử */
+            justify-content: space-between; /* Chia đều không gian giữa các phần */
+            align-items: center;
             padding: 15px;
             border: 1px solid #ccc;
             background: #f9f9f9;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #tree-buttons {
+            display: flex;
+            justify-content: flex-start; /* Căn trái */
+            gap: 10px;
+        }
+
+        #control-buttons {
+            display: flex;
+            justify-content: flex-end; /* Căn phải */
+            gap: 10px;
         }
 
         #tree-buttons {
@@ -47,13 +60,6 @@
         }
         #tree-buttons button:hover {
             background-color: #0056b3; /* Màu xanh đậm khi hover */
-        }
-
-        #control-buttons {
-            display: flex;
-            flex-direction: row-reverse;
-            gap: 10px; /* Khoảng cách giữa các nút */
-            margin-bottom: 10px; /* Thêm khoảng cách với tree */
         }
 
         #tree-container {
