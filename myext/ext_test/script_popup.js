@@ -108,28 +108,27 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             let node = findNodeById(treeData, id);
             if (node) {
                 let isBranch = node.children.length > 0;
-                let isFullySelected = isBranch ? node.children.every(child => document.querySelector(`input[data-id='${child.id}']`).checked) : false;
                 
-                // 🔥 Kiểm tra nếu cha có giá trị "show"
+                // 🔥 Kiểm tra nếu cha có được chọn hay không
                 let parentNode = node.parent;
-                let parentHasShow = parentNode && selectedItems.some(item => item.id === parentNode.id && item.display === "show");
+                let parentChecked = parentNode ? document.querySelector(`input[data-id='${parentNode.id}']`).checked : false;
     
                 // 🔥 Cập nhật điều kiện "display"
-                let parentCheckbox = parentNode ? document.querySelector(`input[data-id='${parentNode.id}']`) : null;
-                let display = (isBranch && isFullySelected && !parentHasShow) || (!isBranch && (!parentCheckbox || !parentCheckbox.checked)) ? "show" : "";
+                let display = (!parentChecked) ? "show" : "";
     
                 selectedItems.push({
                     id: node.id,
                     name: node.name,
                     level: getLevel(node),
                     type: isBranch ? "Cành" : "Lá",
-                    selection: isBranch ? (isFullySelected ? "Tất cả" : "Một phần") : "N/A",
+                    selection: isBranch ? "Tất cả" : "N/A",
                     display: display // 🔥 THÊM TRƯỜNG "DISPLAY"
                 });
             }
         });
         renderSelectedItemsTable();  // 🔥 CẬP NHẬT BẢNG 🔥
     }
+    
     
     function renderSelectedItemsTable() { 
         let table = document.getElementById("selected-items-table"); 
