@@ -34,12 +34,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     });
 
-    let popupDate = JSON.parse(payload);
-    let treeData = popupDate.treeData;
-    let selectedData = popupDate.selectedData;
+    let popupData = JSON.parse(payload);
+    let treeData = popupData.treeData;
+    let selectedIds = popupData.selectedData;
     
     renderTree(treeData, document.getElementById("tree-container"), null, 1, expandLevel);
-    selectAndExpandNodes(selectedData);
+    selectAndExpandNodes(selectedIds);
 
     let container = document.getElementById("tree-container");
     container.style.display = container.style.display === "block" ? "none" : "block";
@@ -101,8 +101,10 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         }
     }
 
-    function selectAndExpandNodes(selectedData) {
-        selectedData.forEach(id => {
+    function selectAndExpandNodes(selectedIds) {
+        console.log("selectAndExpandNodes", selectedIds);
+        
+        selectedIds.forEach(id => {
             let checkbox = document.querySelector(`input[data-id='${id}']`);
             if (checkbox) {
                 checkbox.checked = true; // Tích chọn checkbox
