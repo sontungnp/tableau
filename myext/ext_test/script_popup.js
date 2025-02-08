@@ -16,16 +16,16 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     container.style.display = container.style.display === "block" ? "none" : "block";
     
 
-    function renderTree(node, container, parent = null) {
+    function renderTree(node, container, parent = null, level = 1) {
         if (!node) return;
-        node.parent = parent; // Gán parent cho mỗi node
-    
+        node.parent = parent;
+
         let div = document.createElement("div");
         div.classList.add("node");
-    
+
         let toggle = document.createElement("span");
         toggle.classList.add("toggle");
-        toggle.textContent = node.children.length ? "▶" : "";
+        toggle.textContent = node.children.length ? (level < 3 ? "▼" : "▶") : "";
         toggle.addEventListener("click", function (event) {
             event.stopPropagation();
             let parent = this.parentElement;
@@ -36,7 +36,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
                 this.textContent = isExpanded ? "▶" : "▼";
             }
         });
-    
+
         let checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.dataset.id = node.id;
@@ -44,17 +44,22 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             toggleChildren(node, this.checked);
             updateParentState(node.parent);
         });
-    
+
         div.appendChild(toggle);
         div.appendChild(checkbox);
         div.appendChild(document.createTextNode(node.name));
         container.appendChild(div);
-    
+
         if (node.children.length) {
             let childrenContainer = document.createElement("div");
             childrenContainer.classList.add("children");
             container.appendChild(childrenContainer);
-            node.children.forEach(child => renderTree(child, childrenContainer, node)); // Truyền node cha vào
+
+            if (level < 3) {
+                childrenContainer.style.display = "block"; // Mở rộng Level 1 & 2
+            }
+
+            node.children.forEach(child => renderTree(child, childrenContainer, node, level + 1));
         }
     }
 
