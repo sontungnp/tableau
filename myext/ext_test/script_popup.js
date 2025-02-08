@@ -8,6 +8,8 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     console.log(payload);
 
+    document.getElementById("search-box").addEventListener("input", filterTree);
+
     document.getElementById("okPopup").addEventListener("click", () => {
         tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
         // tableau.extensions.ui.closeDialog(JSON.stringify(selectedItems));
