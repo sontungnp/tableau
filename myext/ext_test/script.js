@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             popupData = {
                 "treeData": treeData,
-                "selectData": selectedData
+                "selectedData": selectedData
             };
 
             tableau.extensions.ui.displayDialogAsync(popupUrl, JSON.stringify(popupData), { width: 600, height: 800 }) // JSON.stringify(treeData)
