@@ -34,7 +34,9 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
 
     });
 
-    let treeData = JSON.parse(payload);
+    let popupDate = JSON.parse(payload);
+    let treeData = popupDate.treeData;
+    let selectedData = popupDate.selectedData;
     
     renderTree(treeData, document.getElementById("tree-container"), null, 1, expandLevel);
     let container = document.getElementById("tree-container");

@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let treeData = [];
 
         let selectedData = {};
+        let popupData = {};
 
         fetchData();
 
@@ -45,7 +46,12 @@ document.addEventListener("DOMContentLoaded", () => {
         
             removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
             
-            tableau.extensions.ui.displayDialogAsync(popupUrl, JSON.stringify(treeData), { width: 600, height: 800 }) // JSON.stringify(treeData)
+            popupData = {
+                "treeData": treeData,
+                "selectData": selectedData
+            };
+
+            tableau.extensions.ui.displayDialogAsync(popupUrl, JSON.stringify(popupData), { width: 600, height: 800 }) // JSON.stringify(treeData)
                 .then((payload) => {
                     console.log("Popup đóng với dữ liệu: " + payload);
                     let receivedValue  = JSON.parse(payload);
