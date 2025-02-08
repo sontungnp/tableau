@@ -38,7 +38,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     let treeData = popupDate.treeData;
     let selectedData = popupDate.selectedData;
     
-    renderTree(treeData, document.getElementById("tree-container"), null, 1, expandLevel);
+    renderTree(treeData, document.getElementById("tree-container"), null, 1, expandLevel, selectedData);
     let container = document.getElementById("tree-container");
     container.style.display = container.style.display === "block" ? "none" : "block";
     
@@ -51,13 +51,13 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         });
     }
 
-    function renderTree(node, container, parent = null, level = 1, expandLevel = 2) {
+    function renderTree(node, container, parent = null, level = 1, expandLevel = 2, selectedData = []) {
         if (!node) return;
         node.parent = parent;
-
+    
         let div = document.createElement("div");
         div.classList.add("node");
-
+    
         let toggle = document.createElement("span");
         toggle.classList.add("toggle");
         toggle.textContent = node.children.length ? (level <= expandLevel ? "▼" : "▶") : "";
@@ -71,33 +71,40 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
                 this.textContent = isExpanded ? "▶" : "▼";
             }
         });
-
+    
         let checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.dataset.id = node.id;
+        
+        // 🔥 Tự động check nếu ID nằm trong danh sách `selectedData`
+        if (selectedData.includes(node.id)) {
+            checkbox.checked = true;
+        }
+    
         checkbox.addEventListener("change", function () {
             toggleChildren(node, this.checked);
             updateParentState(node.parent);
             updateSelectedItems(); // 🔥 CẬP NHẬT DANH SÁCH 🔥
         });
-
+    
         div.appendChild(toggle);
         div.appendChild(checkbox);
         div.appendChild(document.createTextNode(node.name));
         container.appendChild(div);
-
+    
         if (node.children.length) {
             let childrenContainer = document.createElement("div");
             childrenContainer.classList.add("children");
             container.appendChild(childrenContainer);
-
+    
             if (level <= expandLevel) {
                 childrenContainer.style.display = "block"; // Mở rộng theo tham số truyền vào
             }
-
-            node.children.forEach(child => renderTree(child, childrenContainer, node, level + 1, expandLevel));
+    
+            node.children.forEach(child => renderTree(child, childrenContainer, node, level + 1, expandLevel, selectedData));
         }
     }
+    
 
     function filterTree() {
         expandalltree();
