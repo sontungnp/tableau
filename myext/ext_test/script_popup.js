@@ -1,17 +1,20 @@
 'use strict';
 
 tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử dụng async ở đây
+    let selectedItems = [];
+    let expandLevel = 2; // Giá trị này có thể nhận từ tham số truyền vào
+
     console.log("Popup mở thành công!");
 
     console.log(payload);
 
     document.getElementById("closePopup").addEventListener("click", () => {
         tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
+        // tableau.extensions.ui.closeDialog(JSON.stringify(selectedItems));
     });
 
     let treeData = JSON.parse(payload);
-    let expandLevel = 2; // Giá trị này có thể nhận từ tham số truyền vào
-
+    
     renderTree(treeData, document.getElementById("tree-container"), null, 1, expandLevel);
     let container = document.getElementById("tree-container");
     container.style.display = container.style.display === "block" ? "none" : "block";
@@ -44,6 +47,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         checkbox.addEventListener("change", function () {
             toggleChildren(node, this.checked);
             updateParentState(node.parent);
+            updateSelectedItems(); // 🔥 CẬP NHẬT DANH SÁCH 🔥
         });
 
         div.appendChild(toggle);
@@ -96,4 +100,44 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     
         updateParentState(node.parent);
     }
+
+    function updateSelectedItems() { 
+        selectedItems = [];  // 🔥 XÓA DANH SÁCH CŨ 🔥
+        document.querySelectorAll("input[type='checkbox']:checked").forEach(checkbox => {
+            let id = checkbox.dataset.id;
+            let node = findNodeById(treeData, id);
+            if (node) {
+                let isBranch = node.children.length > 0;
+                let isFullySelected = isBranch ? node.children.every(child => document.querySelector(`input[data-id='${child.id}']`).checked) : false;
+    
+                selectedItems.push({
+                    id: node.id,
+                    name: node.name,
+                    level: getLevel(node),
+                    type: isBranch ? "Cành" : "Lá",
+                    selection: isBranch ? (isFullySelected ? "Tất cả" : "Một phần") : "N/A"
+                });
+            }
+        });
+        renderSelectedItemsTable();  // 🔥 CẬP NHẬT BẢNG 🔥
+    }
+    
+    function renderSelectedItemsTable() { 
+        let table = document.getElementById("selected-items-table"); 
+        let tbody = table.querySelector("tbody"); 
+        tbody.innerHTML = ""; // 🔥 XÓA DỮ LIỆU CŨ 🔥
+    
+        selectedItems.forEach(item => { 
+            let row = document.createElement("tr"); 
+            row.innerHTML = `
+                <td>${item.id}</td>
+                <td>${item.name}</td>
+                <td>${item.level}</td>
+                <td>${item.type}</td>
+                <td>${item.selection}</td>
+            `; 
+            tbody.appendChild(row); 
+        }); 
+    }
+    
 });

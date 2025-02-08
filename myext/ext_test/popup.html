@@ -24,7 +24,6 @@
 
         #tree-container {
             display: none;
-            position: absolute;
             top: 40px;
             width: 100%;
             max-height: 300px;
@@ -52,6 +51,18 @@
         .expanded > .children {
             display: block;
         }
+        #selected-items-table {
+            margin-top: 10px; /* 🔥 THÊM KHOẢNG CÁCH 🔥 */
+            border-collapse: collapse;
+            width: 100%;
+        }
+        #selected-items-table th, #selected-items-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        #selected-items-table th {
+            background-color: #f2f2f2; /* 🔥 LÀM NỔI BẬT HEADER 🔥 */
+        }
     </style>
 </head>
 <body>
@@ -59,6 +70,19 @@
         <h2>Đây là popup ngoài iframe</h2>
         <button id="closePopup">Đóng Popup</button>
         <div id="tree-container"></div>
+
+        <table id="selected-items-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Level</th>
+                    <th>Loại</th>
+                    <th>Trạng thái chọn</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 </body>
 </html>
