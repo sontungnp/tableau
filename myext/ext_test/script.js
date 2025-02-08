@@ -5,8 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Extension initialized");
 
         let selectedNodes = new Set();
+        let popupData = {};
         let treeData = [];
 
+        // khởi tạo giá trị lần đầu load extension lên
         let selectedData = {
             "action": "INIT",
             "selectedLeafIds": [],
@@ -14,11 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "isAll": "ALL",
             "maxLevel": 2
         };
-        
         fetchData();
-
-        // khởi tạo giá trị lần đầu load extension lên
-        let popupData = {};
 
         function fetchData() {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
@@ -27,21 +25,50 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
+        // function transformDataToTree(data) {
+        //     const nodes = {};
+        //     data.data.forEach(row => {
+        //         const id = row[0].value;
+        //         const parentId = row[1].value;
+        //         const label = row[2].value;
+        //         nodes[id] = nodes[id] || { id, name: label, children: [], parent: null };
+        //         if (parentId !== null) {
+        //             nodes[parentId] = nodes[parentId] || { id: parentId, name: "", children: [], parent: null };
+        //             nodes[parentId].children.push(nodes[id]);
+        //             nodes[id].parent = nodes[parentId];
+        //         }
+        //     });
+        //     return Object.values(nodes).find(node => !node.parent) || [];
+        // }
+
         function transformDataToTree(data) {
+            if (!data.data.length) return null; // Nếu dữ liệu rỗng, trả về null
+        
             const nodes = {};
+            let rootId = data.data[0][0].value; // Lấy ID của dòng đầu tiên làm root
+        
             data.data.forEach(row => {
                 const id = row[0].value;
                 const parentId = row[1].value;
                 const label = row[2].value;
-                nodes[id] = nodes[id] || { id, name: label, children: [], parent: null };
+        
+                if (!nodes[id]) {
+                    nodes[id] = { id, name: label, children: [] };
+                } else {
+                    nodes[id].name = label;
+                }
+        
                 if (parentId !== null) {
-                    nodes[parentId] = nodes[parentId] || { id: parentId, name: "", children: [], parent: null };
+                    if (!nodes[parentId]) {
+                        nodes[parentId] = { id: parentId, name: "", children: [] };
+                    }
                     nodes[parentId].children.push(nodes[id]);
-                    nodes[id].parent = nodes[parentId];
                 }
             });
-            return Object.values(nodes).find(node => !node.parent) || [];
+        
+            return nodes[rootId] || null; // Trả về node gốc đã chọn
         }
+        
         
         document.getElementById("dropdown-toggle").addEventListener("click", () => {
             let popupUrl = window.location.origin + "/tableau/myext/ext_test/popup.html"; // URL của file popup
