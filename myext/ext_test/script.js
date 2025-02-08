@@ -8,9 +8,20 @@ document.addEventListener("DOMContentLoaded", () => {
         let treeData = [];
 
         let selectedData = {};
-        let popupData = {};
-
+        
         fetchData();
+
+        // khởi tạo giá trị lần đầu load extension lên
+        let popupData = {
+            "treeData": treeData,
+            "selectedData": {
+                "action": "INIT",
+                "selectedLeafIds": [],
+                "showIds": ["ALL"],
+                "isAll": "ALL",
+                "maxLevel": 2
+            }
+        };
 
         function fetchData() {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
@@ -64,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             "maxLevel": receivedValue.maxLevel
                         }
 
-                        document.getElementById("search-box").value = JSON.stringify(selectedData.showIds);
+                        document.getElementById("search-box").value = arrayToString(selectedData.showIds);
 
                     } else {
                         console.log("Calcel");
@@ -74,5 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log("Lỗi khi mở popup: " + error.message);
                 });
         });
+
+        function arrayToString(arr) {
+            return arr.join(",");
+        }
     });
 });
