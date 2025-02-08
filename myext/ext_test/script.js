@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let selectedNodes = new Set();
         let treeData = [];
+
+        let selectedData = {};
+
         fetchData();
 
         function fetchData() {
@@ -48,6 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     let receivedValue  = JSON.parse(payload);
                     if (receivedValue.action === 'ok') {
                         console.log("Ok");
+                        selectedData = {
+                            "selectedLeafIds": receivedValue.selectedLeafIds, 
+                            "showIds": receivedValue.showIds, 
+                            "isAll": receivedValue.isAll
+                        }
                     } else {
                         console.log("Calcel");
                     }
