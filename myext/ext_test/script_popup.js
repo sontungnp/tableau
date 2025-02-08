@@ -101,12 +101,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         }
     }
 
-    function selectAndExpandNodes(selectedData) {
-        if (!selectedData || !Array.isArray(selectedData) || selectedData.length === 0) {
+    function selectAndExpandNodes(selectedIds) {
+        if (!selectedIds || !Array.isArray(selectedIds) || selectedIds.length === 0) {
             return;
         }
     
-        selectedData.forEach(id => {
+        selectedIds.forEach(id => {
             let checkbox = document.querySelector(`input[data-id='${id}']`);
             if (checkbox) {
                 checkbox.checked = true; // ✅ Tích chọn checkbox
