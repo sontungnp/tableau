@@ -30,7 +30,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
     });
 
     document.getElementById("closePopup").addEventListener("click", function () {
-        selectAndExpandNodes(selectedIds);
+        selectAndExpandNodes(selectedLeafIds);
         // returnData("cancel");
 
     });
