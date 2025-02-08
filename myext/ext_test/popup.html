@@ -9,62 +9,69 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
         #popup-container {
-            width: 400px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        #search-box {
-            width: 100%;
-            padding: 8px;
+            display: flex;
+            flex-direction: column; /* Sắp xếp các phần tử theo chiều dọc */
+            gap: 10px; /* Tạo khoảng cách giữa các phần tử */
+            padding: 15px;
             border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            background: #f9f9f9;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
+        #popup-button {
+            display: flex;
+            flex-direction: row; /* Sắp xếp các phần tử theo chiều ngang */
+            gap: 10px; /* Tạo khoảng cách giữa các phần tử */
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
         #tree-buttons {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+            justify-content: flex-start; /* Căn trái */
+            gap: 10px; /* Khoảng cách giữa các nút */
+            margin-bottom: 10px; /* Thêm khoảng cách với tree */
         }
-        #tree-buttons button, #popup-button button {
+        #tree-buttons button {
             padding: 8px 12px;
             border: none;
-            border-radius: 5px;
-            background-color: #007bff;
+            background-color: #007bff; /* Màu xanh dương */
             color: white;
             cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-        #tree-buttons button:hover, #popup-button button:hover {
-            background-color: #0056b3;
-        }
-        #tree-container {
-            border: 1px solid #ddd;
-            padding: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            background: white;
             border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s ease-in-out;
+        }
+        #tree-buttons button:hover {
+            background-color: #0056b3; /* Màu xanh đậm khi hover */
+        }
+
+        #control-buttons {
+            display: flex;
+            justify-content: flex-end; /* Căn trái */
+            gap: 10px; /* Khoảng cách giữa các nút */
+            margin-bottom: 10px; /* Thêm khoảng cách với tree */
+        }
+        
+        #tree-container {
+            /* display: none; */
+            top: 40px;
+            /* width: 100%; */
+            /* max-height: 300px; */
+            border: 1px solid #ccc;
+            background: white;
+            overflow: auto;
+            z-index: 1000;
+            padding: 5px;
         }
         .node {
             display: flex;
             align-items: center;
             gap: 5px;
-            padding: 5px;
-            cursor: pointer;
+            padding: 2px 5px;
         }
         .toggle {
             cursor: pointer;
@@ -75,39 +82,37 @@
             margin-left: 20px;
             display: none;
         }
+        .expanded > .children {
+            display: block;
+        }
         #selected-items-table {
-            width: 100%;
+            margin-top: 10px; /* 🔥 THÊM KHOẢNG CÁCH 🔥 */
             border-collapse: collapse;
-            margin-top: 10px;
+            width: 100%;
         }
         #selected-items-table th, #selected-items-table td {
             border: 1px solid #ddd;
             padding: 8px;
-            text-align: left;
         }
         #selected-items-table th {
-            background-color: #f2f2f2;
+            background-color: #f2f2f2; /* 🔥 LÀM NỔI BẬT HEADER 🔥 */
         }
-        #popup-button {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-        }
-        #popup-button button:last-child {
-            background-color: #dc3545;
-        }
-        #popup-button button:last-child:hover {
-            background-color: #a71d2a;
-        }
+        
     </style>
 </head>
 <body>
     <div id="popup-container">
         <h2>Đây là popup ngoài iframe</h2>
         <input type="text" id="search-box" placeholder="Search...">
-        <div id="tree-buttons">
-            <button id="expandAll">Expand All</button>
-            <button id="collapseAll">Collapse All</button>
+        <div id="popup-button">
+            <div id="tree-buttons">
+                <button id="expandAll">Expand All</button>
+                <button id="collapseAll">Collapse All</button>
+            </div>
+            <div id="control-button">
+                <button id="okPopup">Ok</button>
+                <button id="closePopup">Cancel</button>
+            </div>
         </div>
         <div id="tree-container"></div>
 
@@ -124,10 +129,7 @@
             </thead>
             <tbody></tbody>
         </table>
-        <div id="popup-button">
-            <button id="okPopup">Ok</button>
-            <button id="closePopup">Cancel</button>
-        </div>
+        
     </div>
 </body>
 </html>
