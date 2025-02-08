@@ -110,9 +110,13 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
                 let isBranch = node.children.length > 0;
                 let isFullySelected = isBranch ? node.children.every(child => document.querySelector(`input[data-id='${child.id}']`).checked) : false;
                 
-                // 🔥 Tính giá trị của "display"
-                let parentCheckbox = node.parent ? document.querySelector(`input[data-id='${node.parent.id}']`) : null;
-                let display = (isBranch && isFullySelected) || (!isBranch && (!parentCheckbox || !parentCheckbox.checked)) ? "show" : "";
+                // 🔥 Kiểm tra nếu cha có giá trị "show"
+                let parentNode = node.parent;
+                let parentHasShow = parentNode && selectedItems.some(item => item.id === parentNode.id && item.display === "show");
+    
+                // 🔥 Cập nhật điều kiện "display"
+                let parentCheckbox = parentNode ? document.querySelector(`input[data-id='${parentNode.id}']`) : null;
+                let display = (isBranch && isFullySelected && !parentHasShow) || (!isBranch && (!parentCheckbox || !parentCheckbox.checked)) ? "show" : "";
     
                 selectedItems.push({
                     id: node.id,
@@ -126,7 +130,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         });
         renderSelectedItemsTable();  // 🔥 CẬP NHẬT BẢNG 🔥
     }
-    
     
     function renderSelectedItemsTable() { 
         let table = document.getElementById("selected-items-table"); 
