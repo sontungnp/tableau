@@ -9,74 +9,48 @@
     <style>
         body {
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: start;
+            /* display: flex; */
+            /* justify-content: center; */
+            /* align-items: start; */
             height: 100vh; /* Chiều cao 100% cửa sổ */
             background-color: #0758B8; /* Màu nền */
             font-family: Arial, sans-serif;
         }
 
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
         .combobox {
             display: flex;
             align-items: center;
-            gap: 10px; /* Khoảng cách giữa các phần tử */
-            width: 95%; /* Đảm bảo container chiếm 95% chiều rộng màn hình */
-            max-width: 600px; /* Giới hạn chiều rộng tối đa */
-        }
-        /* .combobox {
-            position: relative;
-            width: 300px;
-        } */
-        .combobox input {
-            width: 95%;
-            padding: 8px;
             border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .combobox .arrow {
-            /* position: absolute; */
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-        }
-        /* #tree-container {
-            display: none;
-            position: absolute;
-            top: 40px;
-            width: 100%;
-            max-height: 300px;
-            border: 1px solid #ccc;
-            background: white;
-            overflow: auto;
-            z-index: 1000;
+            border-radius: 5px;
             padding: 5px;
-        } */
-        /* .node {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 2px 5px;
+            max-width: 300px;
+            width: 100%;
         }
-        .toggle {
+
+        #search-box {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        .arrow {
+            margin-left: 5px;
             cursor: pointer;
-            width: 16px;
-            text-align: center;
+            user-select: none;
         }
-        .children {
-            margin-left: 20px;
-            display: none;
-        }
-        .expanded > .children {
-            display: block;
-        } */
     </style>
 </head>
 <body>
+    <label for="orgCodeTex">Org Code</label>
     <div class="combobox">
-        <label for="orgCodeTex">Org Code</label>
         <input type="text" id="search-box" placeholder="Search...">
         <span class="arrow" id="dropdown-toggle">▼</span>
         <!-- <div id="tree-container"></div> -->
