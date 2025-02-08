@@ -110,30 +110,30 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         selectedLeafIds.forEach(id => {
             let checkbox = document.querySelector(`input[data-id='${id}']`);
             if (checkbox) {
-                checkbox.checked = true; // ✅ Tích chọn checkbox
-                checkbox.indeterminate = false; // Xóa trạng thái trung gian nếu có
+                checkbox.checked = true; // ✅ Chọn checkbox
     
-                // 🔥 Mở rộng tất cả các nhánh cha của checkbox này
-                let parentNode = checkbox.closest(".node");
-                while (parentNode) {
+                // Tìm node hiện tại
+                let currentNode = checkbox.closest(".node");
+                if (!currentNode) return;
+    
+                // Lặp qua các node cha để mở rộng chúng
+                let parentNode = currentNode.parentElement;
+                while (parentNode && parentNode.id !== "tree-container") {
                     let toggle = parentNode.querySelector(".toggle");
-                    let childrenContainer = parentNode.nextElementSibling;
+                    let childrenContainer = parentNode.querySelector(".children");
     
-                    // ⚠ Chỉ mở rộng nếu node này có con
                     if (toggle && childrenContainer && childrenContainer.children.length > 0) {
-                        toggle.textContent = "▼"; // Hiển thị dấu mở rộng
-                        childrenContainer.style.display = "block"; // Mở rộng nhánh
+                        toggle.textContent = "▼"; // Biểu tượng mở rộng
+                        childrenContainer.style.display = "block"; // Hiển thị node con
                     }
     
-                    parentNode = parentNode.closest("ul")?.previousElementSibling?.closest(".node");
+                    parentNode = parentNode.parentElement.closest(".node");
                 }
             }
         });
     
-        // 🔥 Cập nhật danh sách đã chọn và render lại bảng hiển thị (nếu có)
-        updateSelectedItems();
-    }    
-    
+        updateSelectedItems(); // Cập nhật danh sách đã chọn
+    }
 
     function filterTree() {
         expandalltree();
