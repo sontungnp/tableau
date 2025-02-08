@@ -119,20 +119,13 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
                     let toggle = parentNode.querySelector(".toggle");
                     let childrenContainer = parentNode.nextElementSibling;
     
-                    // ⚠ Chỉ mở rộng nếu node có con
-                    if (toggle && childrenContainer && childrenContainer.children.length > 0 && childrenContainer.style.display !== "block") {
+                    // ⚠ Chỉ mở rộng nếu node này có con
+                    if (toggle && childrenContainer && childrenContainer.children.length > 0) {
                         toggle.textContent = "▼"; // Hiển thị dấu mở rộng
                         childrenContainer.style.display = "block"; // Mở rộng nhánh
                     }
     
-                    parentNode = parentNode.parentElement?.closest(".node");
-                }
-    
-                // 🔥 Cập nhật trạng thái của cha (nếu có)
-                let node = findNodeById(treeData, id);
-                if (node) {
-                    updateParentState(node.parent);
-                    toggleChildren(node, true); // Đảm bảo các node con phản ánh đúng trạng thái
+                    parentNode = parentNode.closest("ul")?.previousElementSibling?.closest(".node");
                 }
             }
         });
