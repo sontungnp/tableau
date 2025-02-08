@@ -8,12 +8,26 @@
     <script src="script.js"></script>
     <style>
         body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: start;
+            height: 100vh; /* Chiều cao 100% cửa sổ */
+            background-color: #0758B8; /* Màu nền */
             font-family: Arial, sans-serif;
         }
+
         .combobox {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Khoảng cách giữa các phần tử */
+            width: 95%; /* Đảm bảo container chiếm 95% chiều rộng màn hình */
+            max-width: 600px; /* Giới hạn chiều rộng tối đa */
+        }
+        /* .combobox {
             position: relative;
             width: 300px;
-        }
+        } */
         .combobox input {
             width: 100%;
             padding: 8px;
@@ -61,8 +75,8 @@
     </style>
 </head>
 <body>
-    <button id="openPopup">Mở Popup</button>
     <div class="combobox">
+        <label for="orgCodeTex">Org Code</label>
         <input type="text" id="search-box" placeholder="Search...">
         <span class="arrow" id="dropdown-toggle">▼</span>
         <div id="tree-container"></div>
