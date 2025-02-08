@@ -101,16 +101,19 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         }
     }
 
-    function selectAndExpandNodes(selectedIds) {
-        console.log("selectAndExpandNodes", selectedIds);
-        
-        selectedIds.forEach(id => {
+    function selectAndExpandNodes(selectedData) {
+        if (!selectedData || !Array.isArray(selectedData) || selectedData.length === 0) {
+            return;
+        }
+    
+        selectedData.forEach(id => {
             let checkbox = document.querySelector(`input[data-id='${id}']`);
             if (checkbox) {
-                checkbox.checked = true; // Tích chọn checkbox
+                checkbox.checked = true; // ✅ Tích chọn checkbox
+                checkbox.indeterminate = false; // Xóa trạng thái trung gian nếu có
     
-                // 🔥 Mở rộng tất cả các nhánh cha
-                let parentNode = checkbox.parentElement;
+                // 🔥 Mở rộng tất cả các nhánh cha của checkbox này
+                let parentNode = checkbox.closest(".node");
                 while (parentNode) {
                     let toggle = parentNode.querySelector(".toggle");
                     let childrenContainer = parentNode.nextElementSibling;
@@ -118,10 +121,20 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
                         toggle.textContent = "▼"; // Hiển thị dấu mở rộng
                         childrenContainer.style.display = "block"; // Mở rộng nhánh
                     }
-                    parentNode = parentNode.parentElement.closest(".node");
+                    parentNode = parentNode.parentElement?.closest(".node");
+                }
+    
+                // 🔥 Cập nhật trạng thái của cha (nếu có)
+                let node = findNodeById(treeData, id);
+                if (node) {
+                    updateParentState(node.parent);
+                    toggleChildren(node, true); // Đảm bảo các node con phản ánh đúng trạng thái
                 }
             }
         });
+    
+        // 🔥 Cập nhật danh sách đã chọn và render lại bảng hiển thị (nếu có)
+        updateSelectedItems();
     }
     
 
