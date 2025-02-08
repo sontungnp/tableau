@@ -140,4 +140,22 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
         }); 
     }
     
+    function findNodeById(node, id) {
+        if (!node) return null;
+        if (node.id == id) return node;
+        for (let child of node.children) {
+            let found = findNodeById(child, id);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    function getLevel(node) {
+        let level = 1;
+        while (node.parent) {
+            level++;
+            node = node.parent;
+        }
+        return level;
+    }
 });
