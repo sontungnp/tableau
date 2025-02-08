@@ -111,28 +111,9 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             let checkbox = document.querySelector(`input[data-id='${id}']`);
             if (checkbox) {
                 checkbox.checked = true; // ✅ Chọn checkbox
-    
-                // Tìm node hiện tại
-                let currentNode = checkbox.closest(".node");
-                if (!currentNode) return;
-    
-                // Lặp qua các node cha để mở rộng chúng
-                let parentNode = currentNode.parentElement;
-                while (parentNode && parentNode.id !== "tree-container") {
-                    let toggle = parentNode.querySelector(".toggle");
-                    let childrenContainer = parentNode.querySelector(".children");
-    
-                    if (toggle && childrenContainer && childrenContainer.children.length > 0) {
-                        toggle.textContent = "▼"; // Biểu tượng mở rộng
-                        childrenContainer.style.display = "block"; // Hiển thị node con
-                    }
-    
-                    parentNode = parentNode.parentElement.closest(".node");
-                }
+                checkbox.dispatchEvent(new Event('change', { bubbles: true })); // Kích hoạt sự kiện thay đổi
             }
         });
-    
-        updateSelectedItems(); // Cập nhật danh sách đã chọn
     }
 
     function filterTree() {
