@@ -60,7 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         selectedData = {
                             "selectedLeafIds": receivedValue.selectedLeafIds, 
                             "showIds": receivedValue.showIds, 
-                            "isAll": receivedValue.isAll
+                            "isAll": receivedValue.isAll,
+                            "maxLevel": receivedValue.maxLevel
                         }
                     } else {
                         console.log("Calcel");

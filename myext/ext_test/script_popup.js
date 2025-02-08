@@ -38,6 +38,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     let popupData = JSON.parse(payload);
     let treeData = popupData.treeData;
     let selectedLeafIds = popupData.selectedData.selectedLeafIds;
+    expandLevel = popupData.selectedData.maxLevel ? popupData.selectedData.maxLevel : 2
     
     renderTree(treeData, document.getElementById("tree-container"), null, 1, expandLevel);
     selectAndExpandNodes(selectedLeafIds);
@@ -227,8 +228,17 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             .map(item => item.id);
     
         let isAll = (showIds.length === 1 && showIds[0] === "ALL") ? "ALL" : "NOTALL";
-    
-        let returnValues = {"action": action, "selectedLeafIds": selectedLeafIds, "showIds":showIds, "isAll":isAll};
+
+        // Lấy giá trị lớn nhất của level
+        let maxLevel = Math.max(...selectedItems.map(item => item.level || 0));
+
+        let returnValues = {
+            "action": action,
+            "selectedLeafIds": selectedLeafIds,
+            "showIds": showIds,
+            "isAll": isAll,
+            "maxLevel": maxLevel
+        };
     
         console.log("Dữ liệu trả về:", returnValues);
         tableau.extensions.ui.closeDialog(JSON.stringify(returnValues));
