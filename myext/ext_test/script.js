@@ -7,21 +7,18 @@ document.addEventListener("DOMContentLoaded", () => {
         let selectedNodes = new Set();
         let treeData = [];
 
-        let selectedData = {};
+        let selectedData = {
+            "action": "INIT",
+            "selectedLeafIds": [],
+            "showIds": ["ALL"],
+            "isAll": "ALL",
+            "maxLevel": 2
+        };
         
         fetchData();
 
         // khởi tạo giá trị lần đầu load extension lên
-        let popupData = {
-            "treeData": treeData,
-            "selectedData": {
-                "action": "INIT",
-                "selectedLeafIds": [],
-                "showIds": ["ALL"],
-                "isAll": "ALL",
-                "maxLevel": 2
-            }
-        };
+        let popupData = {};
 
         function fetchData() {
             const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];

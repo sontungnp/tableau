@@ -5,7 +5,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     let expandLevel = 2; // Giá trị này có thể nhận từ tham số truyền vào
 
     console.log("Popup mở thành công! Giá trị nhận được payload là: ");
-
     console.log(payload);
 
     document.getElementById("search-box").addEventListener("input", filterTree);
@@ -24,8 +23,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     });    
 
     document.getElementById("okPopup").addEventListener("click", () => {
-        // tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
-        // tableau.extensions.ui.closeDialog(JSON.stringify(selectedItems));
         returnData("ok");
     });
 
