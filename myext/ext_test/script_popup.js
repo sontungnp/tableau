@@ -4,7 +4,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     let selectedItems = [];
     let expandLevel = 2; // Giá trị này có thể nhận từ tham số truyền vào
 
-    console.log("Popup mở thành công!");
+    console.log("Popup mở thành công! Giá trị nhận được payload là: ");
 
     console.log(payload);
 
