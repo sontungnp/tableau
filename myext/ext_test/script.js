@@ -45,6 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
             tableau.extensions.ui.displayDialogAsync(popupUrl, JSON.stringify(treeData), { width: 600, height: 800 }) // JSON.stringify(treeData)
                 .then((payload) => {
                     console.log("Popup đóng với dữ liệu: " + payload);
+                    if (payload.action === 'Ok') {
+                        console.log("Ok");
+                    } else {
+                        console.log("Calcel");
+                    }
                 })
                 .catch((error) => {
                     console.log("Lỗi khi mở popup: " + error.message);

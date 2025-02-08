@@ -207,9 +207,9 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             .filter(item => item.display === "show")
             .map(item => item.id);
     
-        let finalValue = (showIds.length === 1 && showIds[0] === "ALL") ? "ALL" : showIds;
+        let isAll = (showIds.length === 1 && showIds[0] === "ALL") ? "ALL" : "NOTALL";
     
-        let returnValues = [action, selectedLeafIds, showIds, finalValue];
+        let returnValues = {"action": action, "selectedLeafIds": selectedLeafIds, "showIds":showIds, "isAll":isAll};
     
         console.log("Dữ liệu trả về:", returnValues);
         tableau.extensions.ui.closeDialog(JSON.stringify(returnValues));
