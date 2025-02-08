@@ -10,13 +10,14 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     });
 
     let treeData = JSON.parse(payload);
+    let expandLevel = 2; // Giá trị này có thể nhận từ tham số truyền vào
 
-    renderTree(treeData, document.getElementById("tree-container"));
+    renderTree(treeData, document.getElementById("tree-container"), null, 1, expandLevel);
     let container = document.getElementById("tree-container");
     container.style.display = container.style.display === "block" ? "none" : "block";
     
 
-    function renderTree(node, container, parent = null, level = 1) {
+    function renderTree(node, container, parent = null, level = 1, expandLevel = 2) {
         if (!node) return;
         node.parent = parent;
 
@@ -25,7 +26,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
         let toggle = document.createElement("span");
         toggle.classList.add("toggle");
-        toggle.textContent = node.children.length ? (level < 3 ? "▼" : "▶") : "";
+        toggle.textContent = node.children.length ? (level <= expandLevel ? "▼" : "▶") : "";
         toggle.addEventListener("click", function (event) {
             event.stopPropagation();
             let parent = this.parentElement;
@@ -55,11 +56,11 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             childrenContainer.classList.add("children");
             container.appendChild(childrenContainer);
 
-            if (level < 3) {
-                childrenContainer.style.display = "block"; // Mở rộng Level 1 & 2
+            if (level <= expandLevel) {
+                childrenContainer.style.display = "block"; // Mở rộng theo tham số truyền vào
             }
 
-            node.children.forEach(child => renderTree(child, childrenContainer, node, level + 1));
+            node.children.forEach(child => renderTree(child, childrenContainer, node, level + 1, expandLevel));
         }
     }
 
