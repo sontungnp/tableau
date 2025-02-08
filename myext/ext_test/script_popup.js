@@ -24,12 +24,14 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     });    
 
     document.getElementById("okPopup").addEventListener("click", () => {
-        tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
+        // tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
         // tableau.extensions.ui.closeDialog(JSON.stringify(selectedItems));
+        returnData("ok");
     });
 
     document.getElementById("closePopup").addEventListener("click", function () {
-        document.getElementById("popup-container").style.display = "none";
+        returnData("cancel");
+
     });
 
     let treeData = JSON.parse(payload);
@@ -194,5 +196,22 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             node = node.parent;
         }
         return level;
+    }
+
+    function returnData(action) {
+        let selectedLeafIds = selectedItems
+            .filter(item => item.type === "Lá")
+            .map(item => item.id);
+    
+        let showIds = selectedItems
+            .filter(item => item.display === "show")
+            .map(item => item.id);
+    
+        let finalValue = (showIds.length === 1 && showIds[0] === "ALL") ? "ALL" : showIds;
+    
+        let returnValues = [action, selectedLeafIds, showIds, finalValue];
+    
+        console.log("Dữ liệu trả về:", returnValues);
+        tableau.extensions.ui.closeDialog(JSON.stringify(returnValues));
     }
 });
