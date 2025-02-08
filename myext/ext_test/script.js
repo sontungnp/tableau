@@ -63,6 +63,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             "isAll": receivedValue.isAll,
                             "maxLevel": receivedValue.maxLevel
                         }
+
+                        document.getElementById("search-box").value = JSON.stringify(selectedData.showIds);
+
                     } else {
                         console.log("Calcel");
                     }
