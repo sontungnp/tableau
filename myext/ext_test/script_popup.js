@@ -10,6 +10,24 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     document.getElementById("search-box").addEventListener("input", filterTree);
 
+    document.getElementById("expandAll").addEventListener("click", () => {
+        document.querySelectorAll(".children").forEach(child => {
+            child.style.display = "block";
+        });
+        document.querySelectorAll(".toggle").forEach(toggle => {
+            if (toggle.textContent === "▶") toggle.textContent = "▼";
+        });
+    });
+    
+    document.getElementById("collapseAll").addEventListener("click", () => {
+        document.querySelectorAll(".children").forEach(child => {
+            child.style.display = "none";
+        });
+        document.querySelectorAll(".toggle").forEach(toggle => {
+            if (toggle.textContent === "▼") toggle.textContent = "▶";
+        });
+    });    
+
     document.getElementById("okPopup").addEventListener("click", () => {
         tableau.extensions.ui.closeDialog("Dữ liệu trả về từ popup");
         // tableau.extensions.ui.closeDialog(JSON.stringify(selectedItems));

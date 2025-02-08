@@ -69,12 +69,37 @@
         #selected-items-table th {
             background-color: #f2f2f2; /* 🔥 LÀM NỔI BẬT HEADER 🔥 */
         }
+        #tree-buttons {
+            display: flex;
+            justify-content: flex-start; /* Căn trái */
+            gap: 10px; /* Khoảng cách giữa các nút */
+            margin-bottom: 10px; /* Thêm khoảng cách với tree */
+        }
+
+        #tree-buttons button {
+            padding: 8px 12px;
+            border: none;
+            background-color: #007bff; /* Màu xanh dương */
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s ease-in-out;
+        }
+
+        #tree-buttons button:hover {
+            background-color: #0056b3; /* Màu xanh đậm khi hover */
+        }
     </style>
 </head>
 <body>
     <div id="popup-container">
         <h2>Đây là popup ngoài iframe</h2>
         <input type="text" id="search-box" placeholder="Search...">
+        <div id="tree-buttons">
+            <button id="expandAll">Expand All</button>
+            <button id="collapseAll">Collapse All</button>
+        </div>
         <div id="tree-container"></div>
 
         <table id="selected-items-table">
