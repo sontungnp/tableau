@@ -118,10 +118,13 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
                 while (parentNode) {
                     let toggle = parentNode.querySelector(".toggle");
                     let childrenContainer = parentNode.nextElementSibling;
-                    if (toggle && childrenContainer && childrenContainer.style.display !== "block") {
+    
+                    // ⚠ Chỉ mở rộng nếu node có con
+                    if (toggle && childrenContainer && childrenContainer.children.length > 0 && childrenContainer.style.display !== "block") {
                         toggle.textContent = "▼"; // Hiển thị dấu mở rộng
                         childrenContainer.style.display = "block"; // Mở rộng nhánh
                     }
+    
                     parentNode = parentNode.parentElement?.closest(".node");
                 }
     
@@ -136,7 +139,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     
         // 🔥 Cập nhật danh sách đã chọn và render lại bảng hiển thị (nếu có)
         updateSelectedItems();
-    }
+    }    
     
 
     function filterTree() {
