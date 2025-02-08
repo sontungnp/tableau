@@ -10,6 +10,18 @@
         body {
             font-family: Arial, sans-serif;
         }
+        #popup-container {
+            display: flex;
+            flex-direction: column; /* Sắp xếp các phần tử theo chiều dọc */
+            gap: 10px; /* Tạo khoảng cách giữa các phần tử */
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            width: fit-content;
+            min-width: 300px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
         #tree-container {
             display: none;
             position: absolute;
