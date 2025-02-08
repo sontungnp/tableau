@@ -11,12 +11,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     document.getElementById("search-box").addEventListener("input", filterTree);
 
     document.getElementById("expandAll").addEventListener("click", () => {
-        document.querySelectorAll(".children").forEach(child => {
-            child.style.display = "block";
-        });
-        document.querySelectorAll(".toggle").forEach(toggle => {
-            if (toggle.textContent === "▶") toggle.textContent = "▼";
-        });
+        expandalltree();
     });
     
     document.getElementById("collapseAll").addEventListener("click", () => {
@@ -39,6 +34,14 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     let container = document.getElementById("tree-container");
     container.style.display = container.style.display === "block" ? "none" : "block";
     
+    function expandalltree() {
+        document.querySelectorAll(".children").forEach(child => {
+            child.style.display = "block";
+        });
+        document.querySelectorAll(".toggle").forEach(toggle => {
+            if (toggle.textContent === "▶") toggle.textContent = "▼";
+        });
+    }
 
     function renderTree(node, container, parent = null, level = 1, expandLevel = 2) {
         if (!node) return;
@@ -89,6 +92,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     }
 
     function filterTree() {
+        expandalltree();
         let query = document.getElementById("search-box").value.toLowerCase();
         document.querySelectorAll(".node").forEach(node => {
             let text = node.textContent.toLowerCase();
