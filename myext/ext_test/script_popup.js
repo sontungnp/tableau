@@ -28,6 +28,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
         // tableau.extensions.ui.closeDialog(JSON.stringify(selectedItems));
     });
 
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("closePopup").addEventListener("click", function () {
+            document.getElementById("popup-container").style.display = "none";
+        });
+    });
+
     let treeData = JSON.parse(payload);
     
     renderTree(treeData, document.getElementById("tree-container"), null, 1, expandLevel);
