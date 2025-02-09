@@ -123,37 +123,37 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const dashboard = tableau.extensions.dashboardContent.dashboard;
             const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
-
+    
             let worksheets = dashboard.worksheets;
-
+    
             // Chuyển filterValue về chuỗi hoặc giá trị mặc định
             let filterStr = (filterValue !== null && filterValue !== undefined) ? String(filterValue).toUpperCase() : "ALL";
-
-            let filterPromises = worksheets.map(async (ws) => {
+    
+            for (const ws of worksheets) {
                 // 🔹 Lấy danh sách filters hiện có trên worksheet
                 let filters = await ws.getFiltersAsync();
                 let hasFilter = filters.some(f => f.fieldName === filterField);
-
+    
                 if (!hasFilter) {
                     console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
-                    return;
+                    continue;
                 }
-                
+    
                 if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
                     // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
-                    return ws.clearFilterAsync(filterField);
+                    await ws.clearFilterAsync(filterField);
                 } else {
                     // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
                     let filterValues = Array.isArray(filterValue) ? filterValue.map(v => String(v).toUpperCase()) : [String(filterValue).toUpperCase()];
-                    return ws.applyFilterAsync(filterField, filterValues, tableau.FilterUpdateType.REPLACE);
+                    await ws.applyFilterAsync(filterField, filterValues, tableau.FilterUpdateType.REPLACE);
                 }
-            });
-
-            await Promise.all(filterPromises);
+            }
+    
             alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
         } catch (error) {
             console.error("Error setting filter:", error);
             alert("Failed to set filter. Check console for details.");
         }
     }
+    
 });
