@@ -132,6 +132,8 @@ document.addEventListener("DOMContentLoaded", () => {
             for (const ws of worksheets) {
                 // 🔹 Lấy danh sách filters hiện có trên worksheet
                 let filters = await ws.getFiltersAsync();
+                // Tìm filter theo tên
+                let orgFilter = filters.find(f => f.fieldName === filterField);
                 let hasFilter = filters.some(f => f.fieldName === filterField);
     
                 if (!hasFilter) {
@@ -145,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else {
                     // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
                     let filterValues = Array.isArray(filterValue) ? filterValue.map(v => String(v).toUpperCase()) : [String(filterValue).toUpperCase()];
-                    await ws.applyFilterAsync(filterField, filterValues, tableau.FilterUpdateType.REPLACE);
+                    await ws.applyFilterAsync(orgFilter, filterValues, tableau.FilterUpdateType.REPLACE);
                 }
             }
     
