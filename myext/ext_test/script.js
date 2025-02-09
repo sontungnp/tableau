@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function setFilterOrgCode(filterValue, isAll) {
         try {
             const dashboard = tableau.extensions.dashboardContent.dashboard;
-            const filterField = "orgid"; // 🔴 Đổi tên filter nếu cần
+            const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
 
             let worksheets = dashboard.worksheets;
             let filterPromises = worksheets.map(ws => {
