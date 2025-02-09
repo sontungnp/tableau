@@ -224,7 +224,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             .filter(item => item.display === "show")
             .map(item => item.id);
     
-        let isAll = (showIds.length === 1 && showIds[0] === "ALL") ? "ALL" : "NOTALL";
+        let isAll = (showIds.length === 1 || showIds[0] === "ALL") ? "ALL" : "NOTALL";
 
         // Lấy giá trị lớn nhất của level
         let maxLevel = Math.max(...selectedItems.map(item => item.level || 0));
