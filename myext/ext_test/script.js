@@ -147,7 +147,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else {
                     // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
                     let filterValues = Array.isArray(filterValue) ? filterValue.map(v => String(v).toUpperCase()) : [String(filterValue).toUpperCase()];
-                    await ws.applyFilterAsync(orgFilter, filterValues, tableau.FilterUpdateType.REPLACE);
+                    // await ws.applyFilterAsync(orgFilter, filterValues, tableau.FilterUpdateType.REPLACE);
+
+                    const filter = new tableau.Filter(filterField, tableau.FilterUpdateType.Replace, filterValues);
+                    ws.applyFilterAsync(filter).then(() => {
+                        console.log("Filter applied successfully!");
+                    }).catch(err => {
+                        console.error("Error applying filter: ", err);
+                    });
                 }
             }
     
