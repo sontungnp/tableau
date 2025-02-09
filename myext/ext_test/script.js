@@ -126,7 +126,16 @@ document.addEventListener("DOMContentLoaded", () => {
             // Chuyển filterValue về chuỗi hoặc giá trị mặc định
             let filterStr = (filterValue !== null && filterValue !== undefined) ? String(filterValue).toUpperCase() : "ALL";
 
-            let filterPromises = worksheets.map(ws => {
+            let filterPromises = worksheets.map(async (ws) => {
+                // 🔹 Lấy danh sách filters hiện có trên worksheet
+                let filters = await ws.getFiltersAsync();
+                let hasFilter = filters.some(f => f.fieldName === filterField);
+
+                if (!hasFilter) {
+                    console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
+                    return;
+                }
+                
                 if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
                     // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
                     return ws.clearFilterAsync(filterField);
