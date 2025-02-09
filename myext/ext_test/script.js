@@ -131,8 +131,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
                     return ws.clearFilterAsync(filterField);
                 } else {
-                    // 🔹 Áp dụng filter với giá trị cụ thể
-                    return ws.applyFilterAsync(filterField, filterValue, tableau.FilterUpdateType.REPLACE);
+                    // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
+                    let filterValues = Array.isArray(filterValue) ? filterValue.map(v => String(v).toUpperCase()) : [String(filterValue).toUpperCase()];
+                    return ws.applyFilterAsync(filterField, filterValues, tableau.FilterUpdateType.REPLACE);
                 }
             });
 
