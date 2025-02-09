@@ -122,8 +122,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
 
             let worksheets = dashboard.worksheets;
+
+            // Chuyển filterValue về chuỗi hoặc giá trị mặc định
+            let filterStr = (filterValue !== null && filterValue !== undefined) ? String(filterValue).toUpperCase() : "ALL";
+
             let filterPromises = worksheets.map(ws => {
-                if (!filterValue || filterValue.toUpperCase() === "ALL" || isAll === "ALL") {
+                if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
                     // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
                     return ws.clearFilterAsync(filterField);
                 } else {
