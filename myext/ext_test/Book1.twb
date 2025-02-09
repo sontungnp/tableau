@@ -234,7 +234,7 @@
     </datasource>
   </datasources>
   <worksheets>
-    <worksheet name='Sheet 1'>
+    <worksheet name='OrgCodeSheet'>
       <table>
         <view>
           <datasources>
@@ -392,7 +392,7 @@
                   <format attr='margin' value='4' />
                 </zone-style>
               </zone>
-              <zone h='27125' id='52' name='Sheet 1' w='39646' x='40447' y='1000'>
+              <zone h='27125' id='52' name='OrgCodeSheet' w='39646' x='40447' y='1000'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
                   <format attr='border-style' value='none' />
@@ -414,8 +414,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='54' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98000' id='53' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+            <zone h='100000' id='56' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98000' id='55' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
                 <zone forceUpdate='true' h='27125' id='34' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/]' type-v2='dashboard-object' w='39647' x='800' y='1000'>
                   <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/' extension-version='0.1.0' instance-id='E947798B7AFA43F1BC7A97EB2C15B75B'>
                     <instance-settings />
@@ -431,7 +431,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='209' h='27125' id='52' is-fixed='true' name='Sheet 1' w='39646' x='40447' y='1000'>
+                <zone fixed-size='209' h='27125' id='52' is-fixed='true' name='OrgCodeSheet' w='39646' x='40447' y='1000'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -473,7 +473,7 @@
     </dashboard>
   </dashboards>
   <windows source-height='51'>
-    <window class='worksheet' name='Sheet 1'>
+    <window class='worksheet' maximized='true' name='OrgCodeSheet'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -506,12 +506,12 @@
       </viewpoint>
       <simple-id uuid='{B76CCEF9-ED99-4097-809B-57EBF674D1D2}' />
     </window>
-    <window class='dashboard' maximized='true' name='Dashboard 1'>
+    <window class='dashboard' name='Dashboard 1'>
       <viewpoints>
-        <viewpoint name='Sheet 1' />
+        <viewpoint name='OrgCodeSheet' />
         <viewpoint name='Sheet 2' />
       </viewpoints>
-      <active id='-1' />
+      <active id='34' />
       <simple-id uuid='{FDAF6D3E-C107-412E-A96E-4AA8592DC86B}' />
     </window>
     <window class='worksheet' name='Sheet 2'>
@@ -553,7 +553,7 @@
   <thumbnails>
     <thumbnail height='192' name='Dashboard 1' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAA7DAAAOwwHHb6hk
-      AAAP3klEQVR4nO3dSXMbZ37H8S8WEgB3gqRIcRFFSrIWS5a3sR1PTSqpSs1UnHgOOaRqUjnm
+      AAAP2ElEQVR4nO3dSXMbZ37H8S8WEgB3gqRIcRFFSrIWS5a3sR1PTSqpSs1UnHgOOaRqUjnm
       Vcxcs7yIXFJZb0lNTeWQVKw4tjyyNko0LZGyNpIgse+NXoHuzoGWbM2MRRJoipCf/+diSwX8
       9TQaP/SzAR3yfd9HCEWFD7sBQhwmCYBQmgRAKE0CIJQmARBKkwB0qUJmk+vXb/BwM8PKnbu7
       Pr5Wr33z3PQmt79cO8jmfW9IALrU8pf3eOOtt1iYnSS7tc7S0g3Wt/NkU4+5+vlVdMfl/t0v
@@ -597,40 +597,40 @@
       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
-      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
+      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
     </thumbnail>
-    <thumbnail height='124' name='Sheet 1' width='192'>
+    <thumbnail height='124' name='OrgCodeSheet' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAAB8CAYAAAA/1L8JAAAACXBIWXMAAA7DAAAOwwHHb6hk
       AAALk0lEQVR4nO3de1hUdR7H8XeNEEVaXFJQUaNYQRebnFHTBdMuKt5ww02TZ9Nyi6JMI3W1
       Vnhw1fLymKa4UvIk+uiupoU30DE3VFIzWJDWW5oCohARJYqwA9PZPxBFBbmM4yC/7+svmPOb

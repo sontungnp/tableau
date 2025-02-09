@@ -19,7 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchData();
 
         function fetchData() {
-            const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
+            const worksheetName = "OrgCodeSheet"; // Tên worksheet cần lấy
+            const dashboard = tableau.extensions.dashboardContent.dashboard;
+            // const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
+            const worksheet = dashboard.worksheets.find(ws => ws.name === worksheetName);
             worksheet.getSummaryDataAsync().then(data => {
                 treeData = transformDataToTree(data);
             });
