@@ -145,22 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         await ws.clearFilterAsync(filterField);
                     } else {
                         // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
-                        // let filterValues = Array.isArray(filterValue) ? filterValue.map(v => String(v).toUpperCase()) : [String(filterValue).toUpperCase()];
-                        // await ws.applyFilterAsync("Orgid", ["q1","HN"], tableau.FilterUpdateType.REPLACE);
-
-                        const fieldName = "Orgid"; // Tên trường bạn muốn lọc
-                        const values = ["q1", "HN"]; // Giá trị bạn muốn lọc
-
-                        // Tạo bộ lọc
-                        const filter = new tableau.CategoricalFilter(fieldName, tableau.FilterUpdateType.REPLACE, values);
-
-                        // Áp dụng bộ lọc
-                        try {
-                            await worksheet.applyFilterAsync(filter);
-                            console.log("Filter applied successfully!");
-                        } catch (err) {
-                            console.error("Error applying filter: ", err);
-                        }
+                        await ws.applyFilterAsync(filterField, filterValue, tableau.FilterUpdateType.REPLACE);
                     }
                 }
         
