@@ -101,6 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         document.getElementById("search-box").value = arrayToString(selectedData.showIds);
 
+                        setFilterOrgCode(selectedData.selectedLeafIds, selectedData.isAll);
                     } else {
                         console.log("Calcel");
                     }
@@ -114,4 +115,28 @@ document.addEventListener("DOMContentLoaded", () => {
             return arr.join(",");
         }
     });
+
+    async function setFilterOrgCode(filterValue, isAll) {
+        try {
+            const dashboard = tableau.extensions.dashboardContent.dashboard;
+            const filterField = "orgid"; // 🔴 Đổi tên filter nếu cần
+
+            let worksheets = dashboard.worksheets;
+            let filterPromises = worksheets.map(ws => {
+                if (!filterValue || filterValue.toUpperCase() === "ALL" || isAll === "ALL") {
+                    // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
+                    return ws.clearFilterAsync(filterField);
+                } else {
+                    // 🔹 Áp dụng filter với giá trị cụ thể
+                    return ws.applyFilterAsync(filterField, filterValue, tableau.FilterUpdateType.REPLACE);
+                }
+            });
+
+            await Promise.all(filterPromises);
+            alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
+        } catch (error) {
+            console.error("Error setting filter:", error);
+            alert("Failed to set filter. Check console for details.");
+        }
+    }
 });
