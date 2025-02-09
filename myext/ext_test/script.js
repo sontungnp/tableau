@@ -131,8 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 for (const ws of worksheets) {
                     // 🔹 Lấy danh sách filters hiện có trên worksheet
                     let filters = await ws.getFiltersAsync();
-                    // Tìm filter theo tên
-                    // let orgFilter = filters.find(f => f.fieldName === filterField);
+                    
+                    // Tìm xem worksheet có filter này không -> nếu ko có thì continue sang worksheet khác
                     let hasFilter = filters.some(f => f.fieldName === filterField);
         
                     if (!hasFilter) {
@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         await ws.clearFilterAsync(filterField);
                     } else {
                         // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
-                        await ws.applyFilterAsync(filterField, filterValue, tableau.FilterUpdateType.REPLACE);
+                        await ws.applyFilterAsync(filterField, filterValue, "replace");
                     }
                 }
         
