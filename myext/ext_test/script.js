@@ -117,52 +117,58 @@ document.addEventListener("DOMContentLoaded", () => {
         function arrayToString(arr) {
             return arr.join(",");
         }
-    });
 
-    async function setFilterOrgCode(filterValue, isAll) {
-        try {
-            const dashboard = tableau.extensions.dashboardContent.dashboard;
-            const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
-    
-            let worksheets = dashboard.worksheets;
-    
-            // Chuyển filterValue về chuỗi hoặc giá trị mặc định
-            let filterStr = (filterValue !== null && filterValue !== undefined) ? String(filterValue).toUpperCase() : "ALL";
-    
-            for (const ws of worksheets) {
-                // 🔹 Lấy danh sách filters hiện có trên worksheet
-                let filters = await ws.getFiltersAsync();
-                // Tìm filter theo tên
-                let orgFilter = filters.find(f => f.fieldName === filterField);
-                let hasFilter = filters.some(f => f.fieldName === filterField);
-    
-                if (!hasFilter) {
-                    console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
-                    continue;
-                }
-    
-                if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
-                    // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
-                    await ws.clearFilterAsync(filterField);
-                } else {
-                    // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
-                    let filterValues = Array.isArray(filterValue) ? filterValue.map(v => String(v).toUpperCase()) : [String(filterValue).toUpperCase()];
-                    // await ws.applyFilterAsync(orgFilter, filterValues, tableau.FilterUpdateType.REPLACE);
+        async function setFilterOrgCode(filterValue, isAll) {
+            try {
+                const dashboard = tableau.extensions.dashboardContent.dashboard;
+                const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
+        
+                let worksheets = dashboard.worksheets;
+        
+                // Chuyển filterValue về chuỗi hoặc giá trị mặc định
+                let filterStr = (filterValue !== null && filterValue !== undefined) ? String(filterValue).toUpperCase() : "ALL";
+        
+                for (const ws of worksheets) {
+                    // 🔹 Lấy danh sách filters hiện có trên worksheet
+                    let filters = await ws.getFiltersAsync();
+                    // Tìm filter theo tên
+                    // let orgFilter = filters.find(f => f.fieldName === filterField);
+                    let hasFilter = filters.some(f => f.fieldName === filterField);
+        
+                    if (!hasFilter) {
+                        console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
+                        continue;
+                    }
+        
+                    if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
+                        // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
+                        await ws.clearFilterAsync(filterField);
+                    } else {
+                        // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
+                        // let filterValues = Array.isArray(filterValue) ? filterValue.map(v => String(v).toUpperCase()) : [String(filterValue).toUpperCase()];
+                        // await ws.applyFilterAsync("Orgid", ["q1","HN"], tableau.FilterUpdateType.REPLACE);
 
-                    const filter = new tableau.Filter(filterField, tableau.FilterUpdateType.Replace, filterValues);
-                    ws.applyFilterAsync(filter).then(() => {
-                        console.log("Filter applied successfully!");
-                    }).catch(err => {
-                        console.error("Error applying filter: ", err);
-                    });
+                        const fieldName = "Orgid"; // Tên trường bạn muốn lọc
+                        const values = ["q1", "HN"]; // Giá trị bạn muốn lọc
+
+                        // Tạo bộ lọc
+                        const filter = new tableau.CategoricalFilter(fieldName, tableau.FilterUpdateType.REPLACE, values);
+
+                        // Áp dụng bộ lọc
+                        try {
+                            await worksheet.applyFilterAsync(filter);
+                            console.log("Filter applied successfully!");
+                        } catch (err) {
+                            console.error("Error applying filter: ", err);
+                        }
+                    }
                 }
+        
+                alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
+            } catch (error) {
+                console.error("Error setting filter:", error);
+                alert("Failed to set filter. Check console for details.");
             }
-    
-            alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
-        } catch (error) {
-            console.error("Error setting filter:", error);
-            alert("Failed to set filter. Check console for details.");
         }
-    }
-    
+    });
 });
