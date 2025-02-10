@@ -101,39 +101,27 @@
             gap: 5px;
             padding: 2px 5px;
         }
+        
+        .children {
+            position: relative;
+            margin-left: 20px;
+            padding-left: 10px; /* Tạo khoảng cách để vẽ đường */
+            border-left: 1px solid #ccc; /* Đường dọc nối các node */
+        }
 
+        /* Đường kẻ ngang cho node lá */
         .node::before {
             content: "";
             position: absolute;
-            left: -10px;
+            left: -10px; /* Điều chỉnh vị trí */
             top: 50%;
-            width: 10px;
-            height: 1px;
-            background-color: #aaa;
+            width: 10px; /* Độ dài đường ngang */
+            border-top: 1px solid #ccc;
         }
 
+        /* Ẩn đường kẻ cho node gốc */
         .node:first-child::before {
-            display: none; /* Ẩn đường ngang của node root */
-        }
-
-        .children {
-            margin-left: 20px;
-            position: relative;
-        }
-
-        .children::before {
-            content: "";
-            position: absolute;
-            left: -10px;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background-color: #aaa;
-        }
-
-        /* Ẩn đường kẻ dọc cho node cuối cùng */
-        .children:last-child::before {
-            height: 50%;
+            display: none;
         }
     </style>
 </head>
