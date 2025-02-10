@@ -23,6 +23,108 @@
     <preference name='ui.shelf.height' value='26' />
   </preferences>
   <datasources>
+    <datasource caption='Report (data)' inline='true' name='federated.1wr9rd10bpq1n016z0rmc0567lq8' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='data' name='excel-direct.06z86if01593hr1cpkrvv0wk6bs4'>
+            <connection class='excel-direct' cleaning='no' compat='no' dataRefreshTime='' filename='D:/PROJECTS/OUT_PROJECT/FIS/GIT/tableau/myext/ext_test/data.xlsx' interpretationMode='0' password='' server='' validate='no' />
+          </named-connection>
+        </named-connections>
+        <relation connection='excel-direct.06z86if01593hr1cpkrvv0wk6bs4' name='Sheet1' table='[Sheet1$]' type='table'>
+          <columns gridOrigin='A1:C4:no:A1:C4:0' header='yes' outcome='6'>
+            <column datatype='string' name='orgid' ordinal='0' />
+            <column datatype='integer' name='soluong' ordinal='1' />
+            <column datatype='integer' name='thanhtien' ordinal='2' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[Sheet1]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='context'>0</attribute>
+              <attribute datatype='string' name='gridOrigin'>&quot;A1:C4:no:A1:C4:0&quot;</attribute>
+              <attribute datatype='boolean' name='header'>true</attribute>
+              <attribute datatype='integer' name='outcome'>6</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>orgid</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[orgid]</local-name>
+            <parent-name>[Sheet1]</parent-name>
+            <remote-alias>orgid</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_RUS_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+            <object-id>[Sheet1_EAC1D373F87B474391CCF311428A0524]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>soluong</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[soluong]</local-name>
+            <parent-name>[Sheet1]</parent-name>
+            <remote-alias>soluong</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[Sheet1_EAC1D373F87B474391CCF311428A0524]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>thanhtien</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[thanhtien]</local-name>
+            <parent-name>[Sheet1]</parent-name>
+            <remote-alias>thanhtien</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[Sheet1_EAC1D373F87B474391CCF311428A0524]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Sheet1' datatype='table' name='[__tableau_internal_object_id__].[Sheet1_EAC1D373F87B474391CCF311428A0524]' role='measure' type='quantitative' />
+      <column caption='Orgid' datatype='string' name='[orgid]' role='dimension' type='nominal' />
+      <column caption='Soluong' datatype='integer' name='[soluong]' role='measure' type='quantitative' />
+      <column caption='Thanhtien' datatype='integer' name='[thanhtien]' role='measure' type='quantitative' />
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='Sheet1' id='Sheet1_EAC1D373F87B474391CCF311428A0524'>
+            <properties context=''>
+              <relation connection='excel-direct.06z86if01593hr1cpkrvv0wk6bs4' name='Sheet1' table='[Sheet1$]' type='table'>
+                <columns gridOrigin='A1:C4:no:A1:C4:0' header='yes' outcome='6'>
+                  <column datatype='string' name='orgid' ordinal='0' />
+                  <column datatype='integer' name='soluong' ordinal='1' />
+                  <column datatype='integer' name='thanhtien' ordinal='2' />
+                </columns>
+              </relation>
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
     <datasource caption='Sheet1 (dstest)' inline='true' name='federated.017b7zr1fv1l2q19k0d410dnu9u6' version='18.1'>
       <connection class='federated'>
         <named-connections>
@@ -130,108 +232,6 @@
         </objects>
       </object-graph>
     </datasource>
-    <datasource caption='Report (data)' inline='true' name='federated.1wr9rd10bpq1n016z0rmc0567lq8' version='18.1'>
-      <connection class='federated'>
-        <named-connections>
-          <named-connection caption='data' name='excel-direct.06z86if01593hr1cpkrvv0wk6bs4'>
-            <connection class='excel-direct' cleaning='no' compat='no' dataRefreshTime='' filename='D:/PROJECTS/OUT_PROJECT/FIS/GIT/tableau/myext/ext_test/data.xlsx' interpretationMode='0' password='' server='' validate='no' />
-          </named-connection>
-        </named-connections>
-        <relation connection='excel-direct.06z86if01593hr1cpkrvv0wk6bs4' name='Sheet1' table='[Sheet1$]' type='table'>
-          <columns gridOrigin='A1:C4:no:A1:C4:0' header='yes' outcome='6'>
-            <column datatype='string' name='orgid' ordinal='0' />
-            <column datatype='integer' name='soluong' ordinal='1' />
-            <column datatype='integer' name='thanhtien' ordinal='2' />
-          </columns>
-        </relation>
-        <metadata-records>
-          <metadata-record class='capability'>
-            <remote-name />
-            <remote-type>0</remote-type>
-            <parent-name>[Sheet1]</parent-name>
-            <remote-alias />
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='integer' name='context'>0</attribute>
-              <attribute datatype='string' name='gridOrigin'>&quot;A1:C4:no:A1:C4:0&quot;</attribute>
-              <attribute datatype='boolean' name='header'>true</attribute>
-              <attribute datatype='integer' name='outcome'>6</attribute>
-            </attributes>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>orgid</remote-name>
-            <remote-type>130</remote-type>
-            <local-name>[orgid]</local-name>
-            <parent-name>[Sheet1]</parent-name>
-            <remote-alias>orgid</remote-alias>
-            <ordinal>0</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
-            <collation flag='1' name='LEN_RUS_S2' />
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
-            </attributes>
-            <object-id>[Sheet1_EAC1D373F87B474391CCF311428A0524]</object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>soluong</remote-name>
-            <remote-type>20</remote-type>
-            <local-name>[soluong]</local-name>
-            <parent-name>[Sheet1]</parent-name>
-            <remote-alias>soluong</remote-alias>
-            <ordinal>1</ordinal>
-            <local-type>integer</local-type>
-            <aggregation>Sum</aggregation>
-            <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
-            </attributes>
-            <object-id>[Sheet1_EAC1D373F87B474391CCF311428A0524]</object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>thanhtien</remote-name>
-            <remote-type>20</remote-type>
-            <local-name>[thanhtien]</local-name>
-            <parent-name>[Sheet1]</parent-name>
-            <remote-alias>thanhtien</remote-alias>
-            <ordinal>2</ordinal>
-            <local-type>integer</local-type>
-            <aggregation>Sum</aggregation>
-            <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
-            </attributes>
-            <object-id>[Sheet1_EAC1D373F87B474391CCF311428A0524]</object-id>
-          </metadata-record>
-        </metadata-records>
-      </connection>
-      <aliases enabled='yes' />
-      <column caption='Sheet1' datatype='table' name='[__tableau_internal_object_id__].[Sheet1_EAC1D373F87B474391CCF311428A0524]' role='measure' type='quantitative' />
-      <column caption='Orgid' datatype='string' name='[orgid]' role='dimension' type='nominal' />
-      <column caption='Soluong' datatype='integer' name='[soluong]' role='measure' type='quantitative' />
-      <column caption='Thanhtien' datatype='integer' name='[thanhtien]' role='measure' type='quantitative' />
-      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
-      <semantic-values>
-        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
-      </semantic-values>
-      <object-graph>
-        <objects>
-          <object caption='Sheet1' id='Sheet1_EAC1D373F87B474391CCF311428A0524'>
-            <properties context=''>
-              <relation connection='excel-direct.06z86if01593hr1cpkrvv0wk6bs4' name='Sheet1' table='[Sheet1$]' type='table'>
-                <columns gridOrigin='A1:C4:no:A1:C4:0' header='yes' outcome='6'>
-                  <column datatype='string' name='orgid' ordinal='0' />
-                  <column datatype='integer' name='soluong' ordinal='1' />
-                  <column datatype='integer' name='thanhtien' ordinal='2' />
-                </columns>
-              </relation>
-            </properties>
-          </object>
-        </objects>
-      </object-graph>
-    </datasource>
   </datasources>
   <worksheets>
     <worksheet name='OrgCodeSheet'>
@@ -286,11 +286,7 @@
             <column caption='Thanhtien' datatype='integer' name='[thanhtien]' role='measure' type='quantitative' />
           </datasource-dependencies>
           <filter class='categorical' column='[federated.1wr9rd10bpq1n016z0rmc0567lq8].[none:orgid:nk]'>
-            <groupfilter function='union' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate'>
-              <groupfilter function='member' level='[none:orgid:nk]' member='&quot;hn&quot;' />
-              <groupfilter function='member' level='[none:orgid:nk]' member='&quot;q1&quot;' />
-              <groupfilter function='member' level='[none:orgid:nk]' member='&quot;q2&quot;' />
-            </groupfilter>
+            <groupfilter function='level-members' level='[none:orgid:nk]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
           <slices>
             <column>[federated.1wr9rd10bpq1n016z0rmc0567lq8].[none:orgid:nk]</column>
@@ -418,8 +414,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='60' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98000' id='59' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+            <zone h='100000' id='62' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98000' id='61' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
                 <zone forceUpdate='true' h='27125' id='34' param='[com.example.extensions.name].[0.1.0].[https://sontungnp.github.io/tableau/myext/ext_test/]' type-v2='dashboard-object' w='39647' x='800' y='1000'>
                   <add-in add-in-id='com.example.extensions.name' extension-url='https://sontungnp.github.io/tableau/myext/ext_test/' extension-version='0.1.0' instance-id='E947798B7AFA43F1BC7A97EB2C15B75B'>
                     <instance-settings />
@@ -510,15 +506,15 @@
       </viewpoint>
       <simple-id uuid='{B76CCEF9-ED99-4097-809B-57EBF674D1D2}' />
     </window>
-    <window class='dashboard' name='Dashboard 1'>
+    <window class='dashboard' maximized='true' name='Dashboard 1'>
       <viewpoints>
         <viewpoint name='OrgCodeSheet' />
         <viewpoint name='Sheet 2' />
       </viewpoints>
-      <active id='34' />
+      <active id='-1' />
       <simple-id uuid='{FDAF6D3E-C107-412E-A96E-4AA8592DC86B}' />
     </window>
-    <window class='worksheet' maximized='true' name='Sheet 2'>
+    <window class='worksheet' name='Sheet 2'>
       <cards>
         <edge name='left'>
           <strip size='160'>
