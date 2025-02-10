@@ -94,15 +94,12 @@
             background-color: #f2f2f2; /* 🔥 LÀM NỔI BẬT HEADER 🔥 */
         }
         /* Thêm đường kẻ tree */
-        .children {
-            margin-left: 20px;
-            border-left: 1px solid #ccc; /* Đường kẻ dọc */
-            padding-left: 10px;
-        }
-
         .node {
             position: relative;
-            padding-left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 5px;
         }
 
         .node::before {
@@ -112,11 +109,31 @@
             top: 50%;
             width: 10px;
             height: 1px;
-            background-color: #ccc; /* Đường kẻ ngang */
+            background-color: #aaa;
         }
 
         .node:first-child::before {
-            display: none; /* Ẩn đường ngang cho node đầu tiên */
+            display: none; /* Ẩn đường ngang của node root */
+        }
+
+        .children {
+            margin-left: 20px;
+            position: relative;
+        }
+
+        .children::before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: #aaa;
+        }
+
+        /* Ẩn đường kẻ dọc cho node cuối cùng */
+        .children:last-child::before {
+            height: 50%;
         }
     </style>
 </head>
