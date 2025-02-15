@@ -10,7 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const dashboard = tableau.extensions.dashboardContent.dashboard;
 
-        dashboard.worksheet.addEventListener(tableau.TableauEventType.FilterChanged, filterChangedHandler);
+        for (const ws of dashboard.worksheets) {
+            ws.addEventListener(tableau.TableauEventType.FilterChanged, filterChangedHandler);
+        }
 
         // khởi tạo giá trị lần đầu load extension lên
         let selectedData = {
