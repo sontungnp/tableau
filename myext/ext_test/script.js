@@ -15,6 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
         
 
         for (const ws of worksheets) {
+            // 🔹 Lấy danh sách filters hiện có trên worksheet
+            let filters = ws.getFiltersAsync();
+
             let hasFilter = filters.some(f => f.fieldName === filterField);
         
             if (!hasFilter) {
