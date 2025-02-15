@@ -176,5 +176,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
         }
+
+        // Lắng nghe sự kiện khi filter thay đổi
+        worksheet.addEventListener(tableau.TableauEventType.FilterChanged, event => {
+            event.getFilterAsync().then(updatedFilter => {
+                console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
+            });
+        });
     });
 });
