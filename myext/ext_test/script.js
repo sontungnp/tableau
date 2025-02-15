@@ -142,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
                     if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
                         // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
+                        document.getElementById("search-box").value = 'ALL';
                         await ws.clearFilterAsync(filterField);
                     } else {
                         // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
@@ -180,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             "maxLevel": 2
                         }
 
-                        // document.getElementById("search-box").value = arrayToString(selectedData.showIds);
+                        // document.getElementById("search-box").value = 'ALL';
 
                         setFilterOrgCode(selectedData.selectedLeafIds, selectedData.isAll);
                     }
