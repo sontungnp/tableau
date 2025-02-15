@@ -94,32 +94,57 @@
             background-color: #f2f2f2; /* 🔥 LÀM NỔI BẬT HEADER 🔥 */
         }
         /* Thêm đường kẻ tree */
-        /* Tạo đường kẻ dọc kết nối các node cha và con */
-        .children {
-            position: relative;
-            margin-left: 20px;
-            padding-left: 20px;
-            border-left: 1px solid #ccc; /* Đường dọc */
-        }
-
-        /* Tạo đường kẻ ngang kết nối node con với đường dọc */
         .node {
-            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 5px;
+            position: relative; /* Cần thiết để định vị đường kẻ */
         }
 
+        .toggle {
+            cursor: pointer;
+            width: 16px;
+            text-align: center;
+        }
+
+        /* Phần tử con sẽ có lề trái để tạo khoảng cách */
+        .children {
+            margin-left: 20px;
+            display: none;
+            position: relative; /* Để vẽ đường thẳng */
+        }
+
+        /* Đường thẳng dọc từ checkbox cha xuống các checkbox con */
         .node::before {
             content: "";
             position: absolute;
-            top: 50%;
-            left: -20px;
-            width: 20px;
-            height: 1px;
-            background-color: #ccc; /* Đường ngang */
+            top: -10px;
+            bottom: 0;
+            left: 9px; /* Điều chỉnh vị trí đường kẻ */
+            width: 1px;
+            background-color: #ccc;
         }
 
-        /* Ẩn đường kẻ của node gốc */
-        .node:first-child::before {
+        /* Đường ngang nối checkbox cha với checkbox con */
+        .node::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 9px;
+            width: 15px; /* Điều chỉnh độ dài đường ngang */
+            height: 1px;
+            background-color: #ccc;
+        }
+
+        /* Ẩn đường thẳng cho node gốc */
+        #tree-container > .node::before {
             display: none;
+        }
+
+        /* Ẩn đường kẻ ngang nếu node không có con */
+        .node:last-child::before {
+            height: 50%;
         }
     </style>
 </head>
