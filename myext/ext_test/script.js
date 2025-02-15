@@ -155,5 +155,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Failed to set filter. Check console for details.");
             }
         }
+
+        document.getElementById("clearFilters").addEventListener("click", clearAllFilters);
+
+        function clearAllFilters() {
+            const dashboard = tableau.extensions.dashboardContent.dashboard;
+    
+            dashboard.worksheets.forEach((worksheet) => {
+                worksheet.getFiltersAsync().then((filters) => {
+                    filters.forEach((filter) => {
+                        worksheet.clearFilterAsync(filter.fieldName);
+                    });
+                });
+            });
+        }
     });
 });
