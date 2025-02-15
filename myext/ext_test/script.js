@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const dashboard = tableau.extensions.dashboardContent.dashboard;
 
+        dashboard.worksheet.addEventListener(tableau.TableauEventType.FilterChanged, filterChangedHandler);
+
         // khởi tạo giá trị lần đầu load extension lên
         let selectedData = {
             "action": "INIT",
@@ -138,13 +140,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (!hasFilter) {
                         console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
                         continue;
-                    } else {
-                        // Lắng nghe sự kiện khi filter thay đổi
-                        worksheet.addEventListener(tableau.TableauEventType.FilterChanged, event => {
-                            event.getFilterAsync().then(updatedFilter => {
-                                console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
-                            });
-                        });
                     }
         
                     if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
@@ -175,11 +170,9 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // Lắng nghe sự kiện khi filter thay đổi
-        dashboard.worksheet.addEventListener(tableau.TableauEventType.FilterChanged, event => {
-            event.getFilterAsync().then(updatedFilter => {
-                console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
-            });
-        });
+        function filterChangedHandler() {
+            console.log('filter change');
+        }
+
     });
 });
