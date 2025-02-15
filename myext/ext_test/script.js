@@ -11,7 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const dashboard = tableau.extensions.dashboardContent.dashboard;
 
         for (const ws of dashboard.worksheets) {
-            ws.addEventListener(tableau.TableauEventType.FilterChanged, filterChangedHandler);
+            
+
+            let hasFilter = filters.some(f => f.fieldName === filterField);
+        
+            if (!hasFilter) {
+                console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
+                continue;
+            } else {
+                ws.addEventListener(tableau.TableauEventType.FilterChanged, filterChangedHandler);
+            }
         }
 
         // khởi tạo giá trị lần đầu load extension lên
@@ -172,8 +181,10 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        function filterChangedHandler() {
-            console.log('filter change');
+        function filterChangedHandler(event) {
+            event.getFilterAsync().then(updatedFilter => {
+                console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
+            });
         }
 
     });
