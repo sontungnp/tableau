@@ -158,6 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById("clearFilters").addEventListener("click", clearAllFilters);
 
+        // Lắng nghe sự kiện thay đổi filter
+        dashboard.addEventListener(tableau.TableauEventType.FilterChanged, filterChangedHandler);
+
         function clearAllFilters() {
             const dashboard = tableau.extensions.dashboardContent.dashboard;
     
@@ -168,6 +171,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 });
             });
+        }
+
+        function filterChangedHandler(event) {
+            console.log(`Filter changed on worksheet: ${event.worksheet.name}`);
         }
     });
 });
