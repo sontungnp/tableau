@@ -170,7 +170,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function filterChangedHandler(event) {
             event.getFilterAsync().then(updatedFilter => {
-                console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
+                if (updatedFilter.fieldName === filterField) {
+                    console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
+                }
             });
         }
 
