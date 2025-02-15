@@ -171,6 +171,19 @@ document.addEventListener("DOMContentLoaded", () => {
         function filterChangedHandler(event) {
             event.getFilterAsync().then(updatedFilter => {
                 if (updatedFilter.fieldName === filterField) {
+                    if (updatedFilter.appliedValues.length === 0) {
+                        selectedData = {
+                            "action": "INIT",
+                            "selectedLeafIds": [],
+                            "showIds": ["ALL"],
+                            "isAll": "ALL",
+                            "maxLevel": 2
+                        }
+
+                        // document.getElementById("search-box").value = arrayToString(selectedData.showIds);
+
+                        setFilterOrgCode(selectedData.selectedLeafIds, selectedData.isAll);
+                    }
                     console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
                 }
             });
