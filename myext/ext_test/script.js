@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
         let popupData = {};
         let treeData = [];
 
+        const dashboard = tableau.extensions.dashboardContent.dashboard;
+
         // khởi tạo giá trị lần đầu load extension lên
         let selectedData = {
             "action": "INIT",
@@ -20,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function fetchData() {
             const worksheetName = "OrgCodeSheet"; // Tên worksheet cần lấy
-            const dashboard = tableau.extensions.dashboardContent.dashboard;
             // const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
             const worksheet = dashboard.worksheets.find(ws => ws.name === worksheetName);
             worksheet.getSummaryDataAsync().then(data => {
@@ -120,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         async function setFilterOrgCode(filterValue, isAll) {
             try {
-                const dashboard = tableau.extensions.dashboardContent.dashboard;
                 const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
         
                 let worksheets = dashboard.worksheets;
@@ -166,8 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("clearFilters").addEventListener("click", clearAllFilters);
 
         function clearAllFilters() {
-            const dashboard = tableau.extensions.dashboardContent.dashboard;
-    
             dashboard.worksheets.forEach((worksheet) => {
                 worksheet.getFiltersAsync().then((filters) => {
                     filters.forEach((filter) => {
@@ -178,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Lắng nghe sự kiện khi filter thay đổi
-        worksheet.addEventListener(tableau.TableauEventType.FilterChanged, event => {
+        dashboard.worksheet.addEventListener(tableau.TableauEventType.FilterChanged, event => {
             event.getFilterAsync().then(updatedFilter => {
                 console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
             });
