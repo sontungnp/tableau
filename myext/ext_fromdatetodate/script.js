@@ -83,6 +83,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 // alert("P_Fd_Td = " + fromDateToDate);
                 console.error(err);
             });
+
+            clearAllFilters();
         }
 
         function init() {
@@ -118,6 +120,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 refreshButton.classList.remove('loading'); // Bỏ class loading
                 refreshButton.disabled = false; // Kích hoạt lại nút
             }
+        }
+
+        function clearAllFilters() {
+            dashboard.worksheets.forEach((worksheet) => {
+                worksheet.getFiltersAsync().then((filters) => {
+                    filters.forEach((filter) => {
+                        worksheet.clearFilterAsync(filter.fieldName);
+                    });
+                });
+            });
         }
     }).catch(err => {
         console.error("Đã có lỗi xảy ra.");

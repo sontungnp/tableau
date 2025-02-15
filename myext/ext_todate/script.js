@@ -59,12 +59,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String)");
                     console.error(err);
                 });
+                
             }).catch(err => {
                 setLoading(false); // Kết thúc loading
                 console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String).");
                 alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String)");
                 console.error(err);
             });
+
+            clearAllFilters();
         }
 
         // Thêm trạng thái loading
@@ -78,6 +81,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 refreshButton.classList.remove('loading'); // Bỏ class loading
                 refreshButton.disabled = false; // Kích hoạt lại nút
             }
+        }
+
+        function clearAllFilters() {
+            dashboard.worksheets.forEach((worksheet) => {
+                worksheet.getFiltersAsync().then((filters) => {
+                    filters.forEach((filter) => {
+                        worksheet.clearFilterAsync(filter.fieldName);
+                    });
+                });
+            });
         }
     }).catch(err => {
         console.error("Đã có lỗi xảy ra.");
