@@ -138,6 +138,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (!hasFilter) {
                         console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
                         continue;
+                    } else {
+                        // Lắng nghe sự kiện khi filter thay đổi
+                        worksheet.addEventListener(tableau.TableauEventType.FilterChanged, event => {
+                            event.getFilterAsync().then(updatedFilter => {
+                                console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
+                            });
+                        });
                     }
         
                     if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
@@ -158,9 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById("clearFilters").addEventListener("click", clearAllFilters);
 
-        // Lắng nghe sự kiện thay đổi filter
-        dashboard.addEventListener(tableau.TableauEventType.FilterChanged, filterChangedHandler);
-
         function clearAllFilters() {
             const dashboard = tableau.extensions.dashboardContent.dashboard;
     
@@ -171,10 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 });
             });
-        }
-
-        function filterChangedHandler(event) {
-            console.log(`Filter changed on worksheet: ${event.worksheet.name}`);
         }
     });
 });
