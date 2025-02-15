@@ -12,21 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const worksheetName = "OrgCodeSheet"; // Tên worksheet cần lấy
         const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
 
-        
-
-        for (const ws of worksheets) {
-            // 🔹 Lấy danh sách filters hiện có trên worksheet
-            let filters = ws.getFiltersAsync();
-
-            let hasFilter = filters.some(f => f.fieldName === filterField);
-        
-            if (!hasFilter) {
-                console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
-                continue;
-            } else {
-                ws.addEventListener(tableau.TableauEventType.FilterChanged, filterChangedHandler);
-            }
-        }
+        addEventListenerFilter()
 
         // khởi tạo giá trị lần đầu load extension lên
         let selectedData = {
@@ -186,6 +172,22 @@ document.addEventListener("DOMContentLoaded", () => {
             event.getFilterAsync().then(updatedFilter => {
                 console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
             });
+        }
+
+        async function addEventListenerFilter() {
+            for (const ws of worksheets) {
+                // 🔹 Lấy danh sách filters hiện có trên worksheet
+                let filters = await ws.getFiltersAsync();
+    
+                let hasFilter = filters.some(f => f.fieldName === filterField);
+            
+                if (!hasFilter) {
+                    console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
+                    continue;
+                } else {
+                    ws.addEventListener(tableau.TableauEventType.FilterChanged, filterChangedHandler);
+                }
+            }
         }
 
     });
