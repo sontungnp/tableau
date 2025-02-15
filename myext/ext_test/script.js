@@ -7,12 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
         let selectedNodes = new Set();
         let popupData = {};
         let treeData = [];
-
         const dashboard = tableau.extensions.dashboardContent.dashboard;
+        let worksheets = dashboard.worksheets;
+        const worksheetName = "OrgCodeSheet"; // Tên worksheet cần lấy
+        const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
 
-        for (const ws of dashboard.worksheets) {
-            
+        
 
+        for (const ws of worksheets) {
             let hasFilter = filters.some(f => f.fieldName === filterField);
         
             if (!hasFilter) {
@@ -34,9 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchData();
 
         function fetchData() {
-            const worksheetName = "OrgCodeSheet"; // Tên worksheet cần lấy
+            
             // const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
-            const worksheet = dashboard.worksheets.find(ws => ws.name === worksheetName);
+            const worksheet = worksheets.find(ws => ws.name === worksheetName);
             worksheet.getSummaryDataAsync().then(data => {
                 treeData = transformDataToTree(data);
             });
@@ -134,10 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         async function setFilterOrgCode(filterValue, isAll) {
             try {
-                const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
-        
-                let worksheets = dashboard.worksheets;
-        
                 // Chuyển filterValue về chuỗi hoặc giá trị mặc định
                 let filterStr = (filterValue !== null && filterValue !== undefined) ? String(filterValue).toUpperCase() : "ALL";
         
@@ -172,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("clearFilters").addEventListener("click", clearAllFilters);
 
         function clearAllFilters() {
-            dashboard.worksheets.forEach((worksheet) => {
+            worksheets.forEach((worksheet) => {
                 worksheet.getFiltersAsync().then((filters) => {
                     filters.forEach((filter) => {
                         worksheet.clearFilterAsync(filter.fieldName);
