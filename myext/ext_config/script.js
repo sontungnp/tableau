@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String)");
                     // console.error("P_Fd_Td = " + fromDateToDate);
                     // alert("P_Fd_Td = " + fromDateToDate);
-                    console.error(err);
+                    console.error(err); 
                 });
             }).catch(err => {
                 setLoading(false); // Kết thúc loading
