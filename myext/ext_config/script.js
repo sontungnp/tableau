@@ -1,107 +1,153 @@
 'use strict';
+
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
-        let selectedNodes = new Set();
-        let treeData = [];
-        fetchData();
-        document.getElementById("dropdown-toggle").addEventListener("click", function () {
-            let container = document.getElementById("tree-container");
-            container.style.display = container.style.display === "block" ? "none" : "block";
+        const dashboard = tableau.extensions.dashboardContent.dashboard;
+
+        // init();
+
+        document.getElementById("refreshButton").addEventListener("click", () => {
+            updateAndRefreshData();
         });
 
-        document.getElementById("search-box").addEventListener("input", filterTree);
+        document.getElementById("resetButton").addEventListener("click", () => {
+            resetData();
+        });
 
-        function fetchData() {
-            const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
-            worksheet.getSummaryDataAsync().then(data => {
-                treeData = transformDataToTree(data);
-                renderTree(treeData, document.getElementById("tree-container"));
+        tableau.extensions.dashboardContent.dashboard.getParametersAsync().then(function (parameters) {
+            parameters.forEach(function (p) {
+                p.addEventListener(tableau.TableauEventType.ParameterChanged, onParameterChange);
+            });
+        });
+
+        function onParameterChange(parameterChangeEvent) {
+            parameterChangeEvent.getParameterAsync().then(function (param) {
+                console.log("Change parameter");
             });
         }
-        function transformDataToTree(data) {
-            const nodes = {};
-            data.data.forEach(row => {
-                const id = row[0].value;
-                const parentId = row[1].value;
-                const label = row[2].value;
-                nodes[id] = nodes[id] || { id, name: label, children: [], parent: null };
-                if (parentId !== null) {
-                    nodes[parentId] = nodes[parentId] || { id: parentId, name: "", children: [], parent: null };
-                    nodes[parentId].children.push(nodes[id]);
-                    nodes[id].parent = nodes[parentId];
-                }
+
+        function updateAndRefreshData() {
+            setLoading(true); // Bắt đầu loading
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            // lưu vào localstorage
+            localStorage.setItem("startDate", startDate);
+            localStorage.setItem("endDate", endDate);
+
+            // Chuyển giá trị sang định dạng yyyy-mm-dd
+            const formattedStartDate = new Date(startDate).toISOString().split('T')[0];
+            const formattedEndDate = new Date(endDate).toISOString().split('T')[0];
+            // Nối hai giá trị với dấu phẩy
+            const fromDateToDate = `${formattedStartDate},${formattedEndDate}`;
+
+            // Get the parameters P_Fd_Td
+            dashboard.getParametersAsync().then(parameters => {
+                const fdtdParam = parameters.find(param => param.name === 'P_Fd_Td');
+                // Cập nhật P_FD bằng giá trị của fromDateToDate
+                fdtdParam.changeValueAsync(fromDateToDate).then(() => {
+                    console.log('thay doi tham so P_Fd_Td');
+                    setLoading(false); // Kết thúc loading
+                }).catch(err => {
+                    setLoading(false); // Kết thúc loading
+                    console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String).");
+                    alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String)");
+                    // console.error("P_Fd_Td = " + fromDateToDate);
+                    // alert("P_Fd_Td = " + fromDateToDate);
+                    console.error(err);
+                });
+            }).catch(err => {
+                setLoading(false); // Kết thúc loading
+                console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String).");
+                alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String)");
+                // console.error("P_Fd_Td = " + fromDateToDate);
+                // alert("P_Fd_Td = " + fromDateToDate);
+                console.error(err);
             });
-            return Object.values(nodes).find(node => !node.parent) || [];
         }
-        function renderTree(node, container) {
-            if (!node) return;
-            let div = document.createElement("div");
-            div.classList.add("node");
+
+        function resetData() {
+            setLoading(false); // Kết thúc loading
+            document.getElementById('startDate').value = null;
+            document.getElementById('endDate').value = null;
             
-            let toggle = document.createElement("span");
-            toggle.classList.add("toggle");
-            toggle.textContent = node.children.length ? "▶" : "";
-            toggle.addEventListener("click", function (event) {
-                event.stopPropagation();
-                let parent = this.parentElement;
-                let childrenContainer = parent.nextElementSibling;
-                if (childrenContainer) {
-                    let isExpanded = childrenContainer.style.display === "block";
-                    childrenContainer.style.display = isExpanded ? "none" : "block";
-                    this.textContent = isExpanded ? "▶" : "▼";
-                }
+            const fromDateToDate = '1000-01-01,1000-01-01';
+            // Get the parameters P_Fd_Td
+            dashboard.getParametersAsync().then(parameters => {
+                const fdtdParam = parameters.find(param => param.name === 'P_Fd_Td');
+                // Cập nhật P_FD bằng giá trị của fromDateToDate
+                fdtdParam.changeValueAsync(fromDateToDate).then(() => {
+                    console.log('thay doi tham so P_Fd_Td');
+                    setLoading(false); // Kết thúc loading
+                });
+            }).catch(err => {
+                setLoading(false); // Kết thúc loading
+                console.error("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String).");
+                alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String)");
+                // console.error("P_Fd_Td = " + fromDateToDate);
+                // alert("P_Fd_Td = " + fromDateToDate);
+                console.error(err);
             });
-            
-            let checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.dataset.id = node.id;
-            checkbox.addEventListener("change", function () {
-                toggleChildren(node, this.checked);
-                updateParentState(node.parent);
-                updateSelectedNodes();
+
+            clearAllFilters();
+        }
+
+        function init() {
+            // Get the parameters P_FROM_DATE and P_TO_DATE
+            dashboard.getParametersAsync().then(parameters => {
+                const fromDateToDate = '1000-01-01,1000-01-01';
+                const fdtdParam = parameters.find(param => param.name === 'P_Fd_Td');
+
+                const fdtdDefaultValue = fdtdParam.currentValue.value;
+                const [startDateDefault, endDateDefault] = fdtdDefaultValue.split(",");
+
+                // Gán giá trị cho các input type="date"
+                document.getElementById("startDate").value = startDateDefault;
+                document.getElementById("endDate").value = endDateDefault;
+
+                // Cập nhật P_FD bằng giá trị của P_From_Date + ',' + P_To_Date
+                fdtdParam.changeValueAsync(fromDateToDate).then(() => {
+                    console.log('thay doi tham so P_Fd_Td');
+                });
+            }).catch(err => {
+                console.error("Đã có lỗi xảy ra. Khi init dữ liệu");
             });
-            
-            div.appendChild(toggle);
-            div.appendChild(checkbox);
-            div.appendChild(document.createTextNode(node.name));
-            container.appendChild(div);
-            
-            if (node.children.length) {
-                let childrenContainer = document.createElement("div");
-                childrenContainer.classList.add("children");
-                container.appendChild(childrenContainer);
-                node.children.forEach(child => renderTree(child, childrenContainer));
+        }
+
+        // Thêm trạng thái loading
+        function setLoading(isLoading) {
+            if (isLoading) {
+                document.body.style.cursor = 'wait'; // Thay đổi con trỏ chuột sang "loading"
+                refreshButton.classList.add('loading'); // Thêm class loading
+                refreshButton.disabled = true; // Vô hiệu hóa nút khi đang loading
+            } else {
+                document.body.style.cursor = 'default'; // Trả lại trạng thái bình thường
+                refreshButton.classList.remove('loading'); // Bỏ class loading
+                refreshButton.disabled = false; // Kích hoạt lại nút
             }
         }
-        function filterTree() {
-            let query = document.getElementById("search-box").value.toLowerCase();
-            document.querySelectorAll(".node").forEach(node => {
-                let text = node.textContent.toLowerCase();
-                node.style.display = text.includes(query) ? "flex" : "none";
+
+        function clearAllFilters() {
+            dashboard.worksheets.forEach((worksheet) => {
+                worksheet.getFiltersAsync().then((filters) => {
+                    filters.forEach((filter) => {
+                        worksheet.clearFilterAsync(filter.fieldName);
+                    });
+                });
             });
         }
-        function toggleChildren(node, checked) {
-            node.children.forEach(child => {
-                let checkbox = document.querySelector(`input[data-id='${child.id}']`);
-                if (checkbox) {
-                    checkbox.checked = checked;
-                    checkbox.indeterminate = false;
-                    toggleChildren(child, checked);
-                }
-            });
-        }
-        function updateParentState(node) {
-            if (!node) return;
-            let parentCheckbox = document.querySelector(`input[data-id='${node.id}']`);
-            let childCheckboxes = node.children.map(child => document.querySelector(`input[data-id='${child.id}']`));
-            
-            let allChecked = childCheckboxes.every(checkbox => checkbox.checked);
-            let someChecked = childCheckboxes.some(checkbox => checkbox.checked || checkbox.indeterminate);
-            
-            parentCheckbox.checked = allChecked;
-            parentCheckbox.indeterminate = !allChecked && someChecked;
-            
-            updateParentState(node.parent);
-        }
+
+        window.onload = function() {
+            let startDateLocal = localStorage.getItem("startDate");
+            let endDateLocal = localStorage.getItem("endDate");
+
+            if (savedDate) {
+                document.getElementById("startDate").value = startDateLocal;
+                document.getElementById("endDate").value = endDateLocal;
+            }
+        };
+    }).catch(err => {
+        console.error("Đã có lỗi xảy ra.");
+        setLoading(false); // Kết thúc loading
     });
 });
