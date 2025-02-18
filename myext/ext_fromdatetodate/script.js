@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const dashboard = tableau.extensions.dashboardContent.dashboard;
 
         // init();
+        setFromDateToDateDefaultValue();
 
         document.getElementById("refreshButton").addEventListener("click", () => {
             updateAndRefreshData();
@@ -139,6 +140,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
         }
+
+        function setFromDateToDateDefaultValue() {
+            console.log('start setFromDateToDateDefaultValue');
+            let startDateLocal = localStorage.getItem("startDate");
+            let endDateLocal = localStorage.getItem("endDate");
+
+            if (startDateLocal && endDateLocal) {
+                console.log('start doc tu local storage');
+                document.getElementById("startDate").value = startDateLocal;
+                document.getElementById("endDate").value = endDateLocal;
+                console.log('end doc tu local storage');
+            }
+        };
     }).catch(err => {
         console.error("Đã có lỗi xảy ra.");
         setLoading(false); // Kết thúc loading
