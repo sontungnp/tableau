@@ -32,8 +32,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const endDate = document.getElementById('endDate').value;
 
             // lưu vào localstorage
+            console.log('start luu vao localstoreage');
             localStorage.setItem("startDate", startDate);
             localStorage.setItem("endDate", endDate);
+            console.log('end luu vao localstoreage');
 
             // Chuyển giá trị sang định dạng yyyy-mm-dd
             const formattedStartDate = new Date(startDate).toISOString().split('T')[0];
@@ -138,12 +140,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         window.onload = function() {
+            console.log('start window.onload');
             let startDateLocal = localStorage.getItem("startDate");
             let endDateLocal = localStorage.getItem("endDate");
 
-            if (savedDate) {
+            if (startDateLocal && endDateLocal) {
+                console.log('start doc tu local storage');
                 document.getElementById("startDate").value = startDateLocal;
                 document.getElementById("endDate").value = endDateLocal;
+                console.log('end doc tu local storage');
             }
         };
     }).catch(err => {
