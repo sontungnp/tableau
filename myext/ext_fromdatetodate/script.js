@@ -2,11 +2,9 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
-        console.log('start tableau.extensions.initializeAsync');
-
         const dashboard = tableau.extensions.dashboardContent.dashboard;
 
-        setFromDateToDateDefaultValue();
+        // init();
 
         document.getElementById("refreshButton").addEventListener("click", () => {
             updateAndRefreshData();
@@ -33,12 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
 
-            // lưu vào localstorage
-            console.log('start luu vao localstoreage');
-            localStorage.setItem("startDate", startDate);
-            localStorage.setItem("endDate", endDate);
-            console.log('end luu vao localstoreage');
-
             // Chuyển giá trị sang định dạng yyyy-mm-dd
             const formattedStartDate = new Date(startDate).toISOString().split('T')[0];
             const formattedEndDate = new Date(endDate).toISOString().split('T')[0];
@@ -58,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert("Đã có lỗi xảy ra. Đảm bảo có đủ tham số: P_Fd_Td (String)");
                     // console.error("P_Fd_Td = " + fromDateToDate);
                     // alert("P_Fd_Td = " + fromDateToDate);
-                    console.error(err); 
+                    console.error(err);
                 });
             }).catch(err => {
                 setLoading(false); // Kết thúc loading
@@ -140,19 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
         }
-
-        function setFromDateToDateDefaultValue() {
-            console.log('start setFromDateToDateDefaultValue');
-            let startDateLocal = localStorage.getItem("startDate");
-            let endDateLocal = localStorage.getItem("endDate");
-
-            if (startDateLocal && endDateLocal) {
-                console.log('start doc tu local storage');
-                document.getElementById("startDate").value = startDateLocal;
-                document.getElementById("endDate").value = endDateLocal;
-                console.log('end doc tu local storage');
-            }
-        };
     }).catch(err => {
         console.error("Đã có lỗi xảy ra.");
         setLoading(false); // Kết thúc loading
