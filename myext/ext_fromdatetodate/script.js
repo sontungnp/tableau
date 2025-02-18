@@ -5,6 +5,16 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log('start tableau.extensions.initializeAsync');
         const dashboard = tableau.extensions.dashboardContent.dashboard;
 
+        let isFirstLoad = !sessionStorage.getItem("isFirstLoad");
+
+        if (isFirstLoad) {
+            console.log("Lần đầu tiên load trang.");
+            sessionStorage.setItem("isFirstLoad", "true");
+            init();
+        } else {
+            console.log("Chuyển tab hoặc reload.");
+        }
+
         // init();
         setFromDateToDateDefaultValue();
 
