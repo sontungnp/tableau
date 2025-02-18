@@ -2,9 +2,11 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
+        console.log('start tableau.extensions.initializeAsync');
+
         const dashboard = tableau.extensions.dashboardContent.dashboard;
 
-        // init();
+        setFromDateToDateDefaultValue();
 
         document.getElementById("refreshButton").addEventListener("click", () => {
             updateAndRefreshData();
@@ -139,8 +141,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        window.onload = function() {
-            console.log('start window.onload');
+        function setFromDateToDateDefaultValue() {
+            console.log('start setFromDateToDateDefaultValue');
             let startDateLocal = localStorage.getItem("startDate");
             let endDateLocal = localStorage.getItem("endDate");
 
