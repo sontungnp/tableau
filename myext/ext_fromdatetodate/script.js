@@ -2,18 +2,17 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
-        console.log('start tableau.extensions.initializeAsync');
+        // console.log('start tableau.extensions.initializeAsync');
         const dashboard = tableau.extensions.dashboardContent.dashboard;
 
-        let isFirstLoad = !sessionStorage.getItem("isFirstLoad");
-
-        if (isFirstLoad) {
-            console.log("Lần đầu tiên load trang.");
-            sessionStorage.setItem("isFirstLoad", "true");
-            init();
-        } else {
-            console.log("Chuyển tab hoặc reload.");
-        }
+        // let isFirstLoad = !sessionStorage.getItem("isFirstLoad");
+        // if (isFirstLoad) {
+        //     console.log("Lần đầu tiên load trang.");
+        //     sessionStorage.setItem("isFirstLoad", "true");
+        //     init();
+        // } else {
+        //     console.log("Chuyển tab hoặc reload.");
+        // }
 
         // init();
         setFromDateToDateDefaultValue();
@@ -44,10 +43,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const endDate = document.getElementById('endDate').value;
 
             // lưu vào localstorage
-            console.log('start luu vao localstoreage');
+            // console.log('start luu vao localstoreage');
             localStorage.setItem("startDate", startDate);
             localStorage.setItem("endDate", endDate);
-            console.log('end luu vao localstoreage');
+            // console.log('end luu vao localstoreage');
 
             // Chuyển giá trị sang định dạng yyyy-mm-dd
             const formattedStartDate = new Date(startDate).toISOString().split('T')[0];
@@ -84,6 +83,12 @@ document.addEventListener("DOMContentLoaded", () => {
             setLoading(false); // Kết thúc loading
             document.getElementById('startDate').value = null;
             document.getElementById('endDate').value = null;
+
+            // lưu vào localstorage
+            // console.log('start luu vao localstoreage');
+            localStorage.setItem("startDate", null);
+            localStorage.setItem("endDate", null);
+            // console.log('end luu vao localstoreage');
             
             const fromDateToDate = '1000-01-01,1000-01-01';
             // Get the parameters P_Fd_Td
@@ -152,15 +157,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function setFromDateToDateDefaultValue() {
-            console.log('start setFromDateToDateDefaultValue');
+            // console.log('start setFromDateToDateDefaultValue');
             let startDateLocal = localStorage.getItem("startDate");
             let endDateLocal = localStorage.getItem("endDate");
 
             if (startDateLocal && endDateLocal) {
-                console.log('start doc tu local storage');
+                // console.log('start doc tu local storage');
                 document.getElementById("startDate").value = startDateLocal;
                 document.getElementById("endDate").value = endDateLocal;
-                console.log('end doc tu local storage');
+                // console.log('end doc tu local storage');
             }
         };
     }).catch(err => {
