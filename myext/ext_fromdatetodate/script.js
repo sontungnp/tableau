@@ -2,6 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     tableau.extensions.initializeAsync().then(() => {
+        console.log('start tableau.extensions.initializeAsync');
         const dashboard = tableau.extensions.dashboardContent.dashboard;
 
         // init();
@@ -30,6 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
             setLoading(true); // Bắt đầu loading
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
+
+            // lưu vào localstorage
+            console.log('start luu vao localstoreage');
+            localStorage.setItem("startDate", startDate);
+            localStorage.setItem("endDate", endDate);
+            console.log('end luu vao localstoreage');
 
             // Chuyển giá trị sang định dạng yyyy-mm-dd
             const formattedStartDate = new Date(startDate).toISOString().split('T')[0];
