@@ -100,12 +100,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         }
     }
 
-    function selectAndExpandNodes(selectedLeafIds) {
-        if (!selectedLeafIds || !Array.isArray(selectedLeafIds) || selectedLeafIds.length === 0) {
+    function selectAndExpandNodes(selectedIds) {
+        if (!selectedIds || !Array.isArray(selectedIds) || selectedIds.length === 0) {
             return;
         }
     
-        selectedLeafIds.forEach(id => {
+        selectedIds.forEach(id => {
             let checkbox = document.querySelector(`input[data-id='${id}']`);
             if (checkbox) {
                 checkbox.checked = true; // ✅ Chọn checkbox
@@ -252,5 +252,39 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             .map(item => item.name); // Lấy tên của item
 
         document.getElementById("selected-box").value = selectedNames.join(", "); // Gán vào ô input
+    }
+
+    function findNodeByName(node, name) {
+        if (!node) return null;
+        if (node.name === name) return node;
+        for (let child of node.children) {
+            let found = findNodeByName(child, name);
+            if (found) return found;
+        }
+        return null;
+    };
+
+    function tickNodeByTypingName() {
+        let inputValue = this.value.trim(); // Lấy giá trị và loại bỏ khoảng trắng ở đầu và cuối
+        let unitNames = inputValue.split(",").map(name => name.trim()); // Tách các tên đơn vị bằng dấu phẩy và loại bỏ khoảng trắng
+
+        // Xóa tất cả các checkbox đã chọn trước đó
+        document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        // Tìm và tích vào các node có tên trùng khớp
+        unitNames.forEach(name => {
+            if (name) { // Chỉ xử lý nếu tên không rỗng
+                let node = findNodeByName(treeData, name);
+                if (node) {
+                    let checkbox = document.querySelector(`input[data-id='${node.id}']`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true })); // Kích hoạt sự kiện thay đổi
+                    }
+                }
+            }
+        });
     }
 });
