@@ -254,6 +254,10 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         document.getElementById("selected-box").value = selectedNames.join(", "); // Gán vào ô input
     }
 
+    document.getElementById("checking-buttons").addEventListener("click", () => {
+        tickNodeByTypingName();
+    });
+
     function findNodeByName(node, name) {
         if (!node) return null;
         if (node.name === name) return node;
