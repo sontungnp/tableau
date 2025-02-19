@@ -22,6 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
             "isAll": "ALL",
             "maxLevel": 2
         };
+
+        document.getElementById("selected-box").value = 'ALL';
+        
         fetchData();
 
         function fetchData() {

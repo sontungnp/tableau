@@ -173,11 +173,11 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
                 });
             }
         });
-        renderSelectedItemsTable();  // 🔥 CẬP NHẬT BẢNG 🔥
+        // renderSelectedItemsTable();  // 🔥 CẬP NHẬT BẢNG 🔥// Bật lên khi cần check
         updateSelectedBox(); // 🔥 Cập nhật ô input 🔥
     }
     
-    
+    /*
     function renderSelectedItemsTable() { 
         let table = document.getElementById("selected-items-table"); 
         let tbody = table.querySelector("tbody"); 
@@ -196,6 +196,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             tbody.appendChild(row); 
         }); 
     }    
+        */
     
     function findNodeById(node, id) {
         if (!node) return null;

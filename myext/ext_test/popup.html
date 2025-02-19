@@ -18,6 +18,8 @@
             border: 1px solid #ccc;
             background: #f9f9f9;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            width: 600px; /* Hoặc chiều rộng phù hợp */
+            height: 800px; /* Chiều cao cố định cho popup */
         }
 
         #popup-button {
@@ -52,17 +54,25 @@
             background-color: #0056b3; /* Màu xanh đậm khi hover */
         }
 
-        #tree-container {
-            /* display: none; */
+        /* #tree-container {
             top: 40px;
-            /* width: 100%; */
-            /* max-height: 300px; */
             border: 1px solid #ccc;
             background: white;
             overflow: auto;
             z-index: 1000;
             padding: 5px;
+        } */
+
+        /* Định dạng cây tổ chức với thanh cuộn */
+        #tree-container {
+            flex-grow: 1; /* Chiếm hết phần còn lại */
+            border: 1px solid #ccc;
+            background: white;
+            overflow-y: auto; /* Chỉ phần cây tổ chức có thể cuộn */
+            max-height: 500px; /* Giới hạn chiều cao tối đa */
+            padding: 5px;
         }
+
         .node {
             display: flex;
             align-items: center;
@@ -165,7 +175,7 @@
         </div>
         <div id="tree-container"></div>
 
-        <table id="selected-items-table">
+        <!-- <table id="selected-items-table">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -173,11 +183,11 @@
                     <th>Level</th>
                     <th>Loại</th>
                     <th>Trạng thái chọn</th>
-                    <th>Hiển thị</th> <!-- 🔥 THÊM CỘT MỚI -->
+                    <th>Hiển thị</th>
                 </tr>
             </thead>
             <tbody></tbody>
-        </table>
+        </table> -->
         
     </div>
 </body>
