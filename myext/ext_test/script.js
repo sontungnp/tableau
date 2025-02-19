@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             "maxLevel": receivedValue.maxLevel
                         }
 
-                        document.getElementById("search-box").value = arrayToString(selectedData.showIds);
+                        document.getElementById("selected-box").value = arrayToString(selectedData.showIds);
 
                         setFilterOrgCode(selectedData.selectedLeafIds, selectedData.isAll);
                     } else {
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
                     if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
                         // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
-                        document.getElementById("search-box").value = 'ALL';
+                        document.getElementById("selected-box").value = 'ALL';
                         await ws.clearFilterAsync(filterField);
                     } else {
                         // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
@@ -157,7 +157,20 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        document.getElementById("clearFilters").addEventListener("click", clearAllFilters);
+        document.getElementById("clear").addEventListener("click", clearOrgFilters);
+
+        function clearOrgFilters() {
+            // thiết lập giá trị khởi tạo ban đầu
+            selectedData = {
+                "action": "INIT",
+                "selectedLeafIds": [],
+                "showIds": ["ALL"],
+                "isAll": "ALL",
+                "maxLevel": 2
+            };
+
+            document.getElementById("selected-box").value = 'ALL';
+        }
 
         function clearAllFilters() {
             worksheets.forEach((worksheet) => {
@@ -181,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             "maxLevel": 2
                         }
 
-                        // document.getElementById("search-box").value = 'ALL';
+                        // document.getElementById("selected-box").value = 'ALL';
 
                         setFilterOrgCode(selectedData.selectedLeafIds, selectedData.isAll);
                     }

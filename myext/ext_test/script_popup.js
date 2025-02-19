@@ -174,6 +174,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             }
         });
         renderSelectedItemsTable();  // 🔥 CẬP NHẬT BẢNG 🔥
+        updateSelectedBox(); // 🔥 Cập nhật ô input 🔥
     }
     
     
@@ -242,5 +243,13 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     
         console.log("Dữ liệu trả về:", returnValues);
         tableau.extensions.ui.closeDialog(JSON.stringify(returnValues));
+    }
+
+    function updateSelectedBox() {
+        let selectedNames = selectedItems
+            .filter(item => item.display === "show") // Chỉ lấy các item có display = "show"
+            .map(item => item.name); // Lấy tên của item
+
+        document.getElementById("selected-box").value = selectedNames.join(", "); // Gán vào ô input
     }
 });
