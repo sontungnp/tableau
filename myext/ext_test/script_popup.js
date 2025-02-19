@@ -231,7 +231,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
 
         let returnValues = {
             "action": action,
-            "selectedLeafIds": selectedLeafIds,
+            "selectedLeafIds": selectedItems,// code cu: selectedLeafIds,
             "showIds": showIds,
             "isAll": isAll,
             "maxLevel": maxLevel
