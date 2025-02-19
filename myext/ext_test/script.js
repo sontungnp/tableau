@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
         
-                alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
+                // alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
             } catch (error) {
                 console.error("Error setting filter:", error);
                 alert("Failed to set filter. Check console for details.");
