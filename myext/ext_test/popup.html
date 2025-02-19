@@ -18,8 +18,16 @@
             border: 1px solid #ccc;
             background: #f9f9f9;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            width: 600px; /* Hoặc chiều rộng phù hợp */
-            height: 800px; /* Chiều cao cố định cho popup */
+        }
+
+        #popup-header {
+            display: flex;
+            flex-direction: column; /* Sắp xếp các phần tử theo chiều dọc */
+            gap: 10px; /* Tạo khoảng cách giữa các phần tử */
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         #popup-button {
@@ -54,25 +62,17 @@
             background-color: #0056b3; /* Màu xanh đậm khi hover */
         }
 
-        /* #tree-container {
+        #tree-container {
+            /* display: none; */
             top: 40px;
+            /* width: 100%; */
+            /* max-height: 300px; */
             border: 1px solid #ccc;
             background: white;
             overflow: auto;
             z-index: 1000;
             padding: 5px;
-        } */
-
-        /* Định dạng cây tổ chức với thanh cuộn */
-        #tree-container {
-            flex-grow: 1; /* Chiếm hết phần còn lại */
-            border: 1px solid #ccc;
-            background: white;
-            overflow-y: auto; /* Chỉ phần cây tổ chức có thể cuộn */
-            max-height: 500px; /* Giới hạn chiều cao tối đa */
-            padding: 5px;
         }
-
         .node {
             display: flex;
             align-items: center;
@@ -160,19 +160,22 @@
 </head>
 <body>
     <div id="popup-container">
-        <h2>Danh mục tổ chức</h2>
-        <input type="text" id="selected-box" placeholder="selected items...">
-        <input type="text" id="search-box" placeholder="Search...">
-        <div id="popup-button">
-            <div id="tree-buttons">
-                <button id="expandAll">Expand All</button>
-                <button id="collapseAll">Collapse All</button>
-            </div>
-            <div id="control-buttons">
-                <button id="okPopup">Ok</button>
-                <button id="closePopup">Cancel</button>
+        <div id="popup-header">
+            <h2>Danh mục tổ chức</h2>
+            <input type="text" id="selected-box" placeholder="selected items...">
+            <input type="text" id="search-box" placeholder="Search...">
+            <div id="popup-button">
+                <div id="tree-buttons">
+                    <button id="expandAll">Expand All</button>
+                    <button id="collapseAll">Collapse All</button>
+                </div>
+                <div id="control-buttons">
+                    <button id="okPopup">Ok</button>
+                    <button id="closePopup">Cancel</button>
+                </div>
             </div>
         </div>
+        
         <div id="tree-container"></div>
 
         <!-- <table id="selected-items-table">
