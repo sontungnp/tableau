@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const worksheetName = "OrgCodeSheet"; // Tên worksheet cần lấy
         const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
 
-        addEventListenerFilter();
+        // addEventListenerFilter();
 
         // khởi tạo giá trị lần đầu load extension lên
         let selectedData = {
