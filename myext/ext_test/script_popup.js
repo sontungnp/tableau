@@ -27,17 +27,17 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
     });
 
     document.getElementById("closePopup").addEventListener("click", function () {
-        selectAndExpandNodes(selectedLeafIds);
-        // returnData("cancel");
+        // selectAndExpandNodes(selectedLeafIds); // for test
+        returnData("cancel");
 
     });
 
     let popupData = JSON.parse(payload);
     let treeData = popupData.treeData;
-    let selectedLeafIds = popupData.selectedData.selectedLeafIds;
+    let selectedLeafIds = popupData.selectedData.showIds; // code cu: popupData.selectedData.selectedLeafIds
     expandLevel = popupData.selectedData.maxLevel ? popupData.selectedData.maxLevel : 2
     
-    renderTree(treeData, document.getElementById("tree-container"), null, 1, expandLevel);
+    renderTree(treeData, document.getElementById("tree-container"), null, 1, 2); // chuyen lai luon show level 2
     selectAndExpandNodes(selectedLeafIds);
 
     let container = document.getElementById("tree-container");
