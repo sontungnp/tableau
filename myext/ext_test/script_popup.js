@@ -27,18 +27,17 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
     });
 
     document.getElementById("closePopup").addEventListener("click", function () {
-        // selectAndExpandNodes(selectedLeafIds); // for test
         returnData("cancel");
 
     });
 
     let popupData = JSON.parse(payload);
     let treeData = popupData.treeData;
-    let selectedLeafIds = popupData.selectedData.showIds; // code cu: popupData.selectedData.selectedLeafIds
+    let showIds = popupData.selectedData.showIds; 
     expandLevel = popupData.selectedData.maxLevel ? popupData.selectedData.maxLevel : 2
     
     renderTree(treeData, document.getElementById("tree-container"), null, 1, 2); // chuyen lai luon show level 2
-    selectAndExpandNodes(selectedLeafIds);
+    selectAndExpandNodes(showIds);
 
     let container = document.getElementById("tree-container");
     container.style.display = container.style.display === "block" ? "none" : "block";
@@ -232,7 +231,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
         let selectedIds = selectedItems
             .map(item => item.id);
 
-        let selectedLeafIds = selectedItems
+        let selectedCodes = selectedItems
             .filter(item => item.type === "LÃ¡")
             .map(item => item.id);
     
@@ -247,7 +246,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
 
         let returnValues = {
             "action": action,
-            "selectedLeafIds": selectedIds,// code cu: selectedLeafIds,
+            "selectedIds": selectedIds,
             "showIds": showIds,
             "isAll": isAll,
             "maxLevel": maxLevel

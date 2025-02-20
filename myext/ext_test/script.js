@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // khởi tạo giá trị lần đầu load extension lên
         let selectedData = {
             "action": "INIT",
-            "selectedLeafIds": [],
+            "selectedIds": [],
             "showIds": ["ALL"],
             "isAll": "ALL",
             "maxLevel": 2
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (receivedValue.action === 'ok') {
                         console.log("Ok");
                         selectedData = {
-                            "selectedLeafIds": receivedValue.selectedLeafIds, 
+                            "selectedIds": receivedValue.selectedIds, 
                             "showIds": receivedValue.showIds, 
                             "isAll": receivedValue.isAll,
                             "maxLevel": receivedValue.maxLevel
@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         document.getElementById("selected-box").value = arrayToString(selectedData.showIds);
 
-                        setFilterOrgCode(selectedData.selectedLeafIds, selectedData.isAll);
+                        setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
                     } else {
                         console.log("Calcel");
                     }
@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // thiết lập giá trị khởi tạo ban đầu
             selectedData = {
                 "action": "INIT",
-                "selectedLeafIds": [],
+                "selectedIds": [],
                 "showIds": ["ALL"],
                 "isAll": "ALL",
                 "maxLevel": 2
@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (updatedFilter.appliedValues.length === 0) {
                         selectedData = {
                             "action": "INIT",
-                            "selectedLeafIds": [],
+                            "selectedIds": [],
                             "showIds": ["ALL"],
                             "isAll": "ALL",
                             "maxLevel": 2
@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         // document.getElementById("selected-box").value = 'ALL';
 
-                        setFilterOrgCode(selectedData.selectedLeafIds, selectedData.isAll);
+                        setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
                     }
                     console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
                 }
