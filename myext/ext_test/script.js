@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById("clear").addEventListener("click", clearOrgFilters);
 
-        function clearOrgFilters() {
+        async function clearOrgFilters() {
             // thiết lập giá trị khởi tạo ban đầu
             selectedData = {
                 "action": "INIT",
@@ -162,6 +162,27 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
             document.getElementById("selected-box").value = 'ALL';
+
+            try {
+                for (const ws of worksheets) {
+                    // 🔹 Lấy danh sách filters hiện có trên worksheet
+                    let filters = await ws.getFiltersAsync();
+                    
+                    // Tìm xem worksheet có filter này không -> nếu ko có thì continue sang worksheet khác
+                    let hasFilter = filters.some(f => f.fieldName === filterField);
+        
+                    if (!hasFilter) {
+                        console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
+                        continue;
+                    } else {
+                        await ws.clearFilterAsync(filterField);
+                    }
+                }
+        
+                // alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
+            } catch (error) {
+                console.error("Error clear filter:" + filterField, error);
+            }
         }
 
         function clearAllFilters() {
