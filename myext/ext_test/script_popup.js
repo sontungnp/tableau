@@ -166,6 +166,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
                 selectedItems.push({
                     id: node.id,
                     name: node.name,
+                    code: node.code,
                     level: getLevel(node),
                     type: isBranch ? "Cành" : "Lá",
                     selection: isBranch ? "Tất cả" : "N/A",
