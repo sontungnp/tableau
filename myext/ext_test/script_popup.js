@@ -259,7 +259,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     function updateSelectedBox() {
         let selectedCodes = selectedItems
-            .filter(item => item.code !== "" && !item.code) // Chỉ lấy các item có code khác null
+            .filter(item => item.code != null && item.code !== "") // Chỉ lấy các item có code khác null
             .map(item => item.code); // Lấy code của item
 
         document.getElementById("selected-box").value = selectedCodes.join(", "); // Gán vào ô input
