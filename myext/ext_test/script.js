@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             "maxLevel": receivedValue.maxLevel
                         }
 
-                        document.getElementById("selected-box").value = arrayToString(selectedData.showIds);
+                        document.getElementById("selected-box").value = arrayToString(selectedData.selectedCodes);
 
                         setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
                     } else {
