@@ -114,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return arr.join(",");
         }
 
+        /*
         async function setFilterOrgCode(filterValue, isAll) {
             try {
                 // Chuyển filterValue về chuỗi hoặc giá trị mặc định
@@ -147,6 +148,41 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Failed to set filter. Check console for details.");
             }
         }
+            
+        */
+
+        async function setFilterOrgCode(filterValue, isAll) {
+            try {
+                // Chuyển filterValue về chuỗi hoặc giá trị mặc định
+                let filterStr = (filterValue !== null && filterValue !== undefined) ? String(filterValue).toUpperCase() : "ALL";
+
+                await Promise.allSettled(worksheets.map(async (ws) => {
+                    // 🔹 Lấy danh sách filters hiện có trên worksheet
+                    let filters = await ws.getFiltersAsync();
+
+                    // Tìm xem worksheet có filter này không -> nếu không có thì bỏ qua
+                    if (!filters.some(f => f.fieldName === filterField)) {
+                        console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
+                        return;
+                    }
+
+                    if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
+                        // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
+                        document.getElementById("selected-box").value = 'ALL';
+                        await ws.clearFilterAsync(filterField);
+                    } else {
+                        // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
+                        await ws.applyFilterAsync(filterField, filterValue, "replace");
+                    }
+                }));
+
+                // alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
+            } catch (error) {
+                console.error("Error setting filter:", error);
+                alert("Failed to set filter. Check console for details.");
+            }
+        }
+
 
         document.getElementById("clear").addEventListener("click", clearOrgFilters);
 
