@@ -157,13 +157,28 @@
         .node:last-child::before {
             height: 50%;
         }
+
+        #selected-area { 
+            display: flex;
+            gap: 10px;
+        }
+        #selected-box { 
+            flex-grow: 1;
+        }
+        #checking-buttons { 
+            display: flex;
+        }
     </style>
 </head>
 <body>
     <div id="popup-container">
         <div id="popup-header">
             <h2>Danh mục tổ chức</h2>
-            <input type="text" id="selected-box" placeholder="selected items...">
+            <div id="selected-area">
+                <input type="text" id="selected-box" placeholder="selected items...">
+                <button id="checking-buttons">Check</button>
+            </div>
+            
             <input type="text" id="search-box" placeholder="Search...">
             <div id="popup-button">
                 <div id="tree-buttons">

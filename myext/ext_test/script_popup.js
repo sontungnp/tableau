@@ -100,12 +100,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         }
     }
 
-    function selectAndExpandNodes(selectedLeafIds) {
-        if (!selectedLeafIds || !Array.isArray(selectedLeafIds) || selectedLeafIds.length === 0) {
+    function selectAndExpandNodes(selectedIds) {
+        if (!selectedIds || !Array.isArray(selectedIds) || selectedIds.length === 0) {
             return;
         }
     
-        selectedLeafIds.forEach(id => {
+        selectedIds.forEach(id => {
             let checkbox = document.querySelector(`input[data-id='${id}']`);
             if (checkbox) {
                 checkbox.checked = true; // ✅ Chọn checkbox
@@ -208,6 +208,16 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         return null;
     }
 
+    function findNodeByCode(node, code) {
+        if (!node) return null;
+        if (node.code == code) return node;
+        for (let child of node.children) {
+            let found = findNodeByCOde(child, code);
+            if (found) return found;
+        }
+        return null;
+    }
+
     function getLevel(node) {
         let level = 1;
         while (node.parent) {
@@ -247,10 +257,71 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     }
 
     function updateSelectedBox() {
-        let selectedNames = selectedItems
-            .filter(item => item.display === "show") // Chỉ lấy các item có display = "show"
-            .map(item => item.name); // Lấy tên của item
+        let selectedCodes = selectedItems
+            .filter(item => item.code !== "" && !item.code) // Chỉ lấy các item có code khác null
+            .map(item => item.code); // Lấy code của item
 
-        document.getElementById("selected-box").value = selectedNames.join(", "); // Gán vào ô input
+        document.getElementById("selected-box").value = selectedCodes.join(", "); // Gán vào ô input
+    }
+
+    document.getElementById("checking-buttons").addEventListener("click", () => {
+        tickNodeByTypingCode();
+    });
+
+    function findNodeByName(node, name) {
+        if (!node) return null;
+        if (node.name === name) return node;
+        for (let child of node.children) {
+            let found = findNodeByName(child, name);
+            if (found) return found;
+        }
+        return null;
+    };
+
+    function tickNodeByTypingCode() {
+        let inputValue = document.getElementById("selected-box").value.trim(); // Lấy giá trị và loại bỏ khoảng trắng ở đầu và cuối
+        let unitCodes = inputValue.split(",").map(code => code.trim()); // Tách các tên đơn vị bằng dấu phẩy và loại bỏ khoảng trắng
+
+        // Xóa tất cả các checkbox đã chọn trước đó
+        document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        selectAndExpandNodesByCode(unitCodes);
+    }
+
+    function selectAndExpandNodesByCode(selectedCodes) {
+        if (!selectedCodes || !Array.isArray(selectedCodes) || selectedCodes.length === 0) {
+            return;
+        }
+    
+        selectedCodes.forEach(code => {
+            let node = findNodeByCode(treeData, code); // Tìm node theo code
+            if (node) {
+                let checkbox = document.querySelector(`input[data-id='${node.id}']`);
+                if (checkbox) {
+                    checkbox.checked = true; // ✅ Chọn checkbox
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true })); // Kích hoạt sự kiện thay đổi
+                    expandParentNodes(node); // Mở rộng các cấp cha
+                }
+            }
+        });
+    }
+
+    function expandParentNodes(node) {
+        while (node.parent) {
+            let parent = node.parent;
+            let toggle = document.querySelector(`input[data-id='${parent.id}']`).parentElement.querySelector(".toggle");
+            let childrenContainer = toggle.parentElement.nextElementSibling;
+
+            if (toggle && toggle.textContent === "▶") {
+                toggle.textContent = "▼";
+            }
+            if (childrenContainer) {
+                childrenContainer.style.display = "block";
+            }
+
+            node = parent;
+        }
     }
 });
