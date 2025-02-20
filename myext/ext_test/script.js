@@ -36,22 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // function transformDataToTree(data) {
-        //     const nodes = {};
-        //     data.data.forEach(row => {
-        //         const id = row[0].value;
-        //         const parentId = row[1].value;
-        //         const label = row[2].value;
-        //         nodes[id] = nodes[id] || { id, name: label, children: [], parent: null };
-        //         if (parentId !== null) {
-        //             nodes[parentId] = nodes[parentId] || { id: parentId, name: "", children: [], parent: null };
-        //             nodes[parentId].children.push(nodes[id]);
-        //             nodes[id].parent = nodes[parentId];
-        //         }
-        //     });
-        //     return Object.values(nodes).find(node => !node.parent) || [];
-        // }
-
         function transformDataToTree(data) {
             if (!data.data.length) return null; // Nếu dữ liệu rỗng, trả về null
         
@@ -62,16 +46,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 const id = row[0].value;
                 const parentId = row[1].value;
                 const label = row[2].value;
+                const code = row[3].value; // Đọc thêm cột code
         
                 if (!nodes[id]) {
-                    nodes[id] = { id, name: label, children: [] };
+                    nodes[id] = { id, name: label, code, children: [] };
                 } else {
                     nodes[id].name = label;
+                    nodes[id].code = code; // Gán giá trị code nếu node đã tồn tại
                 }
         
                 if (parentId !== null) {
                     if (!nodes[parentId]) {
-                        nodes[parentId] = { id: parentId, name: "", children: [] };
+                        nodes[parentId] = { id: parentId, name: "", code: "", children: [] };
                     }
                     nodes[parentId].children.push(nodes[id]);
                 }
@@ -82,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         
         document.getElementById("dropdown-toggle").addEventListener("click", () => {
-            let popupUrl = window.location.origin + "/tableau/myext/ext_test/popup.html"; // URL của file popup
+            let popupUrl = window.location.origin + "/tableau/myext/ext_orgtree/popup.html"; // URL của file popup
 
             function removeParentRefs(node) {
                 if (!node) return;
