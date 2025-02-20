@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let selectedData = {
             "action": "INIT",
             "selectedIds": [],
+            "selectedCodes": "ALL",
             "showIds": ["ALL"],
             "isAll": "ALL",
             "maxLevel": 2
@@ -91,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         console.log("Ok");
                         selectedData = {
                             "selectedIds": receivedValue.selectedIds, 
+                            "selectedCodes": receivedValue.selectedCodes,
                             "showIds": receivedValue.showIds, 
                             "isAll": receivedValue.isAll,
                             "maxLevel": receivedValue.maxLevel
@@ -153,6 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
             selectedData = {
                 "action": "INIT",
                 "selectedIds": [],
+                "selectedCodes": "ALL",
                 "showIds": ["ALL"],
                 "isAll": "ALL",
                 "maxLevel": 2
@@ -178,6 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         selectedData = {
                             "action": "INIT",
                             "selectedIds": [],
+                            "selectedCodes": "ALL",
                             "showIds": ["ALL"],
                             "isAll": "ALL",
                             "maxLevel": 2

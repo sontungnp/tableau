@@ -230,10 +230,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
     function returnData(action) {
         let selectedIds = selectedItems
             .map(item => item.id);
-
-        let selectedCodes = selectedItems
-            .filter(item => item.type === "LÃ¡")
-            .map(item => item.id);
     
         let showIds = selectedItems
             .filter(item => item.display === "show")
@@ -247,6 +243,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
         let returnValues = {
             "action": action,
             "selectedIds": selectedIds,
+            "selectedCodes": document.getElementById("selected-box").value,
             "showIds": showIds,
             "isAll": isAll,
             "maxLevel": maxLevel
