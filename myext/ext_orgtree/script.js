@@ -17,7 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // khởi tạo giá trị lần đầu load extension lên
         let selectedData = {
             "action": "INIT",
-            "selectedLeafIds": [],
+            "selectedIds": [],
+            "selectedCodes": "ALL",
             "showIds": ["ALL"],
             "isAll": "ALL",
             "maxLevel": 2
@@ -36,22 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // function transformDataToTree(data) {
-        //     const nodes = {};
-        //     data.data.forEach(row => {
-        //         const id = row[0].value;
-        //         const parentId = row[1].value;
-        //         const label = row[2].value;
-        //         nodes[id] = nodes[id] || { id, name: label, children: [], parent: null };
-        //         if (parentId !== null) {
-        //             nodes[parentId] = nodes[parentId] || { id: parentId, name: "", children: [], parent: null };
-        //             nodes[parentId].children.push(nodes[id]);
-        //             nodes[id].parent = nodes[parentId];
-        //         }
-        //     });
-        //     return Object.values(nodes).find(node => !node.parent) || [];
-        // }
-
         function transformDataToTree(data) {
             if (!data.data.length) return null; // Nếu dữ liệu rỗng, trả về null
         
@@ -62,16 +47,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 const id = row[0].value;
                 const parentId = row[1].value;
                 const label = row[2].value;
+                const code = row[3].value; // Đọc thêm cột code
         
                 if (!nodes[id]) {
-                    nodes[id] = { id, name: label, children: [] };
+                    nodes[id] = { id, name: label, code, children: [] };
                 } else {
                     nodes[id].name = label;
+                    nodes[id].code = code; // Gán giá trị code nếu node đã tồn tại
                 }
         
                 if (parentId !== null) {
                     if (!nodes[parentId]) {
-                        nodes[parentId] = { id: parentId, name: "", children: [] };
+                        nodes[parentId] = { id: parentId, name: "", code: "", children: [] };
                     }
                     nodes[parentId].children.push(nodes[id]);
                 }
@@ -82,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         
         document.getElementById("dropdown-toggle").addEventListener("click", () => {
-            let popupUrl = window.location.origin + "/tableau/myext/ext_orgtree/popup.html"; // URL của file popup
+            let popupUrl = window.location.origin + "/tableau/myext/ext_test/popup.html"; // URL của file popup
 
             function removeParentRefs(node) {
                 if (!node) return;
@@ -104,15 +91,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (receivedValue.action === 'ok') {
                         console.log("Ok");
                         selectedData = {
-                            "selectedLeafIds": receivedValue.selectedLeafIds, 
+                            "selectedIds": receivedValue.selectedIds, 
+                            "selectedCodes": receivedValue.selectedCodes,
                             "showIds": receivedValue.showIds, 
                             "isAll": receivedValue.isAll,
                             "maxLevel": receivedValue.maxLevel
                         }
 
-                        document.getElementById("selected-box").value = arrayToString(selectedData.showIds);
+                        document.getElementById("selected-box").value = selectedData.selectedCodes;
 
-                        setFilterOrgCode(selectedData.selectedLeafIds, selectedData.isAll);
+                        setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
                     } else {
                         console.log("Calcel");
                     }
@@ -126,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return arr.join(",");
         }
 
+        /*
         async function setFilterOrgCode(filterValue, isAll) {
             try {
                 // Chuyển filterValue về chuỗi hoặc giá trị mặc định
@@ -159,20 +148,77 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Failed to set filter. Check console for details.");
             }
         }
+            
+        */
+
+        async function setFilterOrgCode(filterValue, isAll) {
+            try {
+                // Chuyển filterValue về chuỗi hoặc giá trị mặc định
+                let filterStr = (filterValue !== null && filterValue !== undefined) ? String(filterValue).toUpperCase() : "ALL";
+
+                await Promise.allSettled(worksheets.map(async (ws) => {
+                    // 🔹 Lấy danh sách filters hiện có trên worksheet
+                    let filters = await ws.getFiltersAsync();
+
+                    // Tìm xem worksheet có filter này không -> nếu không có thì bỏ qua
+                    if (!filters.some(f => f.fieldName === filterField)) {
+                        console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
+                        return;
+                    }
+
+                    if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
+                        // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
+                        document.getElementById("selected-box").value = 'ALL';
+                        await ws.clearFilterAsync(filterField);
+                    } else {
+                        // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
+                        await ws.applyFilterAsync(filterField, filterValue, "replace");
+                    }
+                }));
+
+                // alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
+            } catch (error) {
+                console.error("Error setting filter:", error);
+                alert("Failed to set filter. Check console for details.");
+            }
+        }
+
 
         document.getElementById("clear").addEventListener("click", clearOrgFilters);
 
-        function clearOrgFilters() {
+        async function clearOrgFilters() {
             // thiết lập giá trị khởi tạo ban đầu
             selectedData = {
                 "action": "INIT",
-                "selectedLeafIds": [],
+                "selectedIds": [],
+                "selectedCodes": "ALL",
                 "showIds": ["ALL"],
                 "isAll": "ALL",
                 "maxLevel": 2
             };
 
             document.getElementById("selected-box").value = 'ALL';
+
+            try {
+                for (const ws of worksheets) {
+                    // 🔹 Lấy danh sách filters hiện có trên worksheet
+                    let filters = await ws.getFiltersAsync();
+                    
+                    // Tìm xem worksheet có filter này không -> nếu ko có thì continue sang worksheet khác
+                    let hasFilter = filters.some(f => f.fieldName === filterField);
+        
+                    if (!hasFilter) {
+                        console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
+                        continue;
+                    } else {
+                        await ws.clearFilterAsync(filterField);
+                    }
+                }
+        
+                // alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
+            } catch (error) {
+                console.error("Error clear filter:" + filterField, error);
+            }
         }
 
         function clearAllFilters() {
@@ -191,7 +237,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (updatedFilter.appliedValues.length === 0) {
                         selectedData = {
                             "action": "INIT",
-                            "selectedLeafIds": [],
+                            "selectedIds": [],
+                            "selectedCodes": "ALL",
                             "showIds": ["ALL"],
                             "isAll": "ALL",
                             "maxLevel": 2
@@ -199,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         // document.getElementById("selected-box").value = 'ALL';
 
-                        setFilterOrgCode(selectedData.selectedLeafIds, selectedData.isAll);
+                        setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
                     }
                     console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
                 }

@@ -27,22 +27,21 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     });
 
     document.getElementById("closePopup").addEventListener("click", function () {
-        // selectAndExpandNodes(selectedLeafIds); // for test
         returnData("cancel");
 
     });
 
     let popupData = JSON.parse(payload);
     let treeData = popupData.treeData;
-    let selectedLeafIds = popupData.selectedData.showIds; // code cu: popupData.selectedData.selectedLeafIds
+    let showIds = popupData.selectedData.showIds; 
     expandLevel = popupData.selectedData.maxLevel ? popupData.selectedData.maxLevel : 2
     
     renderTree(treeData, document.getElementById("tree-container"), null, 1, 2); // chuyen lai luon show level 2
-    selectAndExpandNodes(selectedLeafIds);
+    selectAndExpandNodes(showIds);
 
     let container = document.getElementById("tree-container");
     container.style.display = container.style.display === "block" ? "none" : "block";
-    
+
     function expandalltree() {
         document.querySelectorAll(".children").forEach(child => {
             child.style.display = "block";
@@ -166,6 +165,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
                 selectedItems.push({
                     id: node.id,
                     name: node.name,
+                    code: node.code,
                     level: getLevel(node),
                     type: isBranch ? "Cành" : "Lá",
                     selection: isBranch ? "Tất cả" : "N/A",
@@ -208,6 +208,16 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         return null;
     }
 
+    function findNodeByCode(node, code) {
+        if (!node) return null;
+        if (node.code == code) return node;
+        for (let child of node.children) {
+            let found = findNodeByCode(child, code);
+            if (found) return found;
+        }
+        return null;
+    }
+
     function getLevel(node) {
         let level = 1;
         while (node.parent) {
@@ -219,10 +229,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     function returnData(action) {
         let selectedIds = selectedItems
-            .map(item => item.id);
-
-        let selectedLeafIds = selectedItems
-            .filter(item => item.type === "Lá")
             .map(item => item.id);
     
         let showIds = selectedItems
@@ -236,7 +242,8 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
         let returnValues = {
             "action": action,
-            "selectedLeafIds": selectedIds,// code cu: selectedLeafIds,
+            "selectedIds": selectedIds,
+            "selectedCodes": document.getElementById("selected-box").value,
             "showIds": showIds,
             "isAll": isAll,
             "maxLevel": maxLevel
@@ -247,15 +254,15 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     }
 
     function updateSelectedBox() {
-        let selectedNames = selectedItems
-            .filter(item => item.display === "show") // Chỉ lấy các item có display = "show"
-            .map(item => item.id); // Lấy tên của item
+        let selectedCodes = selectedItems
+            .filter(item => item.code != "%null%" && item.code != null && item.code !== "") // Chỉ lấy các item có code khác null
+            .map(item => item.code); // Lấy code của item
 
-        document.getElementById("selected-box").value = selectedNames.join(", "); // Gán vào ô input
+        document.getElementById("selected-box").value = selectedCodes.join(", "); // Gán vào ô input
     }
 
     document.getElementById("checking-buttons").addEventListener("click", () => {
-        tickNodeByTypingName();
+        tickNodeByTypingCode();
     });
 
     function findNodeByName(node, name) {
@@ -268,15 +275,52 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         return null;
     };
 
-    function tickNodeByTypingName() {
+    function tickNodeByTypingCode() {
         let inputValue = document.getElementById("selected-box").value.trim(); // Lấy giá trị và loại bỏ khoảng trắng ở đầu và cuối
-        let unitIds = inputValue.split(",").map(id => id.trim()); // Tách các tên đơn vị bằng dấu phẩy và loại bỏ khoảng trắng
+        let unitCodes = inputValue.split(",").map(code => code.trim()); // Tách các tên đơn vị bằng dấu phẩy và loại bỏ khoảng trắng
 
         // Xóa tất cả các checkbox đã chọn trước đó
         document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
             checkbox.checked = false;
+            checkbox.indeterminate = false;
         });
 
-        selectAndExpandNodes(unitIds);
+        selectAndExpandNodesByCode(unitCodes);
+    }
+
+    function selectAndExpandNodesByCode(selectedCodes) {
+        if (!selectedCodes || !Array.isArray(selectedCodes) || selectedCodes.length === 0 || selectedCodes.every(code => !code)) {
+            selectedItems = [];
+            return;
+        }
+    
+        selectedCodes.forEach(code => {
+            let node = findNodeByCode(treeData, code); // Tìm node theo code
+            if (node) {
+                let checkbox = document.querySelector(`input[data-id='${node.id}']`);
+                if (checkbox) {
+                    checkbox.checked = true; // ✅ Chọn checkbox
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true })); // Kích hoạt sự kiện thay đổi
+                    expandParentNodes(node); // Mở rộng các cấp cha
+                }
+            }
+        });
+    }
+
+    function expandParentNodes(node) {
+        while (node.parent) {
+            let parent = node.parent;
+            let toggle = document.querySelector(`input[data-id='${parent.id}']`).parentElement.querySelector(".toggle");
+            let childrenContainer = toggle.parentElement.nextElementSibling;
+
+            if (toggle && toggle.textContent === "▶") {
+                toggle.textContent = "▼";
+            }
+            if (childrenContainer) {
+                childrenContainer.style.display = "block";
+            }
+
+            node = parent;
+        }
     }
 });
