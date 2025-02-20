@@ -41,27 +41,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     let container = document.getElementById("tree-container");
     container.style.display = container.style.display === "block" ? "none" : "block";
-    
-    function showTreeLevel2() {
-        document.querySelectorAll(".children").forEach(child => {
-            const level = parseInt(child.getAttribute("data-level"), 10);
-            if (level >= 3) {
-                child.style.display = "none";
-            } else {
-                child.style.display = "block"; // Đảm bảo level 1 và 2 hiển thị
-            }
-        });
-
-        document.querySelectorAll(".toggle").forEach(toggle => {
-            const parent = toggle.closest(".node");
-            if (parent) {
-                const level = parseInt(parent.getAttribute("data-level"), 10);
-                if (level >= 2 && toggle.textContent === "▼") {
-                    toggle.textContent = "▶";
-                }
-            }
-        });
-    }
 
     function expandalltree() {
         document.querySelectorAll(".children").forEach(child => {
@@ -308,8 +287,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
             checkbox.checked = false;
             checkbox.indeterminate = false;
         });
-
-        showTreeLevel2();
 
         selectAndExpandNodesByCode(unitCodes);
     }
