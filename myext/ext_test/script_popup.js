@@ -292,7 +292,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
     }
 
     function selectAndExpandNodesByCode(selectedCodes) {
-        if (!selectedCodes || !Array.isArray(selectedCodes) || selectedCodes.length === 0) {
+        if (!selectedCodes || !Array.isArray(selectedCodes) || selectedCodes.length === 0 || selectedCodes.every(code => !code)) {
             selectedItems = [];
             return;
         }
