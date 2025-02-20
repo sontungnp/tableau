@@ -249,7 +249,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     function updateSelectedBox() {
         let selectedNames = selectedItems
             .filter(item => item.display === "show") // Chỉ lấy các item có display = "show"
-            .map(item => item.name); // Lấy tên của item
+            .map(item => item.id); // Lấy tên của item
 
         document.getElementById("selected-box").value = selectedNames.join(", "); // Gán vào ô input
     }
