@@ -285,7 +285,8 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
         // Xóa tất cả các checkbox đã chọn trước đó
         document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
-            checkbox.checked = false;
+            checkbox.checked = false; 
+            checkbox.dispatchEvent(new Event('change')); // Kích hoạt sự kiện change để cập nhật trạng thái
         });
 
         selectAndExpandNodesByCode(unitCodes);
