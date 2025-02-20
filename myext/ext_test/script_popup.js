@@ -213,7 +213,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
         if (!node) return null;
         if (node.code == code) return node;
         for (let child of node.children) {
-            let found = findNodeByCOde(child, code);
+            let found = findNodeByCode(child, code);
             if (found) return found;
         }
         return null;
