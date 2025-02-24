@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const dashboard = tableau.extensions.dashboardContent.dashboard;
         let worksheets = dashboard.worksheets;
         const worksheetName = "OrgCodeSheet"; // Tên worksheet cần lấy
-        const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
+        // const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
+        const filterField = "Departmentcode"; // 🔴 Đổi tên filter nếu cần
 
         // addEventListenerFilter();
 
@@ -100,7 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         document.getElementById("selected-box").value = selectedData.selectedCodes;
 
-                        setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
+                        // setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
+                        setFilterOrgCodeByDepartmentCode(selectedData.selectedCodes, selectedData.isAll);
                     } else {
                         console.log("Calcel");
                     }
@@ -173,6 +175,38 @@ document.addEventListener("DOMContentLoaded", () => {
                     } else {
                         // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
                         await ws.applyFilterAsync(filterField, filterValue, "replace");
+                    }
+                }));
+
+                // alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
+            } catch (error) {
+                console.error("Error setting filter:", error);
+                alert("Failed to set filter. Check console for details.");
+            }
+        }
+
+        async function setFilterOrgCodeByDepartmentCode(lstDepartmentCode, isAll) {
+            try {
+                // Chuyển filterValue về chuỗi hoặc giá trị mặc định
+                let filterStr = (lstDepartmentCode !== null && lstDepartmentCode !== undefined) ? String(lstDepartmentCode).toUpperCase() : "ALL";
+
+                await Promise.allSettled(worksheets.map(async (ws) => {
+                    // 🔹 Lấy danh sách filters hiện có trên worksheet
+                    let filters = await ws.getFiltersAsync();
+
+                    // Tìm xem worksheet có filter này không -> nếu không có thì bỏ qua
+                    if (!filters.some(f => f.fieldName === filterField)) {
+                        console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
+                        return;
+                    }
+
+                    if (!lstDepartmentCode || lstDepartmentCode === "ALL" || lstDepartmentCode.trim() === "" || isAll === "ALL") {
+                        // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
+                        document.getElementById("selected-box").value = 'ALL';
+                        await ws.clearFilterAsync(filterField);
+                    } else {
+                        // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
+                        await ws.applyFilterAsync(filterField, lstDepartmentCode.split(",").map(item => item.trim()), "replace");
                     }
                 }));
 
