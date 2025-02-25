@@ -24,9 +24,13 @@ document.addEventListener("DOMContentLoaded", () => {
             "isAll": "ALL",
             "maxLevel": 2
         };
-
-        document.getElementById("selected-box").value = 'ALL';
-        selectedData.selectedCodes = localStorage.getItem("departmentCode") ? localStorage.getItem("departmentCode") : 'ALL'; 
+        
+        // lấy từ localstorage
+        selectedData.selectedCodes = localStorage.getItem("departmentCode");
+        if (selectedData.selectedCodes === null || selectedData.selectedCodes.trim() === "") {
+            selectedData.selectedCodes = 'ALL'
+            document.getElementById("selected-box").value = selectedData.selectedCodes
+        }
         
         fetchData();
 
