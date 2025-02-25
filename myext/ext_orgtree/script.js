@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         document.getElementById("selected-box").value = 'ALL';
+        selectedData.selectedCodes = localStorage.getItem("departmentCode") ? localStorage.getItem("departmentCode") : 'ALL'; 
         
         fetchData();
 
@@ -208,6 +209,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
                         await ws.applyFilterAsync(filterField, lstDepartmentCode.split(",").map(item => item.trim()), "replace");
                     }
+
+                    // lưu vào localstorage
+                    localStorage.setItem("departmentCode", lstDepartmentCode);
                 }));
 
                 // alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
