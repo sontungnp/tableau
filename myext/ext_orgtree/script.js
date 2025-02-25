@@ -314,6 +314,8 @@ document.addEventListener("DOMContentLoaded", () => {
         window.addEventListener("storage", function(event) {
             if (event.key === "departmentCode") {
                 console.log("departmentCode đã thay đổi:", event.newValue);
+                selectedData.selectedCodes = event.newValue
+                document.getElementById("selected-box").value = selectedData.selectedCodes
             }
         });
 
