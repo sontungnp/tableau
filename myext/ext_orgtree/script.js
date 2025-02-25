@@ -75,8 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
         
         
         document.getElementById("dropdown-toggle").addEventListener("click", () => {
-            let popupUrl = window.location.origin + "/tableau/myext/ext_test/popup.html"; // URL của file popup
-            console.log('Vị trí: ', window.location)
+            let popupUrl = window.location.href + "popup.html"; // URL của file popup
+            // console.log('Vị trí: ', window.location)
 
             function removeParentRefs(node) {
                 if (!node) return;
