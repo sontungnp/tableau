@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // lưu vào localstorage
             // console.log('start luu vao localstoreage');
             localStorage.setItem("endDate", null);
+            localStorage.setItem("departmentCode", 'ALL');
             // console.log('end luu vao localstoreage');
             
             const fromDateToDate = 10000101;

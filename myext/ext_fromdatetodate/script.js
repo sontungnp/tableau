@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // console.log('start luu vao localstoreage');
             localStorage.setItem("startDate", null);
             localStorage.setItem("endDate", null);
+            localStorage.setItem("departmentCode", 'ALL');
             // console.log('end luu vao localstoreage');
             
             const fromDateToDate = '1000-01-01,1000-01-01';
