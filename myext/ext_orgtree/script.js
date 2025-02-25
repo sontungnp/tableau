@@ -76,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         document.getElementById("dropdown-toggle").addEventListener("click", () => {
             let popupUrl = window.location.origin + "/tableau/myext/ext_test/popup.html"; // URL của file popup
+            console.log('Vị trí: ', window.location)
 
             function removeParentRefs(node) {
                 if (!node) return;
@@ -240,6 +241,9 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
             document.getElementById("selected-box").value = 'ALL';
+
+            // lưu vào localstorage
+            localStorage.setItem("departmentCode", 'ALL');
 
             try {
                 for (const ws of worksheets) {
