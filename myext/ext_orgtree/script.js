@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         document.getElementById("selected-box").value = selectedData.selectedCodes;
 
                         // lưu vào localstorage
-                        localStorage.setItem("departmentCode", lstDepartmentCode);
+                        localStorage.setItem("departmentCode", selectedData.selectedCodes);
 
                         // setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
                         setFilterOrgCodeByDepartmentCode(selectedData.selectedCodes, selectedData.isAll);
