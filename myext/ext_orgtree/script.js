@@ -311,5 +311,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        window.addEventListener("storage", function(event) {
+            if (event.key === "departmentCode") {
+                console.log("departmentCode đã thay đổi:", event.newValue);
+            }
+        });
+
     });
 });
