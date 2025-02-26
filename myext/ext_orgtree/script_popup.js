@@ -34,10 +34,13 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
     let popupData = JSON.parse(payload);
     let treeData = popupData.treeData;
     let showIds = popupData.selectedData.showIds; 
+    let lstSelectedCodes = popupData.selectedData.selectedCodes
+    let arrSelectedCodes = lstSelectedCodes.split(",").map(code => code.trim());
     expandLevel = popupData.selectedData.maxLevel ? popupData.selectedData.maxLevel : 2
     
     renderTree(treeData, document.getElementById("tree-container"), null, 1, 2); // chuyen lai luon show level 2
-    selectAndExpandNodes(showIds);
+    // selectAndExpandNodes(showIds);
+    selectAndExpandNodesByCode(arrSelectedCodes);
 
     let container = document.getElementById("tree-container");
     container.style.display = container.style.display === "block" ? "none" : "block";
