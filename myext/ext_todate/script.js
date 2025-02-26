@@ -101,7 +101,9 @@ document.addEventListener("DOMContentLoaded", () => {
             dashboard.worksheets.forEach((worksheet) => {
                 worksheet.getFiltersAsync().then((filters) => {
                     filters.forEach((filter) => {
-                        worksheet.clearFilterAsync(filter.fieldName);
+                        if (filter.fieldName !== "Trans_Date_Calc") { 
+                            worksheet.clearFilterAsync(filter.fieldName);
+                        }
                     });
                 });
             });
