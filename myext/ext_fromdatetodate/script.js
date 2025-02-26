@@ -157,6 +157,18 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
+        function clearAllFilters() {
+            dashboard.worksheets.forEach((worksheet) => {
+                worksheet.getFiltersAsync().then((filters) => {
+                    filters.forEach((filter) => {
+                        if (filter.fieldName !== "Trans_Date_Calc") { 
+                            worksheet.clearFilterAsync(filter.fieldName);
+                        }
+                    });
+                });
+            });
+        }
+
         function setFromDateToDateDefaultValue() {
             // console.log('start setFromDateToDateDefaultValue');
             let startDateLocal = localStorage.getItem("startDate");
