@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedData.selectedCodes = localStorage.getItem("departmentCode");
         if (selectedData.selectedCodes === null || selectedData.selectedCodes.trim() === "") {
             selectedData.selectedCodes = 'ALL'
-            document.getElementById("selected-box").value = selectedData.selectedCodes
         }
+        document.getElementById("selected-box").value = selectedData.selectedCodes;
         
         fetchData();
 
