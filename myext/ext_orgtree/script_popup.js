@@ -32,7 +32,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     });
 
     let popupData = JSON.parse(payload);
-    let treeData = popupData.treeData;
+    let treeData; // = popupData.treeData;
 
     // lấy từ localstorage
     let localOrgTreeData = localStorage.getItem("orgTreeData");
