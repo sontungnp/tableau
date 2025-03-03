@@ -342,6 +342,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 
                 document.getElementById("selected-box").value = selectedData.selectedCodes
+            } else if (event.key === "returnValues") {
+                console.log("Popup đóng với dữ liệu: " + localStorage.getItem("returnValues"));
+
+                let receivedValue  = JSON.parse(localStorage.getItem("returnValues"));
+                if (receivedValue.action === 'ok') {
+                    console.log("Ok");
+                    selectedData = {
+                        "selectedIds": receivedValue.selectedIds, 
+                        "selectedCodes": receivedValue.selectedCodes,
+                        "showIds": receivedValue.showIds, 
+                        "isAll": receivedValue.isAll,
+                        "maxLevel": receivedValue.maxLevel
+                    }
+
+                    document.getElementById("selected-box").value = selectedData.selectedCodes;
+
+                    // lưu vào localstorage
+                    localStorage.setItem("departmentCode", selectedData.selectedCodes);
+
+                    // setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
+                    setFilterOrgCodeByDepartmentCode(selectedData.selectedCodes, selectedData.isAll);
+                } else {
+                    console.log("Calcel");
+                }
             }
         });
 

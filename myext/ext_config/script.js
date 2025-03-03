@@ -265,8 +265,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload1) => { // Sử d�
             "maxLevel": maxLevel
         };
     
+        localStorage.setItem("returnValues", JSON.stringify(returnValues));
+        localStorage.setItem("popupVisible", false);
+        popupContainer.style.display = "none";
+
+
         console.log("Dữ liệu trả về:", returnValues);
-        tableau.extensions.ui.closeDialog(JSON.stringify(returnValues));
     }
 
     function updateSelectedBox() {
