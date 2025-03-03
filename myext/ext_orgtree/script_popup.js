@@ -35,16 +35,16 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     let treeData = popupData.treeData;
 
     // lấy từ localstorage
-    // let localOrgTreeData = localStorage.getItem("orgTreeData");
-    // if (localOrgTreeData) { // ton tai trong localstorage
-    //     treeData = localOrgTreeData
-    //     console.log('OrgTreeData lấy trong localstorage', treeData)
-    // } else {
-    //     treeData = popupData.treeData;
-    //     console.log('OrgTreeData lấy truyền vào')
-    //     // lưu vào localstorage
-    //     localStorage.setItem("orgTreeData", treeData);
-    // }
+    let localOrgTreeData = localStorage.getItem("orgTreeData");
+    if (localOrgTreeData) { // ton tai trong localstorage
+        treeData = JSON.parse(localOrgTreeData)
+        console.log('OrgTreeData lấy trong localstorage', treeData)
+    } else {
+        treeData = popupData.treeData;
+        console.log('OrgTreeData lấy truyền vào')
+        // lưu vào localstorage
+        localStorage.setItem("orgTreeData", JSON.stringify(treeData));
+    }
 
     let showIds = popupData.selectedData.showIds; 
     let lstSelectedCodes = popupData.selectedData.selectedCodes
