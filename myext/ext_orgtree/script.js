@@ -32,17 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         document.getElementById("selected-box").value = selectedData.selectedCodes;
         
-        // lấy từ localstorage
-        let localOrgTreeData = localStorage.getItem("orgTreeData");
-        if (localOrgTreeData) { // ton tai trong localstorage
-            treeData = JSON.parse(localOrgTreeData)
-            console.log('OrgTreeData lấy trong localstorage', treeData)
-        } else {
-            fetchData(); // load tree data
-            console.log('OrgTreeData lấy truyền vào', treeData)
-            // lưu vào localstorage
-            localStorage.setItem("orgTreeData", JSON.stringify(treeData));
-        }
+        fetchData();
 
         function fetchData() {
             
@@ -50,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const worksheet = worksheets.find(ws => ws.name === worksheetName);
             worksheet.getSummaryDataAsync().then(data => {
                 treeData = transformDataToTree(data);
-                removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
             });
         }
 
@@ -95,10 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 delete node.parent; // ❌ Xóa thuộc tính parent
             }
         
-            // removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
+            removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
             
             popupData = {
-                // "treeData": treeData,
+                "treeData": treeData,
                 "selectedData": selectedData
             };
 
