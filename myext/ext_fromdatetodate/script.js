@@ -151,17 +151,11 @@ document.addEventListener("DOMContentLoaded", () => {
             dashboard.worksheets.forEach((worksheet) => {
                 worksheet.getFiltersAsync().then((filters) => {
                     filters.forEach((filter) => {
-                        worksheet.clearFilterAsync(filter.fieldName);
-                    });
-                });
-            });
-        }
-
-        function clearAllFilters() {
-            dashboard.worksheets.forEach((worksheet) => {
-                worksheet.getFiltersAsync().then((filters) => {
-                    filters.forEach((filter) => {
-                        if (filter.fieldName !== "Trans_Date_Calc" && filter.fieldName !== "Measure Names" ) { 
+                        if (
+                            filter.fieldName.startsWith("filter_reset_") && 
+                            filter.fieldName !== "Trans_Date_Calc" && 
+                            filter.fieldName !== "Measure Names"
+                        ) {  
                             worksheet.clearFilterAsync(filter.fieldName);
                         }
                     });
