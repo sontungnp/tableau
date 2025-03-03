@@ -100,77 +100,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // luu vao localstorage
             localStorage.setItem("popupData", JSON.stringify(popupData));
-
-            // tableau.extensions.ui.displayDialogAsync(popupUrl, JSON.stringify(popupData), { width: 600, height: 800 }) // JSON.stringify(treeData)
-            //     .then((payload) => {
-            //         console.log("Popup đóng với dữ liệu: " + payload);
-            //         let receivedValue  = JSON.parse(payload);
-            //         if (receivedValue.action === 'ok') {
-            //             console.log("Ok");
-            //             selectedData = {
-            //                 "selectedIds": receivedValue.selectedIds, 
-            //                 "selectedCodes": receivedValue.selectedCodes,
-            //                 "showIds": receivedValue.showIds, 
-            //                 "isAll": receivedValue.isAll,
-            //                 "maxLevel": receivedValue.maxLevel
-            //             }
-
-            //             document.getElementById("selected-box").value = selectedData.selectedCodes;
-
-            //             // lưu vào localstorage
-            //             localStorage.setItem("departmentCode", selectedData.selectedCodes);
-
-            //             // setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
-            //             setFilterOrgCodeByDepartmentCode(selectedData.selectedCodes, selectedData.isAll);
-            //         } else {
-            //             console.log("Calcel");
-            //         }
-            //     })
-            //     .catch((error) => {
-            //         console.log("Lỗi khi mở popup: " + error.message);
-            //     });
         });
 
         function arrayToString(arr) {
             return arr.join(",");
         }
-
-        /*
-        async function setFilterOrgCode(filterValue, isAll) {
-            try {
-                // Chuyển filterValue về chuỗi hoặc giá trị mặc định
-                let filterStr = (filterValue !== null && filterValue !== undefined) ? String(filterValue).toUpperCase() : "ALL";
-        
-                for (const ws of worksheets) {
-                    // 🔹 Lấy danh sách filters hiện có trên worksheet
-                    let filters = await ws.getFiltersAsync();
-                    
-                    // Tìm xem worksheet có filter này không -> nếu ko có thì continue sang worksheet khác
-                    let hasFilter = filters.some(f => f.fieldName === filterField);
-        
-                    if (!hasFilter) {
-                        console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
-                        continue;
-                    }
-        
-                    if (!filterValue || filterStr === "ALL" || filterStr.trim() === "" || isAll === "ALL") {
-                        // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
-                        document.getElementById("selected-box").value = 'ALL';
-                        await ws.clearFilterAsync(filterField);
-                    } else {
-                        // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
-                        await ws.applyFilterAsync(filterField, filterValue, "replace");
-                    }
-                }
-        
-                // alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
-            } catch (error) {
-                console.error("Error setting filter:", error);
-                alert("Failed to set filter. Check console for details.");
-            }
-        }
-            
-        */
 
         async function setFilterOrgCode(filterValue, isAll) {
             try {
@@ -277,16 +211,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        function clearAllFilters() {
-            worksheets.forEach((worksheet) => {
-                worksheet.getFiltersAsync().then((filters) => {
-                    filters.forEach((filter) => {
-                        worksheet.clearFilterAsync(filter.fieldName);
-                    });
-                });
-            });
-        }
-
         function filterChangedHandler(event) {
             event.getFilterAsync().then(updatedFilter => {
                 if (updatedFilter.fieldName === filterField) {
@@ -307,22 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log(`filter_reset_Departmentcode đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
                 }
             });
-        }
-
-        async function addEventListenerFilter() {
-            for (const ws of worksheets) {
-                // 🔹 Lấy danh sách filters hiện có trên worksheet
-                let filters = await ws.getFiltersAsync();
-    
-                let hasFilter = filters.some(f => f.fieldName === filterField);
-            
-                if (!hasFilter) {
-                    console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
-                    continue;
-                } else {
-                    ws.addEventListener(tableau.TableauEventType.FilterChanged, filterChangedHandler);
-                }
-            }
         }
 
         window.addEventListener("storage", function(event) {
