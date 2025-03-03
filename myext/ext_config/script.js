@@ -8,7 +8,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload1) => { // Sử d�
     let popupContainer = document.getElementById("popup-container");
     // Hàm kiểm tra trạng thái popup
     function checkPopupState() {
-        let isVisible = sessionStorage.getItem("popupVisible") === "true";
+        let isVisible = sessionStorage.getItem("popupVisible");
         popupContainer.style.display = isVisible ? "block" : "none";
 
         let payload = localStorage.getItem("popupData");
