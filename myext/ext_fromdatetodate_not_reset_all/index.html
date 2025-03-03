@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Button to Refresh Data</title>
+    <script src="../../lib/tableau.extensions.1.latest.js"></script>
+    <script src="script.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: start;
+            height: 100vh; /* Chiều cao 100% cửa sổ */
+            background-color: #0758B8; /* Màu nền */
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Khoảng cách giữa các phần tử */
+            width: 95%; /* Đảm bảo container chiếm 95% chiều rộng màn hình */
+            max-width: 600px; /* Giới hạn chiều rộng tối đa */
+        }
+
+        .container input[type="date"],
+        .container button {
+            flex: 1; /* Chia đều không gian cho các phần tử */
+            padding: 8px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            min-width: 10px; /* Đảm bảo phần tử không co nhỏ quá mức */
+        }
+
+        .container input[type="date"] {
+            flex: 2; /* Ô nhập liệu chiếm 2 phần */
+            background-color: #fff;
+            color: #000;
+            min-width: 10px;
+        }
+
+        .container button {
+            position: relative;
+            background-color: #fff;
+            color: #000;
+            overflow: hidden; /* Đảm bảo biểu tượng loading không vượt ra ngoài nút */
+            margin-top: 4px;
+        }
+
+        .container button.loading span {
+            visibility: hidden; /* Ẩn chữ "Reload" khi đang loading */
+        }
+
+        .container button.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin-top: -10px; /* Đưa biểu tượng vào giữa nút */
+            margin-left: -10px;
+            border: 2px solid #ccc;
+            border-top-color: #007bff; /* Màu mũi tên */
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .container button:hover {
+            background-color: #ddd;
+        }
+
+        /* Khi chiều rộng container dưới 400px, ẩn chữ "Go..." */
+        @media (max-width: 300px) {
+            #refreshButton {
+                font-size: 0; /* Ẩn chữ */
+            }
+
+            #refreshButton::before {
+                content: "▶"; /* Thay bằng biểu tượng chạy */
+                font-size: 16px;
+            }
+
+            #resetButton {
+                font-size: 0; /* Ẩn chữ */
+            }
+
+            #resetButton::before {
+                content: "⟳"; /* Thay bằng biểu tượng */
+                font-size: 16px;
+            }
+
+            .input-group label {
+                display: none; /* Ẩn nhãn From date và To date */
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex: 2; 
+            flex-direction: column;
+            gap: 1px; /* Khoảng cách giữa tiêu đề và ô nhập */
+            min-width: 10px;
+        }
+
+        .input-group label {
+            font-family: "Tableau Medium", Tableau, Arial, sans-serif;
+            /* color: #ffffff;  */
+            font-size: 12px;
+            line-height: 18px;
+            color: rgb(255, 255, 255); /* Màu chữ */
+            font-weight: bold;
+            font-style: normal;
+            text-decoration: none;
+            min-width: 10px;
+        }
+
+        .input-group input[type="date"] {
+            padding: 1px;
+            font-size: 13px;
+            border: none;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-group">
+            <label for="startDate">From date</label>
+            <input type="date" id="startDate">
+        </div>
+        <div class="input-group">
+            <label for="endDate">To date</label>
+            <input type="date" id="endDate">
+        </div>
+        <button id="refreshButton">Go...</button>
+        <button id="resetButton">Reset</button>
+    </div>
+</body>
+</html>
