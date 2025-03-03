@@ -183,6 +183,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 "isAll": "ALL",
                 "maxLevel": 2
             };
+            popupData.selectedData = selectedData;
+            // luu vao localstorage
+            localStorage.setItem("popupData", JSON.stringify(popupData));
 
             document.getElementById("selected-box").value = 'ALL';
 
