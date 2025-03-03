@@ -52,8 +52,8 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sá»­ dá»
     expandLevel = popupData.selectedData.maxLevel ? popupData.selectedData.maxLevel : 2
     
     renderTree(treeData, document.getElementById("tree-container"), null, 1, 2); // chuyen lai luon show level 2
-    // selectAndExpandNodes(showIds);
-    selectAndExpandNodesByCode(arrSelectedCodes);
+    selectAndExpandNodes(showIds);
+    // selectAndExpandNodesByCode(arrSelectedCodes);
 
     let container = document.getElementById("tree-container");
     container.style.display = container.style.display === "block" ? "none" : "block";
