@@ -2,157 +2,212 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Button to Refresh Data</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popup</title>
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
-    <script src="script.js"></script>
+    <script src="script_popup.js"></script>
     <style>
         body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: start;
-            height: 100vh; /* Chiều cao 100% cửa sổ */
-            background-color: #0758B8; /* Màu nền */
             font-family: Arial, sans-serif;
         }
+        #popup-container {
+            display: flex;
+            flex-direction: column; /* Sắp xếp các phần tử theo chiều dọc */
+            /* gap: 10px; 
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); */
+        }
 
-        .container {
+        #popup-header {
+            display: flex;
+            flex-direction: column; /* Sắp xếp các phần tử theo chiều dọc */
+            gap: 10px; /* Tạo khoảng cách giữa các phần tử */
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #popup-button {
+            display: flex;
+            justify-content: space-between; /* Chia đều không gian giữa các phần */
+            align-items: center;
+        }
+
+        #tree-buttons {
+            display: flex;
+            justify-content: flex-start; /* Căn trái */
+            gap: 10px;
+        }
+
+        #control-buttons {
+            display: flex;
+            justify-content: flex-end; /* Căn phải */
+            gap: 10px;
+        }
+        
+        button {
+            /* padding: 8px 12px; */
+            border: none;
+            background-color: #007bff; /* Màu xanh dương */
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s ease-in-out;
+        }
+        button:hover {
+            background-color: #0056b3; /* Màu xanh đậm khi hover */
+        }
+
+        #tree-container {
+            /* display: none; */
+            top: 40px;
+            /* width: 100%; */
+            max-height: 580px;
+            max-width: 575px;
+            border: 1px solid #ccc;
+            background: white;
+            overflow: auto;
+            z-index: 1000;
+            padding: 5px;
+        }
+        .node {
             display: flex;
             align-items: center;
-            gap: 10px; /* Khoảng cách giữa các phần tử */
-            width: 95%; /* Đảm bảo container chiếm 95% chiều rộng màn hình */
-            max-width: 600px; /* Giới hạn chiều rộng tối đa */
+            gap: 5px;
+            padding: 2px 5px;
         }
-
-        .container input[type="date"],
-        .container button {
-            flex: 1; /* Chia đều không gian cho các phần tử */
-            padding: 8px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
+        .toggle {
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
-            min-width: 10px; /* Đảm bảo phần tử không co nhỏ quá mức */
+            width: 16px;
+            text-align: center;
+        }
+        .children {
+            margin-left: 20px;
+            display: none;
+        }
+        .expanded > .children {
+            display: block;
+        }
+        #selected-items-table {
+            margin-top: 10px; /* 🔥 THÊM KHOẢNG CÁCH 🔥 */
+            border-collapse: collapse;
+            width: 100%;
+        }
+        #selected-items-table th, #selected-items-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        #selected-items-table th {
+            background-color: #f2f2f2; /* 🔥 LÀM NỔI BẬT HEADER 🔥 */
+        }
+        /* Thêm đường kẻ tree */
+        .node {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 5px;
+            position: relative; /* Cần thiết để định vị đường kẻ */
         }
 
-        .container input[type="date"] {
-            flex: 2; /* Ô nhập liệu chiếm 2 phần */
-            background-color: #fff;
-            color: #000;
-            min-width: 10px;
+        .toggle {
+            cursor: pointer;
+            width: 16px;
+            text-align: center;
         }
 
-        .container button {
-            position: relative;
-            background-color: #fff;
-            color: #000;
-            overflow: hidden; /* Đảm bảo biểu tượng loading không vượt ra ngoài nút */
-            margin-top: 4px;
+        /* Phần tử con sẽ có lề trái để tạo khoảng cách */
+        .children {
+            margin-left: 20px;
+            display: none;
+            position: relative; /* Để vẽ đường thẳng */
         }
 
-        .container button.loading span {
-            visibility: hidden; /* Ẩn chữ "Reload" khi đang loading */
+        /* Đường thẳng dọc từ checkbox cha xuống các checkbox con */
+        .node::before {
+            content: "";
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            left: 19px; /* Điều chỉnh vị trí đường kẻ */
+            width: 1px;
+            background-color: #ccc;
         }
 
-        .container button.loading::after {
-            content: '';
+        /* Đường ngang nối checkbox cha với checkbox con */
+        .node::after {
+            content: "";
             position: absolute;
             top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            margin-top: -10px; /* Đưa biểu tượng vào giữa nút */
-            margin-left: -10px;
-            border: 2px solid #ccc;
-            border-top-color: #007bff; /* Màu mũi tên */
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            left: 19px;
+            width: 10px; /* Điều chỉnh độ dài đường ngang */
+            height: 1px;
+            background-color: #ccc;
         }
 
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
+        /* Ẩn đường thẳng cho node gốc */
+        #tree-container > .node::before {
+            display: none;
         }
 
-        .container button:hover {
-            background-color: #ddd;
+        /* Ẩn đường kẻ ngang nếu node không có con */
+        .node:last-child::before {
+            height: 50%;
         }
 
-        /* Khi chiều rộng container dưới 400px, ẩn chữ "Go..." */
-        @media (max-width: 300px) {
-            #refreshButton {
-                font-size: 0; /* Ẩn chữ */
-            }
-
-            #refreshButton::before {
-                content: "▶"; /* Thay bằng biểu tượng chạy */
-                font-size: 16px;
-            }
-
-            #resetButton {
-                font-size: 0; /* Ẩn chữ */
-            }
-
-            #resetButton::before {
-                content: "⟳"; /* Thay bằng biểu tượng */
-                font-size: 16px;
-            }
-
-            .input-group label {
-                display: none; /* Ẩn nhãn From date và To date */
-            }
-        }
-
-        .input-group {
+        #selected-area { 
             display: flex;
-            flex: 2; 
-            flex-direction: column;
-            gap: 1px; /* Khoảng cách giữa tiêu đề và ô nhập */
-            min-width: 10px;
+            gap: 10px;
         }
-
-        .input-group label {
-            font-family: "Tableau Medium", Tableau, Arial, sans-serif;
-            /* color: #ffffff;  */
-            font-size: 12px;
-            line-height: 18px;
-            color: rgb(255, 255, 255); /* Màu chữ */
-            font-weight: bold;
-            font-style: normal;
-            text-decoration: none;
-            min-width: 10px;
+        #selected-box { 
+            flex-grow: 1;
         }
-
-        .input-group input[type="date"] {
-            padding: 1px;
-            font-size: 13px;
-            border: none;
-            border-radius: 5px;
-            background-color: #fff;
-            color: #000;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            min-width: 10px;
+        #checking-buttons { 
+            display: flex;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="input-group">
-            <label for="startDate">From date</label>
-            <input type="date" id="startDate">
+    <div id="popup-container">
+        <div id="popup-header">
+            <h2>Danh mục tổ chức</h2>
+            <div id="selected-area">
+                <input type="text" id="selected-box" placeholder="selected items...">
+                <button id="checking-buttons">Check</button>
+            </div>
+            
+            <input type="text" id="search-box" placeholder="Search...">
+            <div id="popup-button">
+                <div id="tree-buttons">
+                    <button id="expandAll">Expand All</button>
+                    <button id="collapseAll">Collapse All</button>
+                </div>
+                <div id="control-buttons">
+                    <button id="okPopup">Ok</button>
+                    <button id="closePopup">Cancel</button>
+                </div>
+            </div>
         </div>
-        <div class="input-group">
-            <label for="endDate">To date</label>
-            <input type="date" id="endDate">
-        </div>
-        <button id="refreshButton">Go...</button>
-        <button id="resetButton">Reset</button>
+        
+        <div id="tree-container"></div>
+
+        <!-- <table id="selected-items-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Level</th>
+                    <th>Loại</th>
+                    <th>Trạng thái chọn</th>
+                    <th>Hiển thị</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table> -->
+        
     </div>
 </body>
 </html>

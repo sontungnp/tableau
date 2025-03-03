@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const dashboard = tableau.extensions.dashboardContent.dashboard;
         let worksheets = dashboard.worksheets;
         const worksheetName = "OrgCodeSheet"; // Tên worksheet cần lấy
-        const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
+        // const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
+        const filterField = "filter_reset_Departmentcode"; // 🔴 Đổi tên filter nếu cần
 
         // addEventListenerFilter();
 
@@ -23,8 +24,13 @@ document.addEventListener("DOMContentLoaded", () => {
             "isAll": "ALL",
             "maxLevel": 2
         };
-
-        document.getElementById("selected-box").value = 'ALL';
+        
+        // lấy từ localstorage
+        selectedData.selectedCodes = localStorage.getItem("departmentCode");
+        if (selectedData.selectedCodes === null || selectedData.selectedCodes.trim() === "") {
+            selectedData.selectedCodes = 'ALL'
+        }
+        document.getElementById("selected-box").value = selectedData.selectedCodes;
         
         fetchData();
 
@@ -69,7 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
         
         
         document.getElementById("dropdown-toggle").addEventListener("click", () => {
-            let popupUrl = window.location.origin + "/tableau/myext/ext_test/popup.html"; // URL của file popup
+            let popupUrl = window.location.href + "popup.html"; // URL của file popup
+            // console.log('Vị trí: ', window.location)
 
             function removeParentRefs(node) {
                 if (!node) return;
@@ -100,7 +107,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         document.getElementById("selected-box").value = selectedData.selectedCodes;
 
-                        setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
+                        // lưu vào localstorage
+                        localStorage.setItem("departmentCode", selectedData.selectedCodes);
+
+                        // setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
+                        setFilterOrgCodeByDepartmentCode(selectedData.selectedCodes, selectedData.isAll);
                     } else {
                         console.log("Calcel");
                     }
@@ -183,6 +194,38 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        async function setFilterOrgCodeByDepartmentCode(lstDepartmentCode, isAll) {
+            try {
+                // Chuyển filterValue về chuỗi hoặc giá trị mặc định
+                let filterStr = (lstDepartmentCode !== null && lstDepartmentCode !== undefined) ? String(lstDepartmentCode).toUpperCase() : "ALL";
+
+                await Promise.allSettled(worksheets.map(async (ws) => {
+                    // 🔹 Lấy danh sách filters hiện có trên worksheet
+                    let filters = await ws.getFiltersAsync();
+
+                    // Tìm xem worksheet có filter này không -> nếu không có thì bỏ qua
+                    if (!filters.some(f => f.fieldName === filterField)) {
+                        console.warn(`Worksheet "${ws.name}" does not have filter "${filterField}". Skipping...`);
+                        return;
+                    }
+
+                    if (!lstDepartmentCode || lstDepartmentCode === "ALL" || lstDepartmentCode.trim() === "" || isAll === "ALL") {
+                        // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
+                        document.getElementById("selected-box").value = 'ALL';
+                        await ws.clearFilterAsync(filterField);
+                    } else {
+                        // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
+                        await ws.applyFilterAsync(filterField, lstDepartmentCode.split(",").map(item => item.trim()), "replace");
+                    }
+                }));
+
+                // alert(`Filter "${filterField}" set to: ${filterValue} on all worksheets`);
+            } catch (error) {
+                console.error("Error setting filter:", error);
+                alert("Failed to set filter. Check console for details.");
+            }
+        }
+
 
         document.getElementById("clear").addEventListener("click", clearOrgFilters);
 
@@ -198,6 +241,9 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
             document.getElementById("selected-box").value = 'ALL';
+
+            // lưu vào localstorage
+            localStorage.setItem("departmentCode", 'ALL');
 
             try {
                 for (const ws of worksheets) {
@@ -248,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
                     }
-                    console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
+                    console.log(`filter_reset_Departmentcode đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
                 }
             });
         }
@@ -268,6 +314,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         }
+
+        window.addEventListener("storage", function(event) {
+            if (event.key === "departmentCode") {
+                console.log("departmentCode đã thay đổi:", event.newValue);
+                if (event.newValue === null || event.newValue === 'ALL') {
+                    selectedData = {
+                            "action": "INIT",
+                            "selectedIds": [],
+                            "selectedCodes": "ALL",
+                            "showIds": ["ALL"],
+                            "isAll": "ALL",
+                            "maxLevel": 2
+                        }
+                } else {
+                    selectedData.selectedCodes = event.newValue
+                }
+                
+                document.getElementById("selected-box").value = selectedData.selectedCodes
+            }
+        });
 
     });
 });
