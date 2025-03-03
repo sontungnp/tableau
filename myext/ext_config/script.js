@@ -40,7 +40,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload1) => { // Sử d�
         selectAndExpandNodesByCode(arrSelectedCodes);
 
         let container = document.getElementById("tree-container");
-        container.style.display = container.style.display === "block" ? "none" : "block";
+        container.style.display = "block";
     }
     // Kiểm tra khi tải lần đầu
     // checkPopupState();

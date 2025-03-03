@@ -326,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         window.addEventListener("storage", function(event) {
-            if (event.key === "departmentCode") {
+            if (event.key === "departmentCode") { // check thay doi do nut reset thuc hien
                 console.log("departmentCode đã thay đổi:", event.newValue);
                 if (event.newValue === null || event.newValue === 'ALL') {
                     selectedData = {
@@ -342,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 
                 document.getElementById("selected-box").value = selectedData.selectedCodes
-            } else if (event.key === "returnValues") {
+            } else if (event.key === "returnValues") { // check thay doi do tree thuc hien
                 console.log("Popup đóng với dữ liệu: " + localStorage.getItem("returnValues"));
 
                 let receivedValue  = JSON.parse(localStorage.getItem("returnValues"));
