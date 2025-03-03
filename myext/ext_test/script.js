@@ -85,18 +85,21 @@ document.addEventListener("DOMContentLoaded", () => {
             // let popupUrl = window.location.href + "popup.html"; // URL của file popup
             // // console.log('Vị trí: ', window.location)
 
-            // function removeParentRefs(node) {
-            //     if (!node) return;
-            //     node.children.forEach(child => removeParentRefs(child));
-            //     delete node.parent; // ❌ Xóa thuộc tính parent
-            // }
+            function removeParentRefs(node) {
+                if (!node) return;
+                node.children.forEach(child => removeParentRefs(child));
+                delete node.parent; // ❌ Xóa thuộc tính parent
+            }
         
-            // removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
+            removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
             
-            // popupData = {
-            //     "treeData": treeData,
-            //     "selectedData": selectedData
-            // };
+            popupData = {
+                "treeData": treeData,
+                "selectedData": selectedData
+            };
+
+            // luu vao localstorage
+            localStorage.setItem("popupData", JSON.stringify(popupData));
 
             // tableau.extensions.ui.displayDialogAsync(popupUrl, JSON.stringify(popupData), { width: 600, height: 800 }) // JSON.stringify(treeData)
             //     .then((payload) => {

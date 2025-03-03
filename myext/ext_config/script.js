@@ -1,8 +1,10 @@
 'use strict';
 
-tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử dụng async ở đây
+tableau.extensions.initializeDialogAsync().then(async (payload1) => { // Sử dụng async ở đây
     let selectedItems = [];
     let expandLevel = 2; // Giá trị này có thể nhận từ tham số truyền vào
+
+    let payload = localStorage.getItem("popupData");
 
     console.log("Popup mở thành công! Giá trị nhận được payload là: ");
     console.log(payload);
@@ -16,7 +18,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     }
     // Kiểm tra khi tải lần đầu
     checkPopupState();
-    
+
     // Lắng nghe sự kiện thay đổi sessionStorage
     window.addEventListener("storage", () => {
         checkPopupState();
