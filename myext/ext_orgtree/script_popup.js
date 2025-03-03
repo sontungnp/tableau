@@ -32,16 +32,16 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     });
 
     let popupData = JSON.parse(payload);
-    let treeData; // = popupData.treeData;
+    let treeData;
 
     // lấy từ localstorage
     let localOrgTreeData = localStorage.getItem("orgTreeData");
-    if (localOrgTreeData) { // ton tai trong localstorage
+    if (localOrgTreeData) {
+        // console.log('OrgTreeData lấy trong localstorage', treeData)
         treeData = JSON.parse(localOrgTreeData)
-        console.log('OrgTreeData lấy trong localstorage', treeData)
     } else {
+        // console.log('OrgTreeData lấy từ biến truyền vào')
         treeData = popupData.treeData;
-        console.log('OrgTreeData lấy truyền vào')
         // lưu vào localstorage
         localStorage.setItem("orgTreeData", JSON.stringify(treeData));
     }
