@@ -4,8 +4,10 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     let selectedItems = [];
     let expandLevel = 2; // Giá trị này có thể nhận từ tham số truyền vào
 
-    console.log("Popup mở thành công! Giá trị nhận được payload là: ");
-    console.log(payload);
+    // console.log("Popup mở thành công! Giá trị nhận được payload là: ");
+    // console.log(payload);
+
+    
 
     document.getElementById("search-box").addEventListener("input", filterTree);
 
@@ -32,7 +34,20 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     });
 
     let popupData = JSON.parse(payload);
-    let treeData = popupData.treeData;
+    let treeData;
+
+    // lấy từ localstorage
+    let localOrgTreeData = localStorage.getItem("orgTreeData");
+    if (!localOrgTreeData) { // ton tai trong localstorage
+        treeData = localOrgTreeData
+        console.log('OrgTreeData lấy trong localstorage')
+    } else {
+        treeData = popupData.treeData;
+        console.log('OrgTreeData lấy truyền vào')
+        // lưu vào localstorage
+        localStorage.setItem("orgTreeData", treeData);
+    }
+
     let showIds = popupData.selectedData.showIds; 
     let lstSelectedCodes = popupData.selectedData.selectedCodes
     let arrSelectedCodes = lstSelectedCodes.split(",").map(code => code.trim());
