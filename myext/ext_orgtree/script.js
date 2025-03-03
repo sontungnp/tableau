@@ -31,6 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
             selectedData.selectedCodes = 'ALL'
         }
         document.getElementById("selected-box").value = selectedData.selectedCodes;
+
+        selectedData.showIds = localStorage.getItem("showIds");
         
         fetchData();
 
@@ -109,6 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         // lưu vào localstorage
                         localStorage.setItem("departmentCode", selectedData.selectedCodes);
+                        localStorage.setItem("showIds", JSON.stringify(selectedData.showIds));
 
                         // setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
                         setFilterOrgCodeByDepartmentCode(selectedData.selectedCodes, selectedData.isAll);
@@ -244,6 +247,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // lưu vào localstorage
             localStorage.setItem("departmentCode", 'ALL');
+            localStorage.setItem("showIds", 'ALL');
+
 
             try {
                 for (const ws of worksheets) {
