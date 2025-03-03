@@ -8,7 +8,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload1) => { // Sử d�
     let popupContainer = document.getElementById("popup-container");
     // Hàm kiểm tra trạng thái popup
     function checkPopupState() {
-        let isVisible = sessionStorage.getItem("popupVisible");
+        let isVisible = localStorage.getItem("popupVisible");
         popupContainer.style.display = isVisible ? "block" : "none";
 
         let payload = localStorage.getItem("popupData");
@@ -46,7 +46,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload1) => { // Sử d�
     // checkPopupState();
     popupContainer.style.display = "none";
 
-    // Lắng nghe sự kiện thay đổi sessionStorage
+    // Lắng nghe sự kiện thay đổi localStorage
     window.addEventListener("storage", function(event) {
         if (event.key === "popupVisible") {
             checkPopupState();
