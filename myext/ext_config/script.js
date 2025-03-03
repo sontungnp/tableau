@@ -14,6 +14,9 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         let isVisible = sessionStorage.getItem("popupVisible") === "true";
         popupContainer.style.display = isVisible ? "block" : "none";
     }
+    // Kiểm tra khi tải lần đầu
+    checkPopupState();
+    
     // Lắng nghe sự kiện thay đổi sessionStorage
     window.addEventListener("storage", () => {
         checkPopupState();
