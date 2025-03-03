@@ -75,50 +75,57 @@ document.addEventListener("DOMContentLoaded", () => {
         
         
         document.getElementById("dropdown-toggle").addEventListener("click", () => {
-            let popupUrl = window.location.href + "popup.html"; // URL của file popup
-            // console.log('Vị trí: ', window.location)
-
-            function removeParentRefs(node) {
-                if (!node) return;
-                node.children.forEach(child => removeParentRefs(child));
-                delete node.parent; // ❌ Xóa thuộc tính parent
-            }
-        
-            removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
+            // Sử dụng sessionStorage để gửi tín hiệu
+            let currentState = sessionStorage.getItem("popupVisible") === "true";
+            sessionStorage.setItem("popupVisible", !currentState);
             
-            popupData = {
-                "treeData": treeData,
-                "selectedData": selectedData
-            };
+            // Gửi sự kiện qua Storage API (Extension2 sẽ nghe sự kiện này)
+            window.dispatchEvent(new Event("storage"));
 
-            tableau.extensions.ui.displayDialogAsync(popupUrl, JSON.stringify(popupData), { width: 600, height: 800 }) // JSON.stringify(treeData)
-                .then((payload) => {
-                    console.log("Popup đóng với dữ liệu: " + payload);
-                    let receivedValue  = JSON.parse(payload);
-                    if (receivedValue.action === 'ok') {
-                        console.log("Ok");
-                        selectedData = {
-                            "selectedIds": receivedValue.selectedIds, 
-                            "selectedCodes": receivedValue.selectedCodes,
-                            "showIds": receivedValue.showIds, 
-                            "isAll": receivedValue.isAll,
-                            "maxLevel": receivedValue.maxLevel
-                        }
+            // let popupUrl = window.location.href + "popup.html"; // URL của file popup
+            // // console.log('Vị trí: ', window.location)
 
-                        document.getElementById("selected-box").value = selectedData.selectedCodes;
+            // function removeParentRefs(node) {
+            //     if (!node) return;
+            //     node.children.forEach(child => removeParentRefs(child));
+            //     delete node.parent; // ❌ Xóa thuộc tính parent
+            // }
+        
+            // removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
+            
+            // popupData = {
+            //     "treeData": treeData,
+            //     "selectedData": selectedData
+            // };
 
-                        // lưu vào localstorage
-                        localStorage.setItem("departmentCode", selectedData.selectedCodes);
+            // tableau.extensions.ui.displayDialogAsync(popupUrl, JSON.stringify(popupData), { width: 600, height: 800 }) // JSON.stringify(treeData)
+            //     .then((payload) => {
+            //         console.log("Popup đóng với dữ liệu: " + payload);
+            //         let receivedValue  = JSON.parse(payload);
+            //         if (receivedValue.action === 'ok') {
+            //             console.log("Ok");
+            //             selectedData = {
+            //                 "selectedIds": receivedValue.selectedIds, 
+            //                 "selectedCodes": receivedValue.selectedCodes,
+            //                 "showIds": receivedValue.showIds, 
+            //                 "isAll": receivedValue.isAll,
+            //                 "maxLevel": receivedValue.maxLevel
+            //             }
 
-                        // setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
-                        setFilterOrgCodeByDepartmentCode(selectedData.selectedCodes, selectedData.isAll);
-                    } else {
-                        console.log("Calcel");
-                    }
-                })
-                .catch((error) => {
-                    console.log("Lỗi khi mở popup: " + error.message);
-                });
+            //             document.getElementById("selected-box").value = selectedData.selectedCodes;
+
+            //             // lưu vào localstorage
+            //             localStorage.setItem("departmentCode", selectedData.selectedCodes);
+
+            //             // setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
+            //             setFilterOrgCodeByDepartmentCode(selectedData.selectedCodes, selectedData.isAll);
+            //         } else {
+            //             console.log("Calcel");
+            //         }
+            //     })
+            //     .catch((error) => {
+            //         console.log("Lỗi khi mở popup: " + error.message);
+            //     });
         });
 
         function arrayToString(arr) {

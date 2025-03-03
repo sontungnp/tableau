@@ -7,6 +7,19 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     console.log("Popup mở thành công! Giá trị nhận được payload là: ");
     console.log(payload);
 
+    // ============================================
+    let popupContainer = document.getElementById("popup-container");
+    // Hàm kiểm tra trạng thái popup
+    function checkPopupState() {
+        let isVisible = sessionStorage.getItem("popupVisible") === "true";
+        popupContainer.style.display = isVisible ? "block" : "none";
+    }
+    // Lắng nghe sự kiện thay đổi sessionStorage
+    window.addEventListener("storage", () => {
+        checkPopupState();
+    });
+    // ============================================
+
     document.getElementById("search-box").addEventListener("input", filterTree);
 
     document.getElementById("expandAll").addEventListener("click", () => {
