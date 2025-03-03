@@ -47,7 +47,10 @@ tableau.extensions.initializeDialogAsync().then(async (payload1) => { // Sử d�
 
     // Lắng nghe sự kiện thay đổi sessionStorage
     window.addEventListener("storage", function(event) {
-        checkPopupState();
+        if (event.key === "popupVisible") {
+            checkPopupState();
+        }
+        
     });
     // ============================================
 

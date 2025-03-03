@@ -75,9 +75,9 @@ document.addEventListener("DOMContentLoaded", () => {
         
         
         document.getElementById("dropdown-toggle").addEventListener("click", () => {
-            // Sử dụng sessionStorage để gửi tín hiệu
-            let currentState = sessionStorage.getItem("popupVisible") === "true";
-            sessionStorage.setItem("popupVisible", !currentState);
+            // Sử dụng localStorage để gửi tín hiệu
+            let currentState = localStorage.getItem("popupVisible") === "true";
+            localStorage.setItem("popupVisible", !currentState);
             
             // Gửi sự kiện qua Storage API (Extension2 sẽ nghe sự kiện này)
             window.dispatchEvent(new Event("storage"));
