@@ -36,9 +36,9 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     // lấy từ localstorage
     let localOrgTreeData = localStorage.getItem("orgTreeData");
-    if (!localOrgTreeData) { // ton tai trong localstorage
+    if (!localOrgTreeData || localOrgTreeData !== null) { // ton tai trong localstorage
         treeData = localOrgTreeData
-        console.log('OrgTreeData lấy trong localstorage')
+        console.log('OrgTreeData lấy trong localstorage', treeData)
     } else {
         treeData = popupData.treeData;
         console.log('OrgTreeData lấy truyền vào')
