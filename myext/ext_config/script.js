@@ -1,26 +1,52 @@
 'use strict';
 
 tableau.extensions.initializeDialogAsync().then(async (payload1) => { // Sử dụng async ở đây
-    let selectedItems = [];
-    let expandLevel = 2; // Giá trị này có thể nhận từ tham số truyền vào
-
-    let payload = localStorage.getItem("popupData");
-
-    console.log("Popup mở thành công! Giá trị nhận được payload là: ");
-    console.log(payload);
-
     // ============================================
     let popupContainer = document.getElementById("popup-container");
     // Hàm kiểm tra trạng thái popup
     function checkPopupState() {
         let isVisible = sessionStorage.getItem("popupVisible") === "true";
         popupContainer.style.display = isVisible ? "block" : "none";
+
+        let payload = localStorage.getItem("popupData");
+        console.log("Popup mở thành công! Giá trị nhận được payload là: ");
+        console.log(payload);
+
+        let selectedItems = [];
+        let expandLevel = 2; // Giá trị này có thể nhận từ tham số truyền vào
+
+        let popupData = JSON.parse(payload);
+        let treeData;
+
+        // lấy từ localstorage
+        let localOrgTreeData = localStorage.getItem("orgTreeData");
+        if (localOrgTreeData) {
+            // console.log('OrgTreeData lấy trong localstorage', treeData)
+            treeData = JSON.parse(localOrgTreeData)
+        } else {
+            // console.log('OrgTreeData lấy từ biến truyền vào')
+            treeData = popupData.treeData;
+            // lưu vào localstorage
+            localStorage.setItem("orgTreeData", JSON.stringify(treeData));
+        }
+
+        let showIds = popupData.selectedData.showIds; 
+        let lstSelectedCodes = popupData.selectedData.selectedCodes
+        let arrSelectedCodes = lstSelectedCodes.split(",").map(code => code.trim());
+        expandLevel = popupData.selectedData.maxLevel ? popupData.selectedData.maxLevel : 2
+
+        renderTree(treeData, document.getElementById("tree-container"), null, 1, 2); // chuyen lai luon show level 2
+        // selectAndExpandNodes(showIds);
+        selectAndExpandNodesByCode(arrSelectedCodes);
+
+        let container = document.getElementById("tree-container");
+        container.style.display = container.style.display === "block" ? "none" : "block";
     }
     // Kiểm tra khi tải lần đầu
     checkPopupState();
 
     // Lắng nghe sự kiện thay đổi sessionStorage
-    window.addEventListener("storage", () => {
+    window.addEventListener("storage", function(event) {
         checkPopupState();
     });
     // ============================================
@@ -48,34 +74,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload1) => { // Sử d�
         returnData("cancel");
 
     });
-
-    let popupData = JSON.parse(payload);
-    let treeData;
-
-    // lấy từ localstorage
-    let localOrgTreeData = localStorage.getItem("orgTreeData");
-    if (localOrgTreeData) {
-        // console.log('OrgTreeData lấy trong localstorage', treeData)
-        treeData = JSON.parse(localOrgTreeData)
-    } else {
-        // console.log('OrgTreeData lấy từ biến truyền vào')
-        treeData = popupData.treeData;
-        // lưu vào localstorage
-        localStorage.setItem("orgTreeData", JSON.stringify(treeData));
-    }
-
-    let showIds = popupData.selectedData.showIds; 
-    let lstSelectedCodes = popupData.selectedData.selectedCodes
-    let arrSelectedCodes = lstSelectedCodes.split(",").map(code => code.trim());
-    expandLevel = popupData.selectedData.maxLevel ? popupData.selectedData.maxLevel : 2
     
-    renderTree(treeData, document.getElementById("tree-container"), null, 1, 2); // chuyen lai luon show level 2
-    // selectAndExpandNodes(showIds);
-    selectAndExpandNodesByCode(arrSelectedCodes);
-
-    let container = document.getElementById("tree-container");
-    container.style.display = container.style.display === "block" ? "none" : "block";
-
     function expandalltree() {
         document.querySelectorAll(".children").forEach(child => {
             child.style.display = "block";
@@ -211,27 +210,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload1) => { // Sử d�
         updateSelectedBox(); // 🔥 Cập nhật ô input 🔥
     }
     
-    /*
-    function renderSelectedItemsTable() { 
-        let table = document.getElementById("selected-items-table"); 
-        let tbody = table.querySelector("tbody"); 
-        tbody.innerHTML = ""; // 🔥 XÓA DỮ LIỆU CŨ 🔥
-    
-        selectedItems.forEach(item => { 
-            let row = document.createElement("tr"); 
-            row.innerHTML = `
-                <td>${item.id}</td>
-                <td>${item.name}</td>
-                <td>${item.level}</td>
-                <td>${item.type}</td>
-                <td>${item.selection}</td>
-                <td>${item.display}</td> <!-- 🔥 HIỂN THỊ CỘT MỚI -->
-            `; 
-            tbody.appendChild(row); 
-        }); 
-    }    
-        */
-    
     function findNodeById(node, id) {
         if (!node) return null;
         if (node.id == id) return node;
@@ -298,16 +276,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload1) => { // Sử d�
     document.getElementById("checking-buttons").addEventListener("click", () => {
         tickNodeByTypingCode();
     });
-
-    function findNodeByName(node, name) {
-        if (!node) return null;
-        if (node.name === name) return node;
-        for (let child of node.children) {
-            let found = findNodeByName(child, name);
-            if (found) return found;
-        }
-        return null;
-    };
 
     function tickNodeByTypingCode() {
         let inputValue = document.getElementById("selected-box").value.trim(); // Lấy giá trị và loại bỏ khoảng trắng ở đầu và cuối
