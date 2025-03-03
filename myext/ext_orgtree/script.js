@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log('OrgTreeData lấy trong localstorage', treeData)
         } else {
             fetchData(); // load tree data
-            console.log('OrgTreeData lấy truyền vào')
+            console.log('OrgTreeData lấy truyền vào', treeData)
             // lưu vào localstorage
             localStorage.setItem("orgTreeData", JSON.stringify(treeData));
         }
