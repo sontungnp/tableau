@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let worksheets = dashboard.worksheets;
         const worksheetName = "OrgCodeSheet"; // Tên worksheet cần lấy
         // const filterField = "Orgid"; // 🔴 Đổi tên filter nếu cần
-        const filterField = "Departmentcode"; // 🔴 Đổi tên filter nếu cần
+        const filterField = "filter_reset_Departmentcode"; // 🔴 Đổi tên filter nếu cần
 
         // addEventListenerFilter();
 
@@ -294,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         setFilterOrgCode(selectedData.selectedIds, selectedData.isAll);
                     }
-                    console.log(`Orgid đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
+                    console.log(`filter_reset_Departmentcode đã bị thay đổi sang giá trị: ${updatedFilter.appliedValues.map(v => v.formattedValue).join(", ")}`);
                 }
             });
         }
