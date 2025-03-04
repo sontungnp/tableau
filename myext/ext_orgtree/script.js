@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 "maxLevel": 2
             };
             localStorage.setItem("selectedData", JSON.stringify(selectedData));
+            localStorage.setItem("departmentCode", selectedData.selectedCodes);
         }
 
         document.getElementById("selected-box").value = selectedData.selectedCodes;
@@ -62,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
 
                         localStorage.setItem("selectedData", JSON.stringify(selectedData));
+                        localStorage.setItem("departmentCode", selectedData.selectedCodes);
 
                         document.getElementById("selected-box").value = selectedData.selectedCodes;
 
@@ -91,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             "maxLevel": 2
                         }
                     localStorage.setItem("selectedData", JSON.stringify(selectedData));
+                    localStorage.setItem("departmentCode", selectedData.selectedCodes);
                 } else {
                     selectedData.selectedCodes = event.newValue
                 }
@@ -181,6 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
             localStorage.setItem("selectedData", JSON.stringify(selectedData));
+            localStorage.setItem("departmentCode", selectedData.selectedCodes);
 
             document.getElementById("selected-box").value = 'ALL';
 
