@@ -87,9 +87,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         
             removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
+
+            localStorage.setItem("treeData", JSON.stringify(treeData));
             
             popupData = {
-                "treeData": treeData,
+                "treeData": treeData ? treeData : JSON.parse(localStorage.getItem("treeData")),
                 "selectedData": selectedData
             };
 
