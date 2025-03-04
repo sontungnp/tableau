@@ -4,8 +4,17 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     let selectedItems = [];
     let expandLevel = 2; // Giá trị này có thể nhận từ tham số truyền vào
 
-    console.log("Popup mở thành công! Giá trị nhận được payload là: ");
-    console.log(payload);
+    let popupData = JSON.parse(payload);
+    let treeData = popupData.treeData;
+
+    let showIds = popupData.selectedData.showIds; 
+    expandLevel = popupData.selectedData.maxLevel ? popupData.selectedData.maxLevel : 2
+    
+    renderTree(treeData, document.getElementById("tree-container"), null, 1, 2); // chuyen lai luon show level 2
+    selectAndExpandNodes(showIds);
+
+    let container = document.getElementById("tree-container");
+    container.style.display = container.style.display === "block" ? "none" : "block";
 
     document.getElementById("search-box").addEventListener("input", filterTree);
 
@@ -30,33 +39,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         returnData("cancel");
 
     });
-
-    let popupData = JSON.parse(payload);
-    let treeData;
-
-    // lấy từ localstorage
-    let localOrgTreeData = localStorage.getItem("orgTreeData");
-    if (localOrgTreeData) {
-        // console.log('OrgTreeData lấy trong localstorage', treeData)
-        treeData = JSON.parse(localOrgTreeData)
-    } else {
-        // console.log('OrgTreeData lấy từ biến truyền vào')
-        treeData = popupData.treeData;
-        // lưu vào localstorage
-        localStorage.setItem("orgTreeData", JSON.stringify(treeData));
-    }
-
-    let showIds = popupData.selectedData.showIds; 
-    let lstSelectedCodes = popupData.selectedData.selectedCodes
-    let arrSelectedCodes = lstSelectedCodes.split(",").map(code => code.trim());
-    expandLevel = popupData.selectedData.maxLevel ? popupData.selectedData.maxLevel : 2
-    
-    renderTree(treeData, document.getElementById("tree-container"), null, 1, 2); // chuyen lai luon show level 2
-    selectAndExpandNodes(showIds);
-    // selectAndExpandNodesByCode(arrSelectedCodes);
-
-    let container = document.getElementById("tree-container");
-    container.style.display = container.style.display === "block" ? "none" : "block";
 
     function expandalltree() {
         document.querySelectorAll(".children").forEach(child => {
@@ -189,30 +171,9 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
                 });
             }
         });
-        // renderSelectedItemsTable();  // 🔥 CẬP NHẬT BẢNG 🔥// Bật lên khi cần check
+        
         updateSelectedBox(); // 🔥 Cập nhật ô input 🔥
     }
-    
-    /*
-    function renderSelectedItemsTable() { 
-        let table = document.getElementById("selected-items-table"); 
-        let tbody = table.querySelector("tbody"); 
-        tbody.innerHTML = ""; // 🔥 XÓA DỮ LIỆU CŨ 🔥
-    
-        selectedItems.forEach(item => { 
-            let row = document.createElement("tr"); 
-            row.innerHTML = `
-                <td>${item.id}</td>
-                <td>${item.name}</td>
-                <td>${item.level}</td>
-                <td>${item.type}</td>
-                <td>${item.selection}</td>
-                <td>${item.display}</td> <!-- 🔥 HIỂN THỊ CỘT MỚI -->
-            `; 
-            tbody.appendChild(row); 
-        }); 
-    }    
-        */
     
     function findNodeById(node, id) {
         if (!node) return null;
@@ -246,12 +207,17 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     function returnData(action) {
         let selectedIds = selectedItems
             .map(item => item.id);
-    
+
+        let selectedCodes = document.getElementById("selected-box").value;
+        if (!selectedCodes || selectedCodes.trim() === "") {
+            selectedCodes = 'ALL'
+        }
+
         let showIds = selectedItems
             .filter(item => item.display === "show")
             .map(item => item.id);
     
-        let isAll = (showIds.length === 1 && (showIds[0] === "ALL" || showIds[0] === "all" || showIds[0] === "FIS00000001")) ? "ALL" : "NOTALL";
+        let isAll = (showIds.length === 1 && (showIds[0] === "ALL" || showIds[0] === "all")) ? "ALL" : "NOTALL";
 
         // Lấy giá trị lớn nhất của level
         let maxLevel = Math.max(...selectedItems.map(item => item.level || 0));
@@ -259,13 +225,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         let returnValues = {
             "action": action,
             "selectedIds": selectedIds,
-            "selectedCodes": document.getElementById("selected-box").value,
+            "selectedCodes": selectedCodes,
             "showIds": showIds,
             "isAll": isAll,
             "maxLevel": maxLevel
         };
     
-        console.log("Dữ liệu trả về:", returnValues);
         tableau.extensions.ui.closeDialog(JSON.stringify(returnValues));
     }
 
@@ -280,16 +245,6 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
     document.getElementById("checking-buttons").addEventListener("click", () => {
         tickNodeByTypingCode();
     });
-
-    function findNodeByName(node, name) {
-        if (!node) return null;
-        if (node.name === name) return node;
-        for (let child of node.children) {
-            let found = findNodeByName(child, name);
-            if (found) return found;
-        }
-        return null;
-    };
 
     function tickNodeByTypingCode() {
         let inputValue = document.getElementById("selected-box").value.trim(); // Lấy giá trị và loại bỏ khoảng trắng ở đầu và cuối
