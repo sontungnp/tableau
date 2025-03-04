@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau Extension Popup</title>
+    <script src="../../lib/tableau.extensions.1.latest.js"></script>
+    <script src="script.js"></script>
+    <style>
+        body {
+            margin: 0;
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+            background-color: #0758B8; /* Màu nền */
+            font-family: Arial, sans-serif;
+        }
+
+        label {
+            display: block;
+            margin-top: 2px;
+            margin-bottom: 2px;
+            margin-left: 10px;
+            font-weight: bold;
+            font-size: 11px;
+            color: rgb(255, 255, 255); /* Màu chữ */
+        }
+
+        input {
+            padding: 1px;
+            font-size: 13px;
+            border: none;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 10px;
+        }
+
+        .combobox {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 1px;
+            /* width: 95%; */
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        #selected-box {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 1px;
+            font-size: 12px;
+        }
+
+        .arrow {
+            margin-left: 5px;
+            cursor: pointer;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <label for="orgCodeTex">Org Code</label>
+    <div class="combobox">
+        <input type="text" id="selected-box" disabled>
+        <span class="arrow" id="dropdown-toggle">▼</span>
+        <!-- <div id="tree-container"></div> -->
+
+        <button id="clear">Clear</button>
+    </div>
+</body>
+</html>
