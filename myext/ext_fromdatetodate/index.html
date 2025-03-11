@@ -21,7 +21,7 @@
             align-items: center;
             gap: 10px; /* Khoảng cách giữa các phần tử */
             width: 95%; /* Đảm bảo container chiếm 95% chiều rộng màn hình */
-            max-width: 600px; /* Giới hạn chiều rộng tối đa */
+            max-width: 900px; /* Giới hạn chiều rộng tối đa */
         }
 
         .container input[type="date"],
@@ -38,7 +38,6 @@
         }
 
         .container input[type="date"] {
-            flex: 2; /* Ô nhập liệu chiếm 2 phần */
             background-color: #fff;
             color: #000;
             min-width: 10px;
@@ -50,6 +49,7 @@
             color: #000;
             overflow: hidden; /* Đảm bảo biểu tượng loading không vượt ra ngoài nút */
             margin-top: 4px;
+            max-width: 40px;
         }
 
         .container button.loading span {
@@ -127,6 +127,7 @@
             font-style: normal;
             text-decoration: none;
             min-width: 10px;
+            text-align: center;
         }
 
         .input-group input[type="date"] {
@@ -151,8 +152,8 @@
             <label for="endDate">To date</label>
             <input type="date" id="endDate">
         </div>
-        <button id="refreshButton">Go...</button>
-        <button id="resetButton">Reset</button>
+        <button id="refreshButton">▶</button>
+        <button id="resetButton">⟳</button>
     </div>
 </body>
 </html>
