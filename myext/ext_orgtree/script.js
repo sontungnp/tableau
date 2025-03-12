@@ -15,13 +15,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // lấy từ localstorage
         // treeData = JSON.parse(localStorage.getItem("treeData"));
+        fetchData();
+
         selectedData = JSON.parse(localStorage.getItem("selectedData"));
 
-        if (true) {
-            fetchData();
+        if (!treeData) {
             removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
             // luu vao localStorage
             localStorage.setItem("treeData", JSON.stringify(treeData));
+            console.log('fetch data')
+        } else {
+            console.log('ko fetch data')
         }
 
         if (!selectedData) {
