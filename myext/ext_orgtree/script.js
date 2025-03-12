@@ -19,14 +19,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         selectedData = JSON.parse(localStorage.getItem("selectedData"));
 
-        if (treeData && treeData.length !== 0) {
-            console.log('fetch tree data thành công')
-            removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
-            // luu vao localStorage
-            localStorage.setItem("treeData", JSON.stringify(treeData));
-        } else {
-            console.log('fetch tree data không thành công')
-        }
+        // if (treeData && treeData.length !== 0) {
+        //     console.log('fetch tree data thành công')
+        //     removeParentRefs(treeData); // Xóa vòng lặp trước khi truyền
+        //     // luu vao localStorage
+        //     localStorage.setItem("treeData", JSON.stringify(treeData));
+        // } else {
+        //     console.log('fetch tree data không thành công')
+        // }
 
         if (!selectedData) {
             // khởi tạo giá trị lần đầu load extension lên
