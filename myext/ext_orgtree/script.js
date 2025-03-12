@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const filterField = "Departmentcode"; // 🔴 Đổi tên filter nếu cần
 
         // lấy từ localstorage
-        treeData = JSON.parse(localStorage.getItem("treeData"));
+        // treeData = JSON.parse(localStorage.getItem("treeData"));
         selectedData = JSON.parse(localStorage.getItem("selectedData"));
 
         if (!treeData) {
