@@ -35,13 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 $('#table-body').append(rowHTML);
             });
 
-            // Kích hoạt DataTable với Export Excel
+            // Kích hoạt DataTable với đầy đủ chức năng
             let table = $('#data-table').DataTable({
                 paging: true,
                 searching: true,
                 ordering: true,
                 pageLength: 10,
-                dom: 'lBfrtip',
+                dom: 'lBfrtip', // Thêm `l` để giữ số dòng trên trang
                 buttons: [
                     {
                         extend: 'excelHtml5',
