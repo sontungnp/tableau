@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 $('#table-header').append(`<th>${col}</th>`);
             });
 
-            // Tạo hàng filter (dropdown cho từng cột)
+            // Tạo hàng filter ngay dưới tiêu đề
             columns.forEach((col, index) => {
                 let uniqueValues = [...new Set(data.map(row => row[index].formattedValue))];
                 let select = `<select class="column-filter" id="filter-${index}" onchange="filterColumn(${index})">
@@ -35,13 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 $('#table-body').append(rowHTML);
             });
 
-            // Kích hoạt DataTable với đầy đủ chức năng
+            // Kích hoạt DataTable
             let table = $('#data-table').DataTable({
                 paging: true,
                 searching: true,
                 ordering: true,
                 pageLength: 10,
-                dom: 'lBfrtip', // Thêm `l` để giữ số dòng trên trang
+                dom: '<"top-controls"lBf>rtip', // Di chuyển controls lên trên
                 buttons: [
                     {
                         extend: 'excelHtml5',

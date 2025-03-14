@@ -17,15 +17,35 @@
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 8px; text-align: left; }
         select, input { width: 100%; padding: 5px; margin-top: 5px; }
+
+        /* Tạo layout cho thanh điều khiển */
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* Giữ export nút Excel bên phải */
+        .dt-buttons {
+            margin-left: auto !important;
+        }
     </style>
 </head>
 <body>
-    <h2>Custom Table with Filters & Export 2</h2>
+    <h2>Custom Table with Filters & Export 3</h2>
+
+    <!-- Thanh điều khiển trên -->
+    <div class="top-controls">
+        <div id="table-length"></div> <!-- "Show X entries" -->
+        <div id="table-search"></div> <!-- Ô tìm kiếm -->
+        <div id="table-export"></div> <!-- Export Excel -->
+    </div>
 
     <table id="data-table" class="display">
         <thead>
             <tr id="table-header"></tr>   <!-- Tiêu đề cột -->
-            <tr id="table-filters"></tr>  <!-- Ô lọc dưới tiêu đề -->
+            <tr id="table-filters"></tr>  <!-- Ô lọc ngay dưới tiêu đề -->
         </thead>
         <tbody id="table-body"></tbody>
     </table>
