@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
-    <!-- <script src="script.js"></script> -->
+    <script src="script.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         table { width: 100%; border-collapse: collapse; }
@@ -22,41 +22,5 @@
         </thead>
         <tbody id="table-body"></tbody>
     </table>
-
-    <script>
-        $(document).ready(function () {
-            tableau.extensions.initializeAsync().then(function () {
-                let worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
-
-                worksheet.getSummaryDataAsync().then(function (sumData) {
-                    let columns = sumData.columns.map(col => col.fieldName);
-                    let data = sumData.data;
-
-                    // Thêm header
-                    columns.forEach(col => {
-                        $('#table-header').append(`<th>${col}</th>`);
-                    });
-
-                    // Thêm dữ liệu
-                    data.forEach(row => {
-                        let rowHTML = '<tr>';
-                        row.forEach(cell => {
-                            rowHTML += `<td>${cell.formattedValue}</td>`;
-                        });
-                        rowHTML += '</tr>';
-                        $('#table-body').append(rowHTML);
-                    });
-
-                    // Kích hoạt DataTables.js
-                    $('#data-table').DataTable({
-                        paging: true,      // Phân trang
-                        searching: true,   // Cho phép filter
-                        ordering: true,    // Cho phép sắp xếp
-                        pageLength: 10     // Số hàng mỗi trang
-                    });
-                });
-            });
-        });
-    </script>
 </body>
 </html>
