@@ -185,14 +185,15 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         return null;
     }
 
-    function findNodeByCode(node, code) {
-        if (!node) return null;
-        if (node.code == code) return node;
-        for (let child of node.children) {
-            let found = findNodeByCode(child, code);
-            if (found) return found;
+    function findNodeByCode(node, code, result = []) {
+        if (!node) return result; // Nếu node null thì return kết quả tìm được
+        if (node.code === code) {
+            result.push(node); // Lưu node phù hợp vào danh sách kết quả
         }
-        return null;
+        for (let child of node.children) {
+            findNodeByCode(child, code, result); // Đệ quy tìm trong con
+        }
+        return result;
     }
 
     function getLevel(node) {
@@ -266,15 +267,15 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         }
     
         selectedCodes.forEach(code => {
-            let node = findNodeByCode(treeData, code); // Tìm node theo code
-            if (node) {
+            let nodes = findNodeByCode(treeData, code); // Lấy danh sách tất cả các node có code khớp
+            nodes.forEach(node => {
                 let checkbox = document.querySelector(`input[data-id='${node.id}']`);
                 if (checkbox) {
                     checkbox.checked = true; // ✅ Chọn checkbox
                     checkbox.dispatchEvent(new Event('change', { bubbles: true })); // Kích hoạt sự kiện thay đổi
-                    expandParentNodes(node); // Mở rộng các cấp cha
+                    expandParentNodes(node); // Mở rộng cha của node
                 }
-            }
+            });
         });
     }
 
