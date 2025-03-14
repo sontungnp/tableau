@@ -15,13 +15,17 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; text-align: left; }
+        select, input { width: 100%; padding: 5px; margin-top: 5px; }
     </style>
 </head>
 <body>
-    <h2>Custom Table with Filter</h2>
+    <h2>Custom Table with Filters & Export</h2>
+
     <table id="data-table" class="display">
         <thead>
-            <tr id="table-header"></tr>
+            <tr id="table-header"></tr>   <!-- Tiêu đề cột -->
+            <tr id="table-filters"></tr>  <!-- Ô lọc dưới tiêu đề -->
         </thead>
         <tbody id="table-body"></tbody>
     </table>
