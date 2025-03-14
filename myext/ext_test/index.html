@@ -14,19 +14,18 @@
     <script src="script.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        select { margin: 5px; padding: 5px; }
         table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; }
+        th select { width: 100%; padding: 5px; }
     </style>
 </head>
 <body>
-    <h2>Custom Table with Filters & Export</h2>
-    <!-- Dropdown filter -->
-    <div id="filters"></div>
+    <h2>Custom Table with Inline Filters & Export 2</h2>
 
-    <!-- Table -->
     <table id="data-table" class="display">
         <thead>
-            <tr id="table-header"></tr>
+            <tr id="table-header"></tr> <!-- Tiêu đề cột -->
+            <tr id="filter-row"></tr>  <!-- Hàng chứa dropdown filter -->
         </thead>
         <tbody id="table-body"></tbody>
     </table>

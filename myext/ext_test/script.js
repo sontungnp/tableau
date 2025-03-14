@@ -8,24 +8,15 @@ document.addEventListener("DOMContentLoaded", () => {
             let columns = sumData.columns.map(col => col.fieldName);
             let data = sumData.data;
 
-            // Tạo header
+            // Thêm header cột
             columns.forEach(col => {
                 $('#table-header').append(`<th>${col}</th>`);
+                $('#filter-row').append(`<th><select id="filter-${col}" onchange="filterColumn('${col}')">
+                    <option value="">All</option>
+                </select></th>`);
             });
 
-            // Tạo dropdown filter
-            columns.forEach((col, index) => {
-                let uniqueValues = [...new Set(data.map(row => row[index].formattedValue))];
-                let select = `<select id="filter-${index}" onchange="filterColumn(${index})">
-                                <option value="">All ${col}</option>`;
-                uniqueValues.forEach(value => {
-                    select += `<option value="${value}">${value}</option>`;
-                });
-                select += `</select>`;
-                $('#filters').append(select);
-            });
-
-            // Thêm dữ liệu vào bảng
+            // Thêm dữ liệu
             data.forEach(row => {
                 let rowHTML = '<tr>';
                 row.forEach(cell => {
@@ -35,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 $('#table-body').append(rowHTML);
             });
 
-            // Kích hoạt DataTable với Export Excel
+            // Khởi tạo DataTable với Export Excel
             let table = $('#data-table').DataTable({
                 paging: true,
                 searching: true,
@@ -51,10 +42,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 ]
             });
 
-            // Hàm filter theo cột
-            window.filterColumn = function (index) {
-                let val = $(`#filter-${index}`).val();
-                table.column(index).search(val ? `^${val}$` : '', true, false).draw();
+            // Lấy danh sách giá trị duy nhất và thêm vào filter
+            columns.forEach((col, index) => {
+                let uniqueValues = [...new Set(data.map(row => row[index].formattedValue))];
+                uniqueValues.forEach(value => {
+                    $(`#filter-${col}`).append(`<option value="${value}">${value}</option>`);
+                });
+            });
+
+            // Hàm filter cột
+            window.filterColumn = function (col) {
+                let colIndex = columns.indexOf(col);
+                let val = $(`#filter-${col}`).val();
+                table.column(colIndex).search(val ? `^${val}$` : '', true, false).draw();
             };
         });
     });
