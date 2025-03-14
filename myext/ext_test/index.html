@@ -4,73 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau Extension Popup</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
-    <script src="script.js"></script>
+    <!-- <script src="script.js"></script> -->
     <style>
-        body {
-            margin: 0;
-            /* display: flex; */
-            justify-content: center;
-            align-items: center;
-            background-color: #0758B8; /* Màu nền */
-            font-family: Arial, sans-serif;
-        }
-
-        label {
-            display: block;
-            margin-top: 2px;
-            margin-bottom: 2px;
-            margin-left: 10px;
-            font-weight: bold;
-            font-size: 11px;
-            color: rgb(255, 255, 255); /* Màu chữ */
-        }
-
-        input {
-            padding: 1px;
-            font-size: 13px;
-            border: none;
-            border-radius: 5px;
-            background-color: #fff;
-            color: #000;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            min-width: 10px;
-        }
-
-        .combobox {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 1px;
-            /* width: 95%; */
-            margin-left: 10px;
-            margin-right: 10px;
-        }
-
-        #selected-box {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 1px;
-            font-size: 12px;
-        }
-
-        .arrow {
-            margin-left: 5px;
-            cursor: pointer;
-            user-select: none;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; }
     </style>
 </head>
 <body>
-    <label for="orgCodeTex">Org Code</label>
-    <div class="combobox">
-        <input type="text" id="selected-box" disabled>
-        <span class="arrow" id="dropdown-toggle">▼</span>
-        <!-- <div id="tree-container"></div> -->
+    <h2>Custom Table with Filter</h2>
+    <table id="data-table" class="display">
+        <thead>
+            <tr id="table-header"></tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
 
-        <button id="clear">Clear</button>
-    </div>
+    <script>
+        $(document).ready(function () {
+            tableau.extensions.initializeAsync().then(function () {
+                let worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
+
+                worksheet.getSummaryDataAsync().then(function (sumData) {
+                    let columns = sumData.columns.map(col => col.fieldName);
+                    let data = sumData.data;
+
+                    // Thêm header
+                    columns.forEach(col => {
+                        $('#table-header').append(`<th>${col}</th>`);
+                    });
+
+                    // Thêm dữ liệu
+                    data.forEach(row => {
+                        let rowHTML = '<tr>';
+                        row.forEach(cell => {
+                            rowHTML += `<td>${cell.formattedValue}</td>`;
+                        });
+                        rowHTML += '</tr>';
+                        $('#table-body').append(rowHTML);
+                    });
+
+                    // Kích hoạt DataTables.js
+                    $('#data-table').DataTable({
+                        paging: true,      // Phân trang
+                        searching: true,   // Cho phép filter
+                        ordering: true,    // Cho phép sắp xếp
+                        pageLength: 10     // Số hàng mỗi trang
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>
