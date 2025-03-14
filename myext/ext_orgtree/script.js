@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const dashboard = tableau.extensions.dashboardContent.dashboard;
         let worksheets = dashboard.worksheets;
         const worksheetName = "OrgCodeSheet"; // Tên worksheet cần lấy
-        const filterField = "Departmentcode"; // 🔴 Đổi tên filter nếu cần
+        const filterField = "BU_ID"; // 🔴 Đổi tên filter nếu cần
 
         // lấy từ localstorage
         // treeData = JSON.parse(localStorage.getItem("treeData"));
