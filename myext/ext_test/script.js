@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 searching: true,
                 ordering: true,
                 pageLength: 10,
-                dom: 'Bfrtip',
+                dom: 'lBfrtip',
                 buttons: [
                     {
                         extend: 'excelHtml5',
