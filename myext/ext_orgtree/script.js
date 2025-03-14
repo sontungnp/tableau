@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // khởi tạo giá trị lần đầu load extension lên
             selectedData = {
                 "action": "INIT",
-                "selectedIds": [],
+                "selectedIds": "ALL",
                 "selectedCodes": "ALL",
                 "showIds": ["ALL"],
                 "isAll": "ALL",
@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
             localStorage.setItem("selectedData", JSON.stringify(selectedData));
             localStorage.setItem("departmentCode", selectedData.selectedCodes);
+            localStorage.setItem("selectedIds", selectedData.selectedIds);
         }
 
         document.getElementById("selected-box").value = selectedData.selectedCodes;
@@ -88,10 +89,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         localStorage.setItem("selectedData", JSON.stringify(selectedData));
                         localStorage.setItem("departmentCode", selectedData.selectedCodes);
+                        localStorage.setItem("selectedIds", selectedData.selectedIds);
 
                         document.getElementById("selected-box").value = selectedData.selectedCodes;
 
-                        setFilterOrgCodeByDepartmentCode(selectedData.selectedCodes, selectedData.isAll);
+                        setFilterOrg(selectedData.selectedIds, selectedData.isAll);
                     } else {
                         console.log("Calcel");
                     }
@@ -110,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
         //         if (event.newValue === null || event.newValue === 'ALL') {
         //             selectedData = {
         //                     "action": "INIT",
-        //                     "selectedIds": [],
+        //                     "selectedIds": "ALL",
         //                     "selectedCodes": "ALL",
         //                     "showIds": ["ALL"],
         //                     "isAll": "ALL",
@@ -118,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         //                 }
         //             localStorage.setItem("selectedData", JSON.stringify(selectedData));
         //             localStorage.setItem("departmentCode", selectedData.selectedCodes);
+        //             localStorage.setItem("selectedIds", selectedData.selectedIds);
         //         } else {
         //             selectedData.selectedCodes = event.newValue
         //         }
@@ -164,10 +167,10 @@ document.addEventListener("DOMContentLoaded", () => {
             return nodes[rootId] || null; // Trả về node gốc đã chọn
         }
 
-        async function setFilterOrgCodeByDepartmentCode(lstDepartmentCode, isAll) {
+        async function setFilterOrg(lstFilter, isAll) {
             try {
                 // Chuyển filterValue về chuỗi hoặc giá trị mặc định
-                let filterStr = (lstDepartmentCode !== null && lstDepartmentCode !== undefined) ? String(lstDepartmentCode).toUpperCase() : "ALL";
+                let filterStr = (lstFilter !== null && lstFilter !== undefined) ? String(lstFilter).toUpperCase() : "ALL";
 
                 await Promise.allSettled(worksheets.map(async (ws) => {
                     // 🔹 Lấy danh sách filters hiện có trên worksheet
@@ -179,13 +182,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
-                    if (!lstDepartmentCode || lstDepartmentCode === "ALL" || lstDepartmentCode.trim() === "" || isAll === "ALL") {
+                    if (!lstFilter || lstFilter === "ALL" || lstFilter.trim() === "" || isAll === "ALL") {
                         // 🔹 Nếu filterValue rỗng hoặc là "ALL" => Clear filter
                         document.getElementById("selected-box").value = 'ALL';
                         await ws.clearFilterAsync(filterField);
                     } else {
                         // 🔹 Kiểm tra nếu filterValue là một mảng thì truyền mảng, nếu không thì truyền giá trị đơn lẻ
-                        await ws.applyFilterAsync(filterField, lstDepartmentCode.split(",").map(item => item.trim()), "replace");
+                        await ws.applyFilterAsync(filterField, lstFilter.split(",").map(item => item.trim()), "replace");
                     }
                 }));
 
@@ -200,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // thiết lập giá trị khởi tạo ban đầu
             selectedData = {
                 "action": "INIT",
-                "selectedIds": [],
+                "selectedIds": "ALL",
                 "selectedCodes": "ALL",
                 "showIds": ["ALL"],
                 "isAll": "ALL",
@@ -209,6 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             localStorage.setItem("selectedData", JSON.stringify(selectedData));
             localStorage.setItem("departmentCode", selectedData.selectedCodes);
+            localStorage.setItem("selectedIds", selectedData.selectedIds);
 
             document.getElementById("selected-box").value = 'ALL';
 

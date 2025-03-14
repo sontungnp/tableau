@@ -97,12 +97,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
         }
     }
 
-    function selectAndExpandNodes(selectedIds) {
-        if (!selectedIds || !Array.isArray(selectedIds) || selectedIds.length === 0) {
+    function selectAndExpandNodes(lstIds) {
+        if (!lstIds || !Array.isArray(lstIds) || lstIds.length === 0) {
             return;
         }
     
-        selectedIds.forEach(id => {
+        lstIds.forEach(id => {
             let checkbox = document.querySelector(`input[data-id='${id}']`);
             if (checkbox) {
                 checkbox.checked = true; // ✅ Chọn checkbox
@@ -207,7 +207,8 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => { // Sử d�
 
     function returnData(action) {
         let selectedIds = selectedItems
-            .map(item => item.id);
+            .map(item => item.id)
+            .join(",");
 
         let selectedCodes = document.getElementById("selected-box").value;
         if (!selectedCodes || selectedCodes.trim() === "") {
