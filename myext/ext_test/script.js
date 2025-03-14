@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 searching: true,
                 ordering: true,
                 pageLength: 10,
-                dom: '<"top-controls"lBf>rtip', // Di chuyển controls lên trên
+                dom: '<"top-controls"lBf>rtip', // Định vị controls lên trên
                 buttons: [
                     {
                         extend: 'excelHtml5',
@@ -50,6 +50,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 ]
             });
+
+            // Di chuyển các control vào vị trí mong muốn
+            $('#table-length').html($('.dataTables_length'));
+            $('#table-search').html($('.dataTables_filter'));
+            $('#table-export').html($('.dt-buttons'));
 
             // Hàm filter theo từng cột
             window.filterColumn = function (index) {
