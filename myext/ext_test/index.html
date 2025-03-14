@@ -7,15 +7,23 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
     <script src="script.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
+        select { margin: 5px; padding: 5px; }
         table { width: 100%; border-collapse: collapse; }
     </style>
 </head>
 <body>
-    <h2>Custom Table with Filter</h2>
+    <h2>Custom Table with Filters & Export</h2>
+    <!-- Dropdown filter -->
+    <div id="filters"></div>
+
+    <!-- Table -->
     <table id="data-table" class="display">
         <thead>
             <tr id="table-header"></tr>
