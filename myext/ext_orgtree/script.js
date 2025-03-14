@@ -104,27 +104,27 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("clear").addEventListener("click", clearOrgFilters);
 
         // check thay đổi lcalstorage do nut reset từ extension khác
-        window.addEventListener("storage", function(event) {
-            if (event.key === "departmentCode") {
-                console.log("departmentCode đã thay đổi:", event.newValue);
-                if (event.newValue === null || event.newValue === 'ALL') {
-                    selectedData = {
-                            "action": "INIT",
-                            "selectedIds": [],
-                            "selectedCodes": "ALL",
-                            "showIds": ["ALL"],
-                            "isAll": "ALL",
-                            "maxLevel": 2
-                        }
-                    localStorage.setItem("selectedData", JSON.stringify(selectedData));
-                    localStorage.setItem("departmentCode", selectedData.selectedCodes);
-                } else {
-                    selectedData.selectedCodes = event.newValue
-                }
+        // window.addEventListener("storage", function(event) {
+        //     if (event.key === "departmentCode") {
+        //         console.log("departmentCode đã thay đổi:", event.newValue);
+        //         if (event.newValue === null || event.newValue === 'ALL') {
+        //             selectedData = {
+        //                     "action": "INIT",
+        //                     "selectedIds": [],
+        //                     "selectedCodes": "ALL",
+        //                     "showIds": ["ALL"],
+        //                     "isAll": "ALL",
+        //                     "maxLevel": 2
+        //                 }
+        //             localStorage.setItem("selectedData", JSON.stringify(selectedData));
+        //             localStorage.setItem("departmentCode", selectedData.selectedCodes);
+        //         } else {
+        //             selectedData.selectedCodes = event.newValue
+        //         }
                 
-                document.getElementById("selected-box").value = selectedData.selectedCodes
-            }
-        });
+        //         document.getElementById("selected-box").value = selectedData.selectedCodes
+        //     }
+        // });
 
         function fetchData() {
             // const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
