@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Kiểm tra có cột Measure Names không
             const measureNameIndex = columns.indexOf("Measure Names");
+            const measureValueIndex = columns.indexOf("Measure Values");
 
             if (measureNameIndex !== -1) {
                 // Pivot dữ liệu
