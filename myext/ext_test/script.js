@@ -8,32 +8,63 @@ document.addEventListener("DOMContentLoaded", () => {
             let columns = sumData.columns.map(col => col.fieldName);
             let data = sumData.data;
 
-            // Tạo hàng tiêu đề
-            columns.forEach(col => {
-                $('#table-header').append(`<th>${col}</th>`);
-            });
+            // Kiểm tra có cột Measure Names không
+            const measureNameIndex = columns.indexOf("Measure Names");
 
-            // Tạo hàng filter ngay dưới tiêu đề
-            columns.forEach((col, index) => {
-                let uniqueValues = [...new Set(data.map(row => row[index].formattedValue))];
-                let select = `<select class="column-filter" id="filter-${index}" onchange="filterColumn(${index})">
-                                <option value="">All ${col}</option>`;
-                uniqueValues.forEach(value => {
-                    select += `<option value="${value}">${value}</option>`;
-                });
-                select += `</select>`;
-                $('#table-filters').append(`<th>${select}</th>`);
-            });
+            if (measureNameIndex !== -1) {
+                // Pivot dữ liệu
+                let pivotData = {};
+                let dimensionCols = columns.filter((_, idx) => idx !== measureNameIndex);
+                let measureCols = [...new Set(data.map(row => row[measureNameIndex].formattedValue))];
 
-            // Thêm dữ liệu vào bảng
-            data.forEach(row => {
-                let rowHTML = '<tr>';
-                row.forEach(cell => {
-                    rowHTML += `<td>${cell.formattedValue}</td>`;
+                // Chuẩn bị header
+                dimensionCols.forEach(col => $('#table-header').append(`<th>${col}</th>`));
+                measureCols.forEach(measure => $('#table-header').append(`<th>${measure}</th>`));
+
+                // Pivot dữ liệu
+                data.forEach(row => {
+                    let key = dimensionCols.map((_, idx) => row[idx].formattedValue).join("|");
+                    if (!pivotData[key]) {
+                        pivotData[key] = Array(dimensionCols.length + measureCols.length).fill("");
+                        dimensionCols.forEach((_, idx) => pivotData[key][idx] = row[idx].formattedValue);
+                    }
+                    let measureIndex = measureCols.indexOf(row[measureNameIndex].formattedValue);
+                    pivotData[key][dimensionCols.length + measureIndex] = row[measureNameIndex + 1].formattedValue;
                 });
-                rowHTML += '</tr>';
-                $('#table-body').append(rowHTML);
-            });
+
+                // Đưa dữ liệu vào bảng
+                Object.values(pivotData).forEach(row => {
+                    $('#table-body').append(`<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`);
+                });
+            } else {
+
+                // Tạo hàng tiêu đề
+                columns.forEach(col => {
+                    $('#table-header').append(`<th>${col}</th>`);
+                });
+
+                // Tạo hàng filter ngay dưới tiêu đề
+                columns.forEach((col, index) => {
+                    let uniqueValues = [...new Set(data.map(row => row[index].formattedValue))];
+                    let select = `<select class="column-filter" id="filter-${index}" onchange="filterColumn(${index})">
+                                    <option value="">All ${col}</option>`;
+                    uniqueValues.forEach(value => {
+                        select += `<option value="${value}">${value}</option>`;
+                    });
+                    select += `</select>`;
+                    $('#table-filters').append(`<th>${select}</th>`);
+                });
+
+                // Thêm dữ liệu vào bảng
+                data.forEach(row => {
+                    let rowHTML = '<tr>';
+                    row.forEach(cell => {
+                        rowHTML += `<td>${cell.formattedValue}</td>`;
+                    });
+                    rowHTML += '</tr>';
+                    $('#table-body').append(rowHTML);
+                });
+            }
 
             // Kích hoạt DataTable
             let table = $('#data-table').DataTable({
