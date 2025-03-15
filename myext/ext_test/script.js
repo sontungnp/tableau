@@ -12,27 +12,33 @@ document.addEventListener("DOMContentLoaded", () => {
             const measureNameIndex = columns.indexOf("Measure Names");
             const measureValueIndex = columns.indexOf("Measure Values");
 
+            // Bỏ các cột không cần thiết như "AGG(index)"
+            const validDimensionCols = columns.filter((col, idx) => 
+                !col.includes("AGG") && idx !== measureNameIndex && idx !== measureValueIndex
+            );
+
             if (measureNameIndex !== -1) {
-                // Pivot dữ liệu
-                let pivotData = {};
-                let dimensionCols = columns.filter((_, idx) => idx !== measureNameIndex && idx !== measureValueIndex);
+                // Tìm tất cả các giá trị measure
                 let measureCols = [...new Set(data.map(row => row[measureNameIndex].formattedValue))];
 
-                // Tạo header (không bao gồm "Measure Names" và "Measure Values")
-                dimensionCols.forEach(col => $('#table-header').append(`<th>${col}</th>`));
+                // Tạo header (bỏ cột không cần thiết)
+                validDimensionCols.forEach(col => $('#table-header').append(`<th>${col}</th>`));
                 measureCols.forEach(measure => $('#table-header').append(`<th>${measure}</th>`));
 
-                // Pivot dữ liệu thành dạng bảng (loại bỏ "Measure Values")
+                // Pivot dữ liệu
+                let pivotData = {};
                 data.forEach(row => {
-                    let dimensionKey = dimensionCols.map((_, idx) => row[idx].formattedValue).join("|");
+                    let dimensionKey = validDimensionCols.map(col => 
+                        row[columns.indexOf(col)].formattedValue
+                    ).join("|");
 
                     if (!pivotData[dimensionKey]) {
                         pivotData[dimensionKey] = {};
-                        dimensionCols.forEach((_, idx) => {
-                            pivotData[dimensionKey][columns[idx]] = row[idx].formattedValue;
+                        validDimensionCols.forEach(col => {
+                            pivotData[dimensionKey][col] = row[columns.indexOf(col)].formattedValue;
                         });
                         measureCols.forEach(measure => {
-                            pivotData[dimensionKey][measure] = ""; // Khởi tạo giá trị trống cho các measure
+                            pivotData[dimensionKey][measure] = "";
                         });
                     }
 
@@ -44,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Hiển thị dữ liệu pivot trong bảng
                 Object.values(pivotData).forEach(row => {
                     let rowHTML = "<tr>";
-                    dimensionCols.forEach(col => rowHTML += `<td>${row[col]}</td>`);
+                    validDimensionCols.forEach(col => rowHTML += `<td>${row[col]}</td>`);
                     measureCols.forEach(measure => rowHTML += `<td>${row[measure]}</td>`);
                     rowHTML += "</tr>";
                     $('#table-body').append(rowHTML);
