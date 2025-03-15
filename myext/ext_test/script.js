@@ -9,32 +9,32 @@ document.addEventListener("DOMContentLoaded", () => {
             let data = sumData.data;
 
             // Kiểm tra có cột Measure Names không
-            const measureNameIndex = columns.indexOf("Measure Names");
-            if (measureNameIndex !== -1) {
-                // Pivot dữ liệu
-                let pivotData = {};
-                let dimensionCols = columns.filter((_, idx) => idx !== measureNameIndex);
-                let measureCols = [...new Set(data.map(row => row[measureNameIndex].formattedValue))];
-                // Chuẩn bị header
-                dimensionCols.forEach(col => $('#table-header').append(`<th>${col}</th>`));
-                measureCols.forEach(measure => $('#table-header').append(`<th>${measure}</th>`));
+            // const measureNameIndex = columns.indexOf("Measure Names");
+            // if (measureNameIndex !== -1) {
+            //     // Pivot dữ liệu
+            //     let pivotData = {};
+            //     let dimensionCols = columns.filter((_, idx) => idx !== measureNameIndex);
+            //     let measureCols = [...new Set(data.map(row => row[measureNameIndex].formattedValue))];
+            //     // Chuẩn bị header
+            //     dimensionCols.forEach(col => $('#table-header').append(`<th>${col}</th>`));
+            //     measureCols.forEach(measure => $('#table-header').append(`<th>${measure}</th>`));
 
-                // Pivot dữ liệu
-                data.forEach(row => {
-                    let key = dimensionCols.map((_, idx) => row[idx].formattedValue).join("|");
-                    if (!pivotData[key]) {
-                        pivotData[key] = Array(dimensionCols.length + measureCols.length).fill("");
-                        dimensionCols.forEach((_, idx) => pivotData[key][idx] = row[idx].formattedValue);
-                    }
-                    let measureIndex = measureCols.indexOf(row[measureNameIndex].formattedValue);
-                    pivotData[key][dimensionCols.length + measureIndex] = row[measureNameIndex + 1].formattedValue;
-                });
+            //     // Pivot dữ liệu
+            //     data.forEach(row => {
+            //         let key = dimensionCols.map((_, idx) => row[idx].formattedValue).join("|");
+            //         if (!pivotData[key]) {
+            //             pivotData[key] = Array(dimensionCols.length + measureCols.length).fill("");
+            //             dimensionCols.forEach((_, idx) => pivotData[key][idx] = row[idx].formattedValue);
+            //         }
+            //         let measureIndex = measureCols.indexOf(row[measureNameIndex].formattedValue);
+            //         pivotData[key][dimensionCols.length + measureIndex] = row[measureNameIndex + 1].formattedValue;
+            //     });
 
-                // Đưa dữ liệu vào bảng
-                Object.values(pivotData).forEach(row => {
-                    $('#table-body').append(`<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`);
-                });
-            } else {
+            //     // Đưa dữ liệu vào bảng
+            //     Object.values(pivotData).forEach(row => {
+            //         $('#table-body').append(`<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`);
+            //     });
+            // } else {
                 // Tạo hàng tiêu đề
                 columns.forEach(col => {
                     $('#table-header').append(`<th>${col}</th>`);
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     rowHTML += '</tr>';
                     $('#table-body').append(rowHTML);
                 });
-            }
+            // }
 
             // Kích hoạt DataTable
             let table = $('#data-table').DataTable({
