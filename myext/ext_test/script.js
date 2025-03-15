@@ -14,10 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (measureNameIndex !== -1) {
                 // Pivot dữ liệu
                 let pivotData = {};
-                let dimensionCols = columns.filter((_, idx) => idx !== measureNameIndex);
+                let dimensionCols = columns.filter((_, idx) => idx !== measureNameIndex && idx !== measureValueIndex);
                 let measureCols = [...new Set(data.map(row => row[measureNameIndex].formattedValue))];
 
-                // Chuẩn bị header
+                // Chuẩn bị header (không bao gồm Measure Names và Measure Values)
                 dimensionCols.forEach(col => $('#table-header').append(`<th>${col}</th>`));
                 measureCols.forEach(measure => $('#table-header').append(`<th>${measure}</th>`));
 
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         dimensionCols.forEach((_, idx) => pivotData[key][idx] = row[idx].formattedValue);
                     }
                     let measureIndex = measureCols.indexOf(row[measureNameIndex].formattedValue);
-                    pivotData[key][dimensionCols.length + measureIndex] = row[measureNameIndex + 1].formattedValue;
+                    pivotData[key][dimensionCols.length + measureIndex] = row[measureValueIndex].formattedValue;
                 });
 
                 // Đưa dữ liệu vào bảng
