@@ -13,22 +13,29 @@ document.addEventListener("DOMContentLoaded", () => {
             const measureValueIndex = columns.indexOf("Measure Values");
 
             // Bỏ các cột không cần thiết như "AGG(index)"
-            const validDimensionCols = columns.filter((col, idx) => 
+            const validDimensionCols = columns.filter((col, idx) =>
                 !col.includes("AGG") && idx !== measureNameIndex && idx !== measureValueIndex
             );
 
+            let measureCols = [];
             if (measureNameIndex !== -1) {
                 // Tìm tất cả các giá trị measure
-                let measureCols = [...new Set(data.map(row => row[measureNameIndex].formattedValue))];
+                measureCols = [...new Set(data.map(row => row[measureNameIndex].formattedValue))];
 
-                // Tạo header (bỏ cột không cần thiết)
-                validDimensionCols.forEach(col => $('#table-header').append(`<th>${col}</th>`));
-                measureCols.forEach(measure => $('#table-header').append(`<th>${measure}</th>`));
+                // Tạo header và filter (bỏ cột không cần thiết)
+                validDimensionCols.forEach(col => {
+                    $('#table-header').append(`<th>${col}</th>`);
+                    $('#table-filters').append(`<th><input type="text" class="column-filter" placeholder="Filter ${col}" /></th>`);
+                });
+                measureCols.forEach(measure => {
+                    $('#table-header').append(`<th>${measure}</th>`);
+                    $('#table-filters').append(`<th><input type="text" class="column-filter" placeholder="Filter ${measure}" /></th>`);
+                });
 
                 // Pivot dữ liệu
                 let pivotData = {};
                 data.forEach(row => {
-                    let dimensionKey = validDimensionCols.map(col => 
+                    let dimensionKey = validDimensionCols.map(col =>
                         row[columns.indexOf(col)].formattedValue
                     ).join("|");
 
