@@ -148,21 +148,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 const parentId = row[1].value;
                 const label = row[2].value;
                 const code = row[3].value; // Đọc thêm cột code
+                const ord = row[4].value; // Đọc thêm cột code
         
                 if (!nodes[id]) {
-                    nodes[id] = { id, name: label, code, children: [] };
+                    nodes[id] = { id, name: label, code, ord, children: [] };
                 } else {
                     nodes[id].name = label;
                     nodes[id].code = code; // Gán giá trị code nếu node đã tồn tại
+                    nodes[id].ord = ord;
                 }
         
                 if (parentId !== null) {
                     if (!nodes[parentId]) {
-                        nodes[parentId] = { id: parentId, name: "", code: "", children: [] };
+                        nodes[parentId] = { id: parentId, name: "", code: "", ord: null, children: [] };
                     }
                     nodes[parentId].children.push(nodes[id]);
                     // Sắp xếp children theo name
-                    nodes[parentId].children.sort((a, b) => a.name.localeCompare(b.name));
+                    nodes[parentId].children.sort((a, b) => a.name.localeCompare(b.ord));
                 }
             });
         
