@@ -139,17 +139,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function transformDataToTree(data) {
             if (!data.data.length) return null; // Nếu dữ liệu rỗng, trả về null
-        
+
             const nodes = {};
             let rootId = data.data[0][0].value; // Lấy ID của dòng đầu tiên làm root
-        
+
             data.data.forEach(row => {
                 const id = row[0].value;
                 const parentId = row[1].value;
                 const label = row[2].value;
                 const code = row[3].value; // Đọc thêm cột code
-                const ord = row[4].value; // Đọc thêm cột code
-        
+                const ord = row[4].value !== null ? Number(row[4].value) : Number.MAX_SAFE_INTEGER; // Đọc thêm cột ord, đảm bảo là số
+
                 if (!nodes[id]) {
                     nodes[id] = { id, name: label, code, ord, children: [] };
                 } else {
@@ -157,17 +157,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     nodes[id].code = code; // Gán giá trị code nếu node đã tồn tại
                     nodes[id].ord = ord;
                 }
-        
+
                 if (parentId !== null) {
                     if (!nodes[parentId]) {
-                        nodes[parentId] = { id: parentId, name: "", code: "", ord: null, children: [] };
+                        nodes[parentId] = { id: parentId, name: "", code: "", ord: Number.MAX_SAFE_INTEGER, children: [] };
                     }
                     nodes[parentId].children.push(nodes[id]);
-                    // Sắp xếp children theo name
-                    nodes[parentId].children.sort((a, b) => a.name.localeCompare(b.ord));
+
+                    // Sắp xếp children theo ord (số nhỏ hơn đứng trước)
+                    nodes[parentId].children.sort((a, b) => a.ord - b.ord);
                 }
             });
-        
+
             return nodes[rootId] || null; // Trả về node gốc đã chọn
         }
 
