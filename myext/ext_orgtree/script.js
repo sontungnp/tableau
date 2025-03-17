@@ -161,6 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         nodes[parentId] = { id: parentId, name: "", code: "", children: [] };
                     }
                     nodes[parentId].children.push(nodes[id]);
+                    // Sắp xếp children theo name
+                    nodes[parentId].children.sort((a, b) => a.name.localeCompare(b.name));
                 }
             });
         
