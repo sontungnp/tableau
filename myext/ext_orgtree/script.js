@@ -147,14 +147,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 const id = row[0].value;
                 const parentId = row[1].value;
                 const label = row[2].value;
-                const code = row[3].value; // Đọc thêm cột code
-                const ord = row[4].value !== null ? Number(row[4].value) : Number.MAX_SAFE_INTEGER; // Đọc thêm cột ord, đảm bảo là số
+                const code = row[3].value; 
+                const ord = row[4].value !== null ? parseInt(row[4].value, 10) || 0 : Number.MAX_SAFE_INTEGER; // Ép kiểu thành số
 
                 if (!nodes[id]) {
                     nodes[id] = { id, name: label, code, ord, children: [] };
                 } else {
                     nodes[id].name = label;
-                    nodes[id].code = code; // Gán giá trị code nếu node đã tồn tại
+                    nodes[id].code = code;
                     nodes[id].ord = ord;
                 }
 
@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     nodes[parentId].children.push(nodes[id]);
 
-                    // Sắp xếp children theo ord (số nhỏ hơn đứng trước)
+                    // 🛠 Sắp xếp lại children theo `ord`
                     nodes[parentId].children.sort((a, b) => a.ord - b.ord);
                 }
             });
