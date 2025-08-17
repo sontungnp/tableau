@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Popup</title>
+    <script src="../../lib/tableau.extensions.1.latest.js"></script>
+    <script src="script_popup.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      #popup-container {
+        display: flex;
+        flex-direction: column; /* Sắp xếp các phần tử theo chiều dọc */
+        /* gap: 10px; 
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); */
+      }
+
+      #popup-header {
+        display: flex;
+        flex-direction: column; /* Sắp xếp các phần tử theo chiều dọc */
+        gap: 10px; /* Tạo khoảng cách giữa các phần tử */
+        padding: 15px;
+        border: 1px solid #ccc;
+        background: #f9f9f9;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      #selected-area {
+        display: flex;
+        gap: 5px; /* Khoảng cách giữa input và button */
+      }
+
+      #selected-box {
+        flex: 1; /* Chiếm hết phần còn lại */
+        /* padding: 5px;
+        font-size: 14px; */
+      }
+
+      #checking-buttons {
+        white-space: nowrap; /* Không xuống dòng */
+        /* padding: 5px 10px; */
+      }
+
+      #popup-button {
+        display: flex;
+        justify-content: space-between; /* Chia đều không gian giữa các phần */
+        align-items: center;
+        gap: 5px;
+      }
+
+      #popup-button input {
+        flex: 1;
+      }
+
+      #control-buttons {
+        display: flex;
+        justify-content: flex-end; /* Căn phải */
+        gap: 10px;
+      }
+
+      button {
+        /* padding: 8px 12px; */
+        border: none;
+        background-color: #007bff; /* Màu xanh dương */
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: background 0.3s ease-in-out;
+      }
+      button:hover {
+        background-color: #0056b3; /* Màu xanh đậm khi hover */
+      }
+
+      #acc-table-container {
+        /* display: none; */
+        top: 40px;
+        /* width: 100%; */
+        max-height: 580px;
+        max-width: 575px;
+        border: 1px solid #ccc;
+        background: white;
+        overflow: auto;
+        z-index: 1000;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="popup-container">
+      <div id="popup-header">
+        <h2>Org structure</h2>
+        <div id="selected-area">
+          <input type="text" id="selected-box" placeholder="Account..." />
+          <button id="checking-buttons">Check</button>
+        </div>
+
+        <input type="text" id="search-box" placeholder="Search..." />
+        <div id="popup-button">
+          <input
+            type="text"
+            id="selected-detail-box"
+            placeholder="selected-account list detail"
+            disabled
+          />
+          <div id="control-buttons">
+            <button id="okPopup">Ok</button>
+            <button id="closePopup">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="acc-table-container"></div>
+    </div>
+  </body>
+</html>
