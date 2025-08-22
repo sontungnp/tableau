@@ -19,12 +19,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
 
   container.style.display = 'block'
 
-  renderTable(arrAllAccount, arrSelectedItems)
+  renderTable(arrAllAccount)
 
   let checkAllBox = document.getElementById('checkAll')
 
   // ===== Vẽ bảng từ arrAllAccount =====
-  function renderTable(data, arrSelected) {
+  function renderTable(data) {
     let tableHtml = `
     <table border="1" cellspacing="0" cellpadding="4" style="width:100%; border-collapse: collapse;">
       <thead>
@@ -38,7 +38,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
         ${data
           .map((row) => {
             let code = row[0]._value
-            let isChecked = arrSelected.includes(code) ? 'checked' : ''
+            let isChecked = arrSelectedItems.includes(code) ? 'checked' : ''
             return `
               <tr>
                 <td style="text-align:center;">
@@ -104,15 +104,20 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
   // ====== Search Filter ======
   document.getElementById('search-box').addEventListener('input', filterAcc)
 
-  function filterAcc() {
-    let keyword = document
-      .getElementById('search-box')
-      .value.trim()
+  function normalizeStr(str) {
+    return str
+      .normalize('NFKD') // Chuẩn hóa Unicode
+      .replace(/[\u0300-\u036f]/g, '') // Bỏ dấu tổ hợp (nếu cần cho tiếng Việt)
       .toLowerCase()
+      .trim()
+  }
+
+  function filterAcc() {
+    let keyword = normalizeStr(document.getElementById('search-box').value)
     let filtered = arrAllAccount.filter(
       (row) =>
-        row[0]._value.toLowerCase().includes(keyword) ||
-        row[1]._value.toLowerCase().includes(keyword)
+        normalizeStr(row[0]._value).includes(keyword) ||
+        normalizeStr(row[1]._value).includes(keyword)
     )
     renderTable(filtered)
   }
