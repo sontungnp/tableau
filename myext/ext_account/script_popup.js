@@ -22,6 +22,11 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
   renderTable(arrAllAccount)
 
   let checkAllBox = document.getElementById('checkAll')
+  let checkShowSelectedItems = document.getElementById('show-selected-items-ck')
+
+  checkShowSelectedItems.addEventListener('change', function () {
+    filterSelectedAcc()
+  })
 
   // ===== Vẽ bảng từ arrAllAccount =====
   function renderTable(data) {
@@ -60,7 +65,11 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
 
     // --- Set trạng thái checkAll + isALL ban đầu ---
     checkAll.checked = Array.from(allChecks).every((chk) => chk.checked)
-    isALL = checkAll.checked ? 'ALL' : 'NOTALL'
+    isALL =
+      arrSelectedItems.length === 0 ||
+      arrSelectedItems.length === arrAllAccount.length
+        ? 'ALL'
+        : 'NOTALL'
 
     // --- Check All ---
     checkAll.addEventListener('change', function () {
@@ -69,7 +78,11 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
         updateSelectedItems(chk.dataset.code, chk.checked)
       })
       // cập nhật biến isALL
-      isALL = this.checked ? 'ALL' : 'NOTALL'
+      isALL =
+        arrSelectedItems.length === 0 ||
+        arrSelectedItems.length === arrAllAccount.length
+          ? 'ALL'
+          : 'NOTALL'
     })
 
     // --- Check từng dòng ---
@@ -79,7 +92,11 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
 
         // Cập nhật lại trạng thái checkAll
         checkAll.checked = Array.from(allChecks).every((chk) => chk.checked)
-        isALL = checkAll.checked ? 'ALL' : 'NOTALL'
+        isALL =
+          arrSelectedItems.length === 0 ||
+          arrSelectedItems.length === arrAllAccount.length
+            ? 'ALL'
+            : 'NOTALL'
       })
     })
   }
@@ -102,7 +119,17 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
   }
 
   // ====== Search Filter ======
-  document.getElementById('search-box').addEventListener('input', filterAcc)
+  document.getElementById('search-box').addEventListener('input', function () {
+    // Bỏ tích checkbox nếu đang được tích
+    if (checkShowSelectedItems.checked) {
+      checkShowSelectedItems.checked = false
+      // Kích hoạt sự kiện change nếu cần
+      checkShowSelectedItems.dispatchEvent(new Event('change'))
+    }
+
+    // Gọi hàm filterAcc
+    filterAcc()
+  })
 
   function normalizeStr(str) {
     return str
@@ -120,6 +147,17 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
         normalizeStr(row[1]._value).includes(keyword)
     )
     renderTable(filtered)
+  }
+
+  function filterSelectedAcc() {
+    if (document.getElementById('show-selected-items-ck').checked) {
+      let filtered = arrAllAccount.filter((row) =>
+        arrSelectedItems.includes(row[0]._value)
+      )
+      renderTable(filtered)
+    } else {
+      renderTable(arrAllAccount)
+    }
   }
 
   document.getElementById('okPopup').addEventListener('click', () => {
@@ -154,6 +192,12 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
       checkAllBox.dispatchEvent(new Event('change'))
     }
     tickNodeByTypingCode()
+
+    // chỉ show những item được chọn thôi.
+    if (!checkShowSelectedItems.checked) {
+      checkShowSelectedItems.checked = true // tích checkbox
+      checkShowSelectedItems.dispatchEvent(new Event('change')) // kích hoạt sự kiện change
+    }
   })
 
   function tickNodeByTypingCode() {
@@ -164,20 +208,28 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
       .split(',')
       .map((code) => code.trim().toLowerCase())
 
-    let checkboxes = container.querySelectorAll('.row-check')
-    checkboxes.forEach((chk) => {
-      let codeVal = chk.dataset.code.toLowerCase()
-      let matched = unitCodes.some((pattern) => {
-        if (pattern.includes('%')) {
-          // LIKE pattern: đổi % thành regex .*
-          let regexPattern = '^' + pattern.replace(/%/g, '.*') + '$'
-          return new RegExp(regexPattern, 'i').test(codeVal)
-        } else {
-          return codeVal === pattern
-        }
+    // Lọc arrAllAccount theo pattern dựa trên row[0]._value
+    let matchedCodes = arrAllAccount
+      .map((row) => row[0]._value) // lấy tất cả code từ row[0]._value
+      .filter((codeVal) => {
+        let lowerCode = codeVal.toLowerCase()
+        return unitCodes.some((pattern) => {
+          if (pattern.includes('%')) {
+            // LIKE pattern: đổi % thành regex .*
+            let regexPattern = '^' + pattern.replace(/%/g, '.*') + '$'
+            return new RegExp(regexPattern, 'i').test(lowerCode)
+          } else {
+            return lowerCode === pattern
+          }
+        })
       })
-      chk.checked = matched
-      updateSelectedItems(chk.dataset.code, chk.checked)
+
+    // Cập nhật arrSelectedItems dựa trên matchedCodes
+    arrAllAccount.forEach((row) => {
+      let code = row[0]._value
+      updateSelectedItems(code, matchedCodes.includes(code))
     })
+
+    filterSelectedAcc()
   }
 })

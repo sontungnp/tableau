@@ -41,6 +41,15 @@
         font-size: 14px; */
       }
 
+      #search-area {
+        display: flex;
+        gap: 5px; /* Khoảng cách giữa input và button */
+      }
+
+      #search-area input {
+        flex: 1; /* Chiếm hết phần còn lại */
+      }
+
       #checking-buttons {
         white-space: nowrap; /* Không xuống dòng */
         /* padding: 5px 10px; */
@@ -100,7 +109,14 @@
           <button id="checking-buttons">Check</button>
         </div>
 
-        <input type="text" id="search-box" placeholder="Search..." />
+        <div id="search-area">
+          <input type="text" id="search-box" placeholder="Search..." />
+          <label>
+            <input type="checkbox" id="show-selected-items-ck" />
+            Show selected items
+          </label>
+        </div>
+
         <div id="popup-button">
           <input
             type="text"
