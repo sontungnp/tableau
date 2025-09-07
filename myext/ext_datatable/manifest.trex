@@ -7,7 +7,7 @@
        <author name="USERNAME" email="USER@example.com" organization="MyCo" website="https://www.example.com"/>
        <min-api-version>1.0</min-api-version>
        <source-location>
-        <url>https://sontungnp.github.io/qlnoibo/myext/ext_datatable/</url>
+        <url>https://sontungnp.github.io/tableau/myext/ext_datatable/</url>
         <!-- <url>http://localhost:9527/myext/ext_datatable/</url> -->
       </source-location>
       <icon>
