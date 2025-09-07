@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tableau Extension Popup</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"
+    />
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="../../lib/tableau.extensions.1.latest.js"></script>
+    <script src="script.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 2px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+      select,
+      input {
+        width: 100%;
+        padding: 5px;
+        margin-top: 5px;
+      }
+
+      /* --- Layout 1–2–1 cho 3 khối --- */
+      .top-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        background-color: #f0f0f0; /* màu xám nhạt */
+      }
+
+      #table-length {
+        flex: 1;
+      }
+
+      #table-search {
+        flex: 2; /* search gấp đôi */
+      }
+
+      #table-export {
+        flex: 1;
+        text-align: right;
+      }
+
+      #copy-btn {
+        text-align: right;
+      }
+
+      /* ===== Cố định header của table ===== */
+      .table-container {
+        /*max-height: 500px; /* chiều cao cố định */
+        overflow-y: auto; /* bật scroll */
+        height: 100%;
+      }
+
+      #data-table thead th {
+        position: sticky;
+        top: 0;
+        background: #f2f2f2; /* màu nền để không bị trong suốt */
+        z-index: 10;
+      }
+
+      #data-table thead tr#table-filters th {
+        top: 40px; /* nếu có hàng filter nằm dưới header */
+        background: #fafafa;
+        z-index: 9;
+      }
+      /* =========== */
+
+      /* --- Chỉnh length control (show + dropdown + entries trên 1 dòng) --- */
+      #table-length .dataTables_length {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      #table-length .dataTables_length label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin: 0;
+      }
+
+      /* --- Chỉnh search control (Search + input trên 1 dòng) --- */
+      #table-search .dataTables_filter {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        width: 100%;
+      }
+
+      #table-search .dataTables_filter label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin: 0;
+        width: 100%;
+      }
+
+      #table-search .dataTables_filter input {
+        flex: 1; /* để input chiếm hết phần còn lại */
+        box-sizing: border-box;
+      }
+      /* ************************************* */
+
+      /* Thêm màu nền cho header */
+      #data-table thead th {
+        background-color: #d9d9d9; /* xám đậm */
+        color: #000; /* chữ trắng để dễ đọc */
+        font-weight: bold;
+        text-align: center;
+      }
+
+      #data-table thead th,
+      #data-table tbody td {
+        border-right: 1px solid #e0e0e0; /* đường kẻ mảnh, sáng hơn */
+        box-shadow: inset -1px 0 2px rgba(0, 0, 0, 0.05); /* bóng mờ rất nhẹ */
+      }
+
+      #data-table thead th:last-child,
+      #data-table tbody td:last-child {
+        border-right: none;
+        box-shadow: none;
+      }
+
+      #data-table thead tr#table-filters th {
+        padding: 1px !important; /* chỉ cách mép trong 1px */
+        text-align: center; /* căn giữa nội dung theo chiều ngang */
+      }
+
+      #data-table thead tr#table-filters input,
+      #data-table thead tr#table-filters select {
+        width: 98%; /* vừa khít với ô, chừa 1px hai bên */
+        margin: 0 auto; /* căn giữa trong thẻ th */
+        display: block; /* bắt buộc full width */
+        padding: 2px 4px; /* padding nhỏ cho gọn */
+        box-sizing: border-box; /* để width tính cả padding */
+        font-size: 12px; /* chữ nhỏ hơn một chút cho đẹp */
+      }
+
+      /* ********************* */
+
+      /* Canh chỉnh export button */
+      .dt-buttons {
+        margin-left: auto !important;
+      }
+
+      .highlight {
+        background-color: #ffd966 !important; /* Màu vàng nhạt */
+      }
+
+      .context-menu {
+        position: absolute;
+        display: none;
+        background: white;
+        border: 1px solid #ccc;
+        padding: 5px 0;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        list-style: none;
+        z-index: 1000;
+        border-radius: 5px;
+        min-width: 120px;
+      }
+      .context-menu li {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      .context-menu li:hover {
+        background: #f0f0f0;
+      }
+
+      .toggle-btn {
+        cursor: pointer;
+        font-weight: bold;
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Thanh điều khiển -->
+    <div class="top-controls">
+      <div id="table-length"></div>
+      <!-- "Show X entries" -->
+      <div id="table-search"></div>
+      <!-- Ô tìm kiếm -->
+      <div id="table-export"></div>
+      <!-- Export Excel -->
+      <button id="copy-btn" class="btn btn-primary">Copy Selected</button>
+    </div>
+
+    <div class="table-container">
+      <table id="data-table" class="display">
+        <thead>
+          <tr id="table-header"></tr>
+          <!-- Tiêu đề cột -->
+          <tr id="table-filters"></tr>
+          <!-- Ô lọc ngay dưới tiêu đề -->
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="context-menu">
+      <ul>
+        <li id="context-copy">Copy</li>
+      </ul>
+    </div>
+  </body>
+</html>
