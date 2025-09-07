@@ -388,6 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pageLength: 500,
         scrollY: '100%', // 👈 thêm dòng này
         dom: '<"top-controls"lBf>rtip',
+        fixedHeader: true, // 👈 cố định thead
         lengthMenu: [
           [10, 50, 100, 500, 1000, 2000, 5000],
           [10, 50, 100, 500, 1000, 2000, 5000]
