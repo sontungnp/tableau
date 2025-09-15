@@ -1,5 +1,13 @@
 'use strict'
 
+function normalizeVietnamese(str) {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   tableau.extensions.initializeAsync().then(() => {
     let worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0]
@@ -65,6 +73,111 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         })
       }
+
+      // Function to calculate totals for measure columns
+      function calculateTotals(
+        dataRows,
+        measureColumns,
+        allColumns,
+        isTreeView = false,
+        nodeList = []
+      ) {
+        const totals = {}
+
+        if (isTreeView && nodeList.length > 0) {
+          // For tree view, calculate totals from nodeList
+          measureColumns.forEach((col, idx) => {
+            totals[idx] = 0
+            nodeList.forEach((node) => {
+              if (node.isLeaf && node.measures[col]) {
+                const value =
+                  parseFloat(node.measures[col].replace(/[^\d.-]/g, '')) || 0
+                totals[idx] += value
+              }
+            })
+          })
+        } else {
+          // For pivot and flat modes, calculate totals from dataRows
+          measureColumns.forEach((col, idx) => {
+            totals[idx] = 0
+            dataRows.forEach((row) => {
+              let value = 0
+
+              if (typeof row === 'object' && row.measures) {
+                // Tree view node object
+                value =
+                  parseFloat(row.measures[col].replace(/[^\d.-]/g, '')) || 0
+              } else if (Array.isArray(row)) {
+                // Flat mode - need to find the measure column index
+                const colIndex = allColumns.findIndex((c) => c === col)
+                if (colIndex !== -1) {
+                  value =
+                    parseFloat(
+                      row[colIndex].formattedValue.replace(/[^\d.-]/g, '')
+                    ) || 0
+                }
+              } else {
+                // Pivot mode - row is an object with measure properties
+                value = parseFloat(row[col].replace(/[^\d.-]/g, '')) || 0
+              }
+
+              totals[idx] += value
+            })
+          })
+        }
+
+        return totals
+      }
+
+      // Function to add total row to the table
+      function addTotalRow(
+        measureColumns,
+        totals,
+        totalColumns,
+        isTreeView = false,
+        dimCols = []
+      ) {
+        let totalRow =
+          '<tr class="total-row" style="font-weight: bold; background-color: #e6e6e6;">'
+
+        if (isTreeView) {
+          totalRow += '<td>TOTAL</td>'
+          // Add empty cells for dimension columns
+          dimCols.forEach(() => {
+            totalRow += '<td></td>'
+          })
+          // Add totals for measure columns
+          measureColumns.forEach((col, idx) => {
+            totalRow += `<td style="text-align:right">${formatNumber(
+              totals[idx]
+            )}</td>`
+          })
+        } else {
+          totalColumns.forEach((col, idx) => {
+            if (measureColumns.includes(col)) {
+              const measureIndex = measureColumns.indexOf(col)
+              totalRow += `<td style="text-align:right">${formatNumber(
+                totals[measureIndex]
+              )}</td>`
+            } else {
+              totalRow += '<td></td>'
+            }
+          })
+        }
+
+        totalRow += '</tr>'
+        $('#table-body').append(totalRow)
+      }
+
+      // Helper function to format numbers
+      function formatNumber(num) {
+        if (isNaN(num)) return ''
+        return new Intl.NumberFormat().format(num)
+      }
+
+      // === MAIN RENDERING LOGIC ===
+      let totals = {}
+      let totalColumns = []
 
       // === BRANCH 1: TREE VIEW (with optional pivot) ===
       if (treeCols.length > 0) {
@@ -176,6 +289,12 @@ document.addEventListener('DOMContentLoaded', () => {
           $('#table-body').append(rowHTML)
         })
 
+        // Calculate and add totals
+        if (valueCols.length > 0) {
+          totals = calculateTotals([], valueCols, columns, true, nodeList)
+          addTotalRow(valueCols, totals, [], true, dimCols)
+        }
+
         // Toggle handlers
         $(document).on('click', '.toggle-btn', function () {
           const $btn = $(this)
@@ -219,8 +338,13 @@ document.addEventListener('DOMContentLoaded', () => {
             unique.forEach(
               (v) => (select += `<option value="${v}">${v}</option>`)
             )
-            select += `</select>`
-            btn.replaceWith(select)
+            select += `</select></div>`
+            btn.closest('th').html(select)
+            // Cập nhật lại layout
+            table.columns.adjust().draw(false)
+
+            // Làm mới fixedHeader
+            table.fixedHeader.adjust()
           } else if (colType === 'dim') {
             const tableColIdx = 1 + idx
             const dName = dimCols[idx]
@@ -230,8 +354,13 @@ document.addEventListener('DOMContentLoaded', () => {
             unique.forEach(
               (v) => (select += `<option value="${v}">${v}</option>`)
             )
-            select += `</select>`
-            btn.replaceWith(select)
+            select += `</select></div>`
+            btn.closest('th').html(select)
+            // Cập nhật lại layout
+            table.columns.adjust().draw(false)
+
+            // Làm mới fixedHeader
+            table.fixedHeader.adjust()
           } else if (colType === 'measure') {
             const tableColIdx = 1 + dimCols.length + idx
             const mName = valueCols[idx]
@@ -241,8 +370,13 @@ document.addEventListener('DOMContentLoaded', () => {
             unique.forEach(
               (v) => (select += `<option value="${v}">${v}</option>`)
             )
-            select += `</select>`
-            btn.replaceWith(select)
+            select += `</select></div>`
+            btn.closest('th').html(select)
+            // Cập nhật lại layout
+            table.columns.adjust().draw(false)
+
+            // Làm mới fixedHeader
+            table.fixedHeader.adjust()
           }
         })
       } else {
@@ -282,7 +416,8 @@ document.addEventListener('DOMContentLoaded', () => {
           }))
 
           // Body
-          Object.values(pivotMap).forEach((row) => {
+          const pivotData = Object.values(pivotMap)
+          pivotData.forEach((row) => {
             let rowHTML = '<tr>'
             validDimensionCols.forEach(
               (col) => (rowHTML += `<td>${row[col]}</td>`)
@@ -293,6 +428,11 @@ document.addEventListener('DOMContentLoaded', () => {
             rowHTML += '</tr>'
             $('#table-body').append(rowHTML)
           })
+
+          // Calculate and add totals
+          totals = calculateTotals(pivotData, measureCols, columns)
+          totalColumns = [...validDimensionCols, ...measureCols]
+          addTotalRow(measureCols, totals, totalColumns)
 
           // Filter button → select (Excel-like)
           $(document).on('click', '.show-filter-btn', function () {
@@ -311,14 +451,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 )
               ]
 
-              let select = `<select class="column-filter" id="filter-${idx}" onchange="filterColumn(${idx})">`
+              let select = `<div class="select-container"><select class="column-filter" id="filter-${idx}" onchange="filterColumn(${idx})">`
               select += `<option value="">All ${colName}</option>`
               unique.forEach(
                 (v) => (select += `<option value="${v}">${v}</option>`)
               )
-              select += `</select>`
+              select += `</select></div>`
 
-              btn.replaceWith(select)
+              btn.closest('th').html(select)
+              // Cập nhật lại layout
+              table.columns.adjust().draw(false)
+
+              // Làm mới fixedHeader
+              table.fixedHeader.adjust()
             } else if (colType === 'measure-flat') {
               // Measure column
               const tableColIdx = validDimensionCols.length + idx
@@ -332,9 +477,14 @@ document.addEventListener('DOMContentLoaded', () => {
               unique.forEach(
                 (v) => (select += `<option value="${v}">${v}</option>`)
               )
-              select += `</select>`
+              select += `</select></div>`
 
-              btn.replaceWith(select)
+              btn.closest('th').html(select)
+              // Cập nhật lại layout
+              table.columns.adjust().draw(false)
+
+              // Làm mới fixedHeader
+              table.fixedHeader.adjust()
             }
           })
 
@@ -343,9 +493,22 @@ document.addEventListener('DOMContentLoaded', () => {
           // SIMPLE FLAT MODE
           console.log('vao day roi')
 
-          columns.forEach((col) => {
+          // Identify numeric columns for totals
+          const numericCols = []
+          columns.forEach((col, index) => {
             $('#table-header').append(`<th>${col}</th>`)
+
+            // Check if column contains numeric data
+            const hasNumericData = data.some((row) => {
+              const value = row[index].formattedValue
+              return !isNaN(parseFloat(value)) && isFinite(value)
+            })
+
+            if (hasNumericData) {
+              numericCols.push(index)
+            }
           })
+
           columns.forEach((col, index) => {
             let unique = [
               ...new Set(data.map((row) => row[index].formattedValue))
@@ -355,9 +518,10 @@ document.addEventListener('DOMContentLoaded', () => {
             unique.forEach(
               (v) => (select += `<option value="${v}">${v}</option>`)
             )
-            select += `</select>`
+            select += `</select></div>`
             $('#table-filters').append(`<th>${select}</th>`)
           })
+
           data.forEach((row) => {
             let rowHTML = '<tr>'
             row.forEach((cell) => {
@@ -366,29 +530,72 @@ document.addEventListener('DOMContentLoaded', () => {
             rowHTML += '</tr>'
             $('#table-body').append(rowHTML)
           })
+
+          // Calculate and add totals for numeric columns
+          if (numericCols.length > 0) {
+            const numericTotals = {}
+            numericCols.forEach((colIndex) => {
+              numericTotals[colIndex] = 0
+              data.forEach((row) => {
+                const value = parseFloat(row[colIndex].formattedValue) || 0
+                numericTotals[colIndex] += value
+              })
+            })
+
+            let totalRow =
+              '<tr class="total-row" style="font-weight: bold; background-color: #e6e6e6;">'
+            columns.forEach((col, index) => {
+              if (numericCols.includes(index)) {
+                totalRow += `<td style="text-align:right">${formatNumber(
+                  numericTotals[index]
+                )}</td>`
+              } else {
+                totalRow += '<td></td>'
+              }
+            })
+            totalRow += '</tr>'
+            $('#table-body').append(totalRow)
+          }
         }
       }
 
       // === COMMON ===
+      // Custom search for Vietnamese with and without diacritics
       $.fn.dataTable.ext.type.search.string = function (data) {
-        return !data
-          ? ''
-          : data
-              .toString()
-              .normalize('NFKD')
-              .replace(/[\u0300-\u036f]/g, '')
-              .toLowerCase()
-              .trim()
+        return !data ? '' : normalizeVietnamese(data.toString())
       }
+
+      // Override the default search method to support Vietnamese diacritics
+      $.fn.dataTable.ext.search.push(function (
+        settings,
+        searchData,
+        dataIndex,
+        rowData,
+        counter
+      ) {
+        var searchTerm = normalizeVietnamese(settings.oPreviousSearch.sSearch)
+        if (searchTerm === '') return true
+
+        for (var i = 0; i < searchData.length; i++) {
+          var cellData = normalizeVietnamese(searchData[i].toString())
+          if (cellData.includes(searchTerm)) {
+            return true
+          }
+        }
+        return false
+      })
 
       let table = $('#data-table').DataTable({
         paging: true,
         searching: true,
         ordering: false,
-        pageLength: 500,
-        scrollY: '100%', // 👈 thêm dòng này
+        pageLength: 100,
+        scrollY: 'calc(100vh - 170px)', // Tính toán chiều cao tự động
         dom: '<"top-controls"lBf>rtip',
-        fixedHeader: true, // 👈 cố định thead
+        fixedHeader: {
+          header: true,
+          headerOffset: $('.fixed-controls').outerHeight() || 50
+        },
         lengthMenu: [
           [10, 50, 100, 500, 1000, 2000, 5000],
           [10, 50, 100, 500, 1000, 2000, 5000]
@@ -399,7 +606,11 @@ document.addEventListener('DOMContentLoaded', () => {
             text: 'Export to Excel',
             title: 'Exported_Data'
           }
-        ]
+        ],
+        footerCallback: function (row, data, start, end, display) {
+          // This ensures the total row stays visible when filtering
+          $('.total-row').appendTo(this.api().table().body())
+        }
       })
 
       $('#table-length').html($('.dataTables_length'))
@@ -408,24 +619,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
       window.filterColumn = function (index) {
         let val = $(`#filter-${index}`).val()
-        table
-          .column(index)
-          .search(val ? `^${val}$` : '', true, false)
-          .draw()
+        let searchVal = val ? normalizeVietnamese(val) : ''
+
+        table.column(index).search(searchVal, true, false).draw()
       }
 
       let lastSelectedRow = null
       $('#table-body').on('click', 'tr', function (event) {
+        if ($(this).hasClass('total-row')) return // Ignore clicks on total row
+
         if (event.ctrlKey) {
           $(this).toggleClass('highlight')
         } else if (event.shiftKey && lastSelectedRow) {
-          let rows = $('#table-body tr')
+          let rows = $('#table-body tr:not(.total-row)')
           let start = rows.index(lastSelectedRow)
           let end = rows.index(this)
           let [min, max] = [Math.min(start, end), Math.max(start, end)]
           rows.slice(min, max + 1).addClass('highlight')
         } else {
-          $('#table-body tr').removeClass('highlight')
+          $('#table-body tr:not(.total-row)').removeClass('highlight')
           $(this).addClass('highlight')
         }
         lastSelectedRow = this
@@ -433,7 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function copySelectedRows() {
         let copiedText = ''
-        $('.highlight').each(function () {
+        $('.highlight:not(.total-row)').each(function () {
           let rowData = $(this)
             .find('td')
             .map(function () {
@@ -451,7 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .select()
           document.execCommand('copy')
           textarea.remove()
-          alert('Copied to clipboard!')
+          // alert('Copied to clipboard!')
         } else {
           alert('No rows selected!')
         }
@@ -474,12 +686,16 @@ document.addEventListener('DOMContentLoaded', () => {
       $(document).on('click', function () {
         $('#context-menu').hide()
       })
-      $('#table-body').on('contextmenu', 'tr.highlight', function (event) {
-        event.preventDefault()
-        $('#context-menu')
-          .css({ top: event.pageY + 'px', left: event.pageX + 'px' })
-          .show()
-      })
+      $('#table-body').on(
+        'contextmenu',
+        'tr.highlight:not(.total-row)',
+        function (event) {
+          event.preventDefault()
+          $('#context-menu')
+            .css({ top: event.pageY + 'px', left: event.pageX + 'px' })
+            .show()
+        }
+      )
       $('#copy-selected').on('click', function () {
         copySelectedRows()
         $('#context-menu').hide()
