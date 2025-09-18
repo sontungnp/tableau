@@ -8,6 +8,15 @@ function normalizeVietnamese(str) {
     .trim()
 }
 
+// Hàm đo độ rộng pixel của text (sử dụng canvas)
+function getTextWidth(text, font) {
+  const canvas = document.createElement('canvas')
+  const context = canvas.getContext('2d')
+  context.font = font
+  const metrics = context.measureText(text)
+  return metrics.width
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   tableau.extensions.initializeAsync().then(() => {
     let worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0]
@@ -559,6 +568,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      // TÍNH TOÁN ĐỘ RỘNG CỘT TRƯỚC KHI INIT DATATABLES (áp dụng cho tất cả mode)
+      const font = '16px Arial' // Font mặc định của body
+      const numCols = $('#table-header th').length
+      let widths = []
+      for (let i = 0; i < numCols; i++) {
+        let headerText = $('#table-header th').eq(i).text()
+        let headerW = getTextWidth(headerText, font) + 16 // + padding left/right ~8px mỗi bên
+        let maxCellW = headerW
+
+        $('#table-body tr').each(function () {
+          let $cell = $(this).find('td').eq(i)
+          let cellText = $cell.text()
+          let paddingLeft = parseInt($cell.css('padding-left')) || 0 // Xử lý indent cho tree col
+          let cellW = getTextWidth(cellText, font) + paddingLeft + 16 // + padding
+          if (cellW > maxCellW) maxCellW = cellW
+        })
+
+        let colW = Math.max(30, Math.min(300, maxCellW))
+        widths.push(colW)
+      }
+
+      // Áp dụng độ rộng vào header và filter th
+      $('#table-header th, #table-filters th').each(function (idx) {
+        $(this).css('width', `${widths[idx]}px`)
+      })
+
       // === COMMON ===
       // Custom search for Vietnamese with and without diacritics
       $.fn.dataTable.ext.type.search.string = function (data) {
@@ -590,6 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
         searching: true,
         ordering: false,
         pageLength: 100,
+        scrollX: true,
         scrollY: 'calc(100vh - 170px)', // Tính toán chiều cao tự động
         dom: '<"top-controls"lBf>rtip',
         fixedHeader: {
@@ -607,6 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: 'Exported_Data'
           }
         ],
+        columns: widths.map((w) => ({ width: `${w}px` })), // Cố định độ rộng cột trong DataTables
         footerCallback: function (row, data, start, end, display) {
           // This ensures the total row stays visible when filtering
           $('.total-row').appendTo(this.api().table().body())

@@ -92,8 +92,9 @@
       }
 
       #data-table {
-        table-layout: fixed;
+        table-layout: fixed; /* Thay đổi từ auto để cố định độ rộng cột */
         width: 100%;
+        border-collapse: collapse;
       }
 
       #data-table thead th {
@@ -120,6 +121,9 @@
 
       #data-table tbody td {
         border-right: 1px solid var(--border-color);
+        white-space: normal; /* Cho phép wrap text */
+        word-wrap: break-word;
+        overflow-wrap: break-word; /* Wrap từ bất kỳ đâu nếu cần */
       }
 
       #table-filters th {
