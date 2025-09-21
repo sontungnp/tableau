@@ -27,245 +27,100 @@
 
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
     <script src="script.js"></script>
-
-    <!-- Tách CSS ra file riêng hoặc ít nhất là thẻ style -->
     <style>
-      :root {
-        --primary-bg: #f0f0f0;
-        --header-bg: #d9d9d9;
-        --border-color: #e0e0e0;
-        --highlight-bg: #ffd966;
-        --context-menu-bg: #fff;
-        --hover-bg: #f0f0f0;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
       body {
         font-family: Arial, sans-serif;
-        margin: 2px;
-        height: 100vh;
-        overflow: hidden;
+        margin: 0;
+        padding: 10px;
       }
 
-      .main-container {
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
+      /* Title + Search sticky */
+      .header-container {
+        position: sticky;
+        top: 0;
+        background: #fff;
+        /* padding: 10px 0; */
+        z-index: 20;
+        border-bottom: 1px solid #ddd;
+        width: 100%; /* chiếm hết chiều ngang */
+        background-color: #f2f2f2; /* xám nhạt */
+        box-sizing: border-box; /* tránh tràn khi có padding */
       }
 
-      .fixed-controls {
-        flex-shrink: 0;
-        background-color: var(--primary-bg);
-        padding: 5px;
-        border-bottom: 1px solid #ccc;
+      #global-search {
+        /* margin-top: 6px;
+        padding: 6px; */
+        width: 100%;
+        max-width: 400px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
       }
 
-      .scrollable-table {
-        flex: 1;
-        overflow-y: auto;
-        position: relative;
-      }
-
-      /* --- Layout 1–2–1 cho 3 khối --- */
-      .top-controls {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-
-        background-color: #f0f0f0; /* màu xám nhạt */
-      }
-
-      #table-length {
-        flex: 1;
-      }
-
-      #table-search {
-        flex: 2; /* search gấp đôi */
-      }
-
-      #table-export {
-        flex: 1;
-        text-align: right;
-      }
-
+      /* Table */
       #data-table {
-        table-layout: fixed; /* Thay đổi từ auto để cố định độ rộng cột */
         width: 100%;
         border-collapse: collapse;
       }
 
-      #data-table thead th {
-        position: sticky;
-        top: 0;
-        background: var(--header-bg);
-        z-index: 10;
-        font-weight: bold;
-        text-align: center;
-        border-right: 1px solid var(--border-color);
+      #data-table th,
+      #data-table td {
+        border: 1px solid #ddd;
+        padding: 6px;
+        text-align: left;
       }
 
-      #data-table thead tr#table-filters th {
-        top: 40px;
+      /* Header dòng 1 */
+      #data-table thead tr:first-child th {
+        position: sticky;
+        top: 48px; /* chiều cao header-container */
+        background: #f5f5f5;
+        z-index: 10;
+      }
+
+      /* Filter dòng 2 */
+      #data-table thead tr:nth-child(2) th {
+        position: sticky;
+        top: 75px; /* = header-container (70px) + header (35px) */
         background: #fafafa;
         z-index: 9;
+      }
+
+      /* Dòng Tổng cộng sticky */
+      #data-table tbody tr.total-row {
         position: sticky;
+        bottom: 0; /* dính đáy bảng */
+        background-color: #f2f2f2;
+        font-weight: bold;
+        z-index: 8; /* thấp hơn header nhưng cao hơn body */
       }
 
-      #data-table thead th:last-child,
-      #data-table tbody td:last-child {
-        border-right: none;
+      tr.selected-row {
+        background-color: #e6d3c6 !important; /* nâu nhạt */
       }
-
-      #data-table tbody td {
-        border-right: 1px solid var(--border-color);
-        white-space: normal; /* Cho phép wrap text */
-        word-wrap: break-word;
-        overflow-wrap: break-word; /* Wrap từ bất kỳ đâu nếu cần */
-      }
-
-      #table-filters th {
-        position: relative;
-        overflow: visible;
-        padding: 4px;
-      }
-
-      #table-filters select,
-      #table-filters input {
-        width: 100%;
-        padding: 4px;
-        font-size: 12px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-
-      .dt-buttons {
-        margin-left: auto;
-      }
-
-      .highlight {
-        background-color: var(--highlight-bg) !important;
-      }
-
-      .context-menu {
-        position: absolute;
-        display: none;
-        background: var(--context-menu-bg);
-        border: 1px solid #ccc;
-        padding: 5px 0;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-        list-style: none;
-        z-index: 1000;
-        border-radius: 5px;
-        min-width: 120px;
-      }
-
-      .context-menu li {
-        padding: 8px 12px;
-        cursor: pointer;
-      }
-
-      .context-menu li:hover {
-        background: var(--hover-bg);
-      }
-
-      #copy-btn {
-        padding: 6px 12px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      #copy-btn:hover {
-        background-color: #0069d9;
-      }
-
-      /* Responsive design */
-      @media screen and (max-width: 768px) {
-        .top-controls {
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        #table-length,
-        #table-search,
-        #table-export {
-          min-width: 100%;
-        }
-
-        #table-filters select,
-        #table-filters input {
-          font-size: 11px;
-        }
-      }
-
-      /* --- Chỉnh length control (show + dropdown + entries trên 1 dòng) --- */
-      #table-length .dataTables_length {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-
-      #table-length .dataTables_length label {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        margin: 0;
-      }
-
-      /* --- Chỉnh search control (Search + input trên 1 dòng) --- */
-      #table-search .dataTables_filter {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        width: 100%;
-      }
-
-      #table-search .dataTables_filter label {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        margin: 0;
-        width: 100%;
-      }
-
-      #table-search .dataTables_filter input {
-        flex: 1; /* để input chiếm hết phần còn lại */
-        box-sizing: border-box;
-      }
-      /* ************************************* */
     </style>
   </head>
   <body>
-    <div class="main-container">
-      <div class="fixed-controls">
-        <div class="top-controls">
-          <div id="table-length"></div>
-          <div id="table-search"></div>
-          <div id="table-export"></div>
-          <button id="copy-btn" class="btn btn-primary">Copy Selected</button>
-        </div>
-      </div>
-
-      <div class="scrollable-table">
-        <table id="data-table" class="display">
-          <thead>
-            <tr id="table-header"></tr>
-            <tr id="table-filters"></tr>
-          </thead>
-          <tbody id="table-body"></tbody>
-        </table>
-      </div>
+    <div class="header-container">
+      <input
+        type="text"
+        id="global-search"
+        placeholder="Tìm kiếm dữ liệu..."
+        style="
+          margin: 10px 0;
+          padding: 6px;
+          width: 100%;
+          max-width: 400px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        "
+      />
     </div>
-
-    <div id="context-menu" class="context-menu">
-      <ul>
-        <li id="context-copy">Copy</li>
-      </ul>
-    </div>
+    <table id="data-table">
+      <thead>
+        <tr id="table-header"></tr>
+        <tr id="table-filter"></tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
   </body>
 </html>
