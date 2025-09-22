@@ -2,6 +2,19 @@
 
 const activeFilters = {} // key: column index, value: array các giá trị được chọn
 
+// Hàm chuẩn hóa chỉ để đồng bộ Unicode, không bỏ dấu
+function normalizeUnicode(str) {
+  return str ? str.normalize('NFC').toLowerCase().trim() : ''
+}
+
+function adjustHeaderContainerWidth() {
+  const tableEl = document.getElementById('data-table')
+  const headerContainer = document.querySelector('.header-container')
+  if (tableEl && headerContainer) {
+    headerContainer.style.width = tableEl.offsetWidth + 'px'
+  }
+}
+
 // Hàm đo độ rộng text
 function getTextWidth(text, font = '14px Arial') {
   const canvas = document.createElement('canvas')
@@ -27,21 +40,43 @@ function renderTable(headers, data, colWidths, isMeasure) {
   tfilter.innerHTML = ''
   tbody.innerHTML = ''
 
+  // Xác định các cột cần ẩn
+  const columnsToHide = headers
+    .map((header, index) => ({ header, index }))
+    .filter((item) => item.header.toLowerCase().startsWith('hiden'))
+    .map((item) => item.index)
+
+  // Lọc chỉ các cột hiển thị
+  const visibleHeaders = headers.filter(
+    (header, index) => !columnsToHide.includes(index)
+  )
+  const visibleColWidths = colWidths.filter(
+    (width, index) => !columnsToHide.includes(index)
+  )
+  const visibleIsMeasure = isMeasure.filter(
+    (measure, index) => !columnsToHide.includes(index)
+  )
+
+  // Lọc dữ liệu - chỉ giữ các cột visible
+  const visibleData = data.map((row) =>
+    row.filter((cell, index) => !columnsToHide.includes(index))
+  )
+
   // Header căn giữa
-  headers.forEach((h, idx) => {
+  visibleHeaders.forEach((h, idx) => {
     const th = document.createElement('th')
     th.textContent = h
     th.style.backgroundColor = '#f2f2f2' // nền xám nhạt
     th.style.fontWeight = 'bold'
-    th.style.minWidth = colWidths[idx] + 'px'
+    th.style.minWidth = visibleColWidths[idx] + 'px'
     th.style.textAlign = 'center'
     thead.appendChild(th)
   })
 
   // filter căn giữa
-  headers.forEach((h, idx) => {
+  visibleHeaders.forEach((h, idx) => {
     const th = document.createElement('th')
-    th.style.minWidth = colWidths[idx] + 'px'
+    th.style.minWidth = visibleColWidths[idx] + 'px'
     th.style.textAlign = 'center'
     th.style.backgroundColor = '#f2f2f2' // nền xám nhạt
 
@@ -52,7 +87,7 @@ function renderTable(headers, data, colWidths, isMeasure) {
       th.innerHTML = '' // bỏ button đi
 
       // distinct values
-      const values = data.map((row) => row[idx])
+      const values = visibleData.map((row) => row[idx])
       const distinct = [...new Set(values)].sort()
 
       // wrapper
@@ -72,8 +107,8 @@ function renderTable(headers, data, colWidths, isMeasure) {
       display.style.overflow = 'hidden'
       display.style.textOverflow = 'ellipsis'
       display.style.position = 'relative'
-      display.style.width = colWidths[idx] + 'px' // giữ độ rộng cố định
-      display.style.maxWidth = colWidths[idx] + 'px'
+      display.style.width = visibleColWidths[idx] + 'px' // giữ độ rộng cố định
+      display.style.maxWidth = visibleColWidths[idx] + 'px'
 
       // icon mũi tên
       const arrow = document.createElement('span')
@@ -101,6 +136,21 @@ function renderTable(headers, data, colWidths, isMeasure) {
       dropdown.style.display = 'none'
       dropdown.style.textAlign = 'left'
 
+      // search box trong dropdown
+      const searchBox = document.createElement('input')
+      searchBox.type = 'text'
+      searchBox.placeholder = 'Tìm...'
+      searchBox.style.width = '100%' // Căng toàn bộ chiều ngang
+      searchBox.style.margin = '4px 0' // Chỉ giữ margin trên-dưới, bỏ trái-phải
+      searchBox.style.padding = '2px 8px' // Padding trái-phải để chữ không sát mép
+      searchBox.style.border = '1px solid #ccc'
+      searchBox.style.position = 'sticky'
+      searchBox.style.top = '0' // Sửa '1' thành '0' cho chuẩn vị trí sticky
+      searchBox.style.background = '#ffb6c1' // Màu hồng phấn
+      searchBox.style.zIndex = '1'
+      searchBox.style.boxSizing = 'border-box' // Đảm bảo padding không làm vượt kích thước
+      dropdown.appendChild(searchBox)
+
       // option: tất cả
       const allDiv = document.createElement('div')
       const allCb = document.createElement('input')
@@ -111,12 +161,26 @@ function renderTable(headers, data, colWidths, isMeasure) {
       allLbl.textContent = '(Tất cả)'
       allDiv.appendChild(allCb)
       allDiv.appendChild(allLbl)
+      allDiv.style.position = 'sticky'
+      allDiv.style.top = '21px' // Giữ nguyên nếu chiều cao searchBox không đổi
+      allDiv.style.background = '#b0c4de' // Màu xanh xám
+      allDiv.style.zIndex = '1'
+      allDiv.style.padding = '4px 8px' // Padding trái-phải để chữ không sát mép, trên-dưới giữ nhỏ
+      allDiv.style.width = '100%' // Căng toàn bộ chiều ngang
+      allDiv.style.boxSizing = 'border-box' // Đảm bảo padding không làm vượt kích thước
       dropdown.appendChild(allDiv)
-      dropdown.appendChild(document.createElement('hr'))
+
+      const hr = document.createElement('hr')
+      hr.style.margin = '0'
+      hr.style.position = 'sticky'
+      hr.style.top = '45px' // Khoảng sau searchBox (30px) + allDiv (30px)
+      hr.style.zIndex = '1'
+      dropdown.appendChild(hr)
 
       // options distinct
       distinct.forEach((v) => {
         const item = document.createElement('div')
+        item.setAttribute('data-value', v)
         const cb = document.createElement('input')
         cb.type = 'checkbox'
         cb.value = v
@@ -126,7 +190,18 @@ function renderTable(headers, data, colWidths, isMeasure) {
         lbl.textContent = v
         item.appendChild(cb)
         item.appendChild(lbl)
+        item.style.padding = '6px 8px' // Tăng padding để giãn dòng
+        item.style.margin = '2px 0' // Thêm margin trên-dưới để các dòng cách nhau
         dropdown.appendChild(item)
+      })
+
+      // Lọc option theo search
+      searchBox.addEventListener('input', () => {
+        const keyword = normalizeUnicode(searchBox.value)
+        dropdown.querySelectorAll('div[data-value]').forEach((item) => {
+          const text = normalizeUnicode(item.innerText)
+          item.style.display = text.includes(keyword) ? '' : 'none'
+        })
       })
 
       // mở/đóng dropdown
@@ -134,6 +209,8 @@ function renderTable(headers, data, colWidths, isMeasure) {
         ev.stopPropagation()
         dropdown.style.display =
           dropdown.style.display === 'none' ? 'block' : 'none'
+
+        adjustHeaderContainerWidth()
       }
 
       // áp dụng filter
@@ -211,6 +288,8 @@ function renderTable(headers, data, colWidths, isMeasure) {
       comboWrapper.appendChild(display)
       comboWrapper.appendChild(dropdown)
       th.appendChild(comboWrapper)
+
+      adjustHeaderContainerWidth()
     }
 
     th.appendChild(btn)
@@ -221,13 +300,13 @@ function renderTable(headers, data, colWidths, isMeasure) {
   let lastSelectedIndex = null
 
   // Body
-  data.forEach((row, rowIndex) => {
+  visibleData.forEach((row, rowIndex) => {
     const tr = document.createElement('tr')
     row.forEach((cell, idx) => {
       const td = document.createElement('td')
-      td.textContent = isMeasure[idx] ? formatNumber(cell) : cell
-      td.style.minWidth = colWidths[idx] + 'px'
-      td.style.textAlign = isMeasure[idx] ? 'right' : 'left'
+      td.textContent = visibleIsMeasure[idx] ? formatNumber(cell) : cell
+      td.style.minWidth = visibleColWidths[idx] + 'px'
+      td.style.textAlign = visibleIsMeasure[idx] ? 'right' : 'left'
       tr.appendChild(td)
     })
 
@@ -284,10 +363,10 @@ function renderTable(headers, data, colWidths, isMeasure) {
 
   // === Dòng tổng cuối bảng ===
   const totals = []
-  isMeasure.forEach((isM, idx) => {
+  visibleIsMeasure.forEach((isM, idx) => {
     if (isM) {
       let sum = 0
-      data.forEach((r) => {
+      visibleData.forEach((r) => {
         const val = Number(r[idx].toString().replace(/,/g, ''))
         if (!isNaN(val)) sum += val
       })
@@ -301,18 +380,21 @@ function renderTable(headers, data, colWidths, isMeasure) {
   totalRow.classList.add('total-row') // 👈 thêm dòng này
   totalRow.style.fontWeight = 'bold'
   totalRow.style.backgroundColor = '#f2f2f2' // nền xám nhạt
+  totalRow.style.color = 'red' // ✅ Thêm màu chữ đỏ
 
+  const dimCount = visibleIsMeasure.filter((v) => !v).length
   let firstDimHandled = false
-  isMeasure.forEach((isM, idx) => {
-    const td = document.createElement('td')
+
+  visibleIsMeasure.forEach((isM, idx) => {
     if (!isM && !firstDimHandled) {
+      const td = document.createElement('td')
       td.textContent = 'Tổng cộng'
-      td.colSpan = isMeasure.findIndex((v) => v) // gộp hết dimension
+      td.colSpan = dimCount
       td.style.textAlign = 'left'
       totalRow.appendChild(td)
       firstDimHandled = true
-    }
-    if (isM) {
+    } else if (isM) {
+      const td = document.createElement('td')
       td.textContent = formatNumber(totals[idx])
       td.style.textAlign = 'right'
       totalRow.appendChild(td)
@@ -385,16 +467,16 @@ function loadAndRender(worksheet) {
       return Math.min(300, Math.max(30, rawWidth)) // giới hạn min = 30, max = 300
     })
 
-    // 👉 Tính tổng width thực của table
-    const totalTableWidth = colWidths.reduce((a, b) => a + b, 0)
+    renderTable(headers, data, colWidths, isMeasure)
 
-    // Gán width cho table và header-container
+    // Sau khi render xong, lấy width thực của table
     const tableEl = document.getElementById('data-table')
     const headerContainer = document.querySelector('.header-container')
-    if (tableEl) tableEl.style.width = totalTableWidth + 'px'
-    if (headerContainer) headerContainer.style.width = totalTableWidth + 'px'
+    if (tableEl && headerContainer) {
+      const tableWidth = tableEl.offsetWidth
+      headerContainer.style.width = tableWidth + 'px'
+    }
 
-    renderTable(headers, data, colWidths, isMeasure)
     attachGlobalSearch()
   })
 }
@@ -405,10 +487,11 @@ function attachGlobalSearch() {
   if (!searchInput) return
 
   searchInput.addEventListener('input', () => {
-    const keyword = searchInput.value.toLowerCase()
+    const keyword = normalizeUnicode(searchInput.value)
     const tbody = document.getElementById('table-body')
+
     tbody.querySelectorAll('tr').forEach((tr) => {
-      const rowText = tr.textContent.toLowerCase()
+      const rowText = normalizeUnicode(tr.textContent)
       tr.style.display = rowText.includes(keyword) ? '' : 'none'
     })
   })
