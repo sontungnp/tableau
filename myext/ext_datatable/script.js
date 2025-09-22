@@ -381,8 +381,18 @@ function loadAndRender(worksheet) {
       const maxCellWidth = Math.max(
         ...data.map((r) => getTextWidth(r[idx] || ''))
       )
-      return Math.max(headerWidth, maxCellWidth) + 20
+      const rawWidth = Math.max(headerWidth, maxCellWidth) + 20
+      return Math.min(300, Math.max(30, rawWidth)) // giới hạn min = 30, max = 300
     })
+
+    // 👉 Tính tổng width thực của table
+    const totalTableWidth = colWidths.reduce((a, b) => a + b, 0)
+
+    // Gán width cho table và header-container
+    const tableEl = document.getElementById('data-table')
+    const headerContainer = document.querySelector('.header-container')
+    if (tableEl) tableEl.style.width = totalTableWidth + 'px'
+    if (headerContainer) headerContainer.style.width = totalTableWidth + 'px'
 
     renderTable(headers, data, colWidths, isMeasure)
     attachGlobalSearch()
