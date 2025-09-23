@@ -25,6 +25,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
     <script src="script.js"></script>
     <style>
@@ -94,7 +96,7 @@
         z-index: 8; /* thấp hơn header nhưng cao hơn body */
       }
 
-      tr.selected-row {
+      tr.row-selected {
         background-color: #e6d3c6 !important; /* nâu nhạt */
       }
     </style>
@@ -114,6 +116,7 @@
           border-radius: 4px;
         "
       />
+      <button id="btn-export">Export Excel</button>
     </div>
     <table id="data-table">
       <thead>

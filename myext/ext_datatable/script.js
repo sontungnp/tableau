@@ -16,11 +16,11 @@ function adjustHeaderContainerWidth() {
 }
 
 // Hàm đo độ rộng text
-function getTextWidth(text, font = '14px Arial') {
-  const canvas = document.createElement('canvas')
-  const context = canvas.getContext('2d')
-  context.font = font
-  return context.measureText(text).width
+const canvas = document.createElement('canvas')
+const ctx = canvas.getContext('2d')
+ctx.font = '14px Arial'
+function getTextWidth(text) {
+  return ctx.measureText(text).width
 }
 
 // Hàm format số
@@ -184,14 +184,20 @@ function renderTable(headers, data, colWidths, isMeasure) {
         const cb = document.createElement('input')
         cb.type = 'checkbox'
         cb.value = v
-        cb.checked = true
+
+        // ✅ giữ lại trạng thái đã chọn
+        if (!activeFilters[idx]) {
+          activeFilters[idx] = distinct.slice() // lần đầu thì chọn tất cả
+        }
+        cb.checked = activeFilters[idx].includes(v)
+
         cb.style.marginRight = '6px'
         const lbl = document.createElement('span')
         lbl.textContent = v
         item.appendChild(cb)
         item.appendChild(lbl)
-        item.style.padding = '6px 8px' // Tăng padding để giãn dòng
-        item.style.margin = '2px 0' // Thêm margin trên-dưới để các dòng cách nhau
+        item.style.padding = '6px 8px'
+        item.style.margin = '2px 0'
         dropdown.appendChild(item)
       })
 
@@ -207,52 +213,60 @@ function renderTable(headers, data, colWidths, isMeasure) {
       // mở/đóng dropdown
       display.onclick = (ev) => {
         ev.stopPropagation()
-        dropdown.style.display =
-          dropdown.style.display === 'none' ? 'block' : 'none'
+        dropdown.style.display = 'block'
+        dropdown.classList.add('dropdown-open')
 
         adjustHeaderContainerWidth()
       }
 
       // áp dụng filter
       function applyFilter() {
-        const selected = []
-        dropdown.querySelectorAll('input[type=checkbox]').forEach((cb) => {
-          if (cb.checked && cb.value) selected.push(cb.value)
-        })
+        const filterCols = Object.entries(activeFilters).filter(
+          ([_, v]) => v.length > 0
+        )
 
-        let textShow
-        if (allCb.checked || selected.length === 0) {
-          textShow = '(Tất cả)'
-        } else if (selected.length <= 2) {
-          textShow = selected.join(', ')
-        } else {
-          textShow =
-            selected.slice(0, 2).join(', ') + ` (+${selected.length - 2})`
-        }
+        // Reset tổng
+        let totals = Array(visibleIsMeasure.length).fill(0)
 
-        // đổi text hiển thị
-        display.childNodes[0].nodeValue = textShow
-
-        // cập nhật filter cho cột này
-        activeFilters[idx] = allCb.checked ? [] : selected
-
-        // lọc bảng dựa trên tất cả filter
-        tbody.querySelectorAll('tr').forEach((tr) => {
-          let show = true
-          for (const [colIdx, values] of Object.entries(activeFilters)) {
-            if (values.length === 0) continue
-            const idxNum = parseInt(colIdx, 10) // 👈 ép về số
-            const cell = tr.children[idxNum]
-            if (!cell) continue // tránh undefined
-            const cellValue = cell.textContent
-            if (!values.includes(cellValue)) {
-              show = false
-              break
-            }
-          }
-
+        tbody.querySelectorAll('tr:not(.total-row)').forEach((tr, rowIndex) => {
+          const row = visibleData[rowIndex]
+          const show = filterCols.every(([colIdx, values]) =>
+            values.includes(row[colIdx])
+          )
           tr.style.display = show ? '' : 'none'
+
+          // Nếu dòng được hiển thị thì cộng vào tổng
+          if (show) {
+            row.forEach((cell, idx) => {
+              if (visibleIsMeasure[idx]) {
+                const val = Number(cell.toString().replace(/,/g, ''))
+                if (!isNaN(val)) totals[idx] += val
+              }
+            })
+          }
         })
+
+        // ✅ Cập nhật lại dòng tổng
+        const totalRow = tbody.querySelector('.total-row')
+        if (totalRow) {
+          totalRow.innerHTML = ''
+          let firstDimHandled = false
+          visibleIsMeasure.forEach((isM, idx) => {
+            if (!isM && !firstDimHandled) {
+              const td = document.createElement('td')
+              td.textContent = 'Tổng cộng'
+              td.colSpan = visibleIsMeasure.filter((v) => !v).length
+              td.style.textAlign = 'left'
+              totalRow.appendChild(td)
+              firstDimHandled = true
+            } else if (isM) {
+              const td = document.createElement('td')
+              td.textContent = formatNumber(totals[idx])
+              td.style.textAlign = 'right'
+              totalRow.appendChild(td)
+            }
+          })
+        }
       }
 
       // check/uncheck tất cả
@@ -261,6 +275,18 @@ function renderTable(headers, data, colWidths, isMeasure) {
         dropdown.querySelectorAll('input[type=checkbox]').forEach((cb) => {
           if (cb !== allCb) cb.checked = checked
         })
+
+        // cập nhật activeFilters
+        activeFilters[idx] = checked ? distinct.slice() : []
+
+        // 👉 cập nhật label hiển thị
+        if (checked) {
+          display.textContent = '(Tất cả)'
+        } else {
+          display.textContent = '(Trống)'
+        }
+        display.appendChild(arrow) // giữ lại icon ▼
+
         applyFilter()
       }
 
@@ -268,11 +294,27 @@ function renderTable(headers, data, colWidths, isMeasure) {
       dropdown.querySelectorAll('input[type=checkbox]').forEach((cb) => {
         if (cb !== allCb) {
           cb.onchange = () => {
-            // nếu tất cả con đều check thì tick lại "Tất cả"
             const allChildren = Array.from(
               dropdown.querySelectorAll('input[type=checkbox]')
             ).filter((x) => x !== allCb)
+
             allCb.checked = allChildren.every((x) => x.checked)
+
+            const selected = allChildren
+              .filter((x) => x.checked)
+              .map((x) => x.value)
+            activeFilters[idx] = selected
+
+            // 👉 cập nhật label hiển thị
+            if (selected.length === distinct.length) {
+              display.textContent = '(Tất cả)'
+            } else if (selected.length === 0) {
+              display.textContent = '(Trống)'
+            } else {
+              display.textContent = selected.join(', ')
+            }
+            display.appendChild(arrow) // giữ lại icon ▼
+
             applyFilter()
           }
         }
@@ -300,66 +342,44 @@ function renderTable(headers, data, colWidths, isMeasure) {
   let lastSelectedIndex = null
 
   // Body
+  const fragment = document.createDocumentFragment()
   visibleData.forEach((row, rowIndex) => {
     const tr = document.createElement('tr')
-    row.forEach((cell, idx) => {
-      const td = document.createElement('td')
-      td.textContent = visibleIsMeasure[idx] ? formatNumber(cell) : cell
-      td.style.minWidth = visibleColWidths[idx] + 'px'
-      td.style.textAlign = visibleIsMeasure[idx] ? 'right' : 'left'
-      tr.appendChild(td)
-    })
+    tr.innerHTML = row
+      .map((cell, idx) => {
+        const align = visibleIsMeasure[idx] ? 'right' : 'left'
+        const content = visibleIsMeasure[idx] ? formatNumber(cell) : cell
+        return `<td style="min-width:${visibleColWidths[idx]}px;text-align:${align}">${content}</td>`
+      })
+      .join('')
 
-    // Click chọn dòng
+    // ✅ Gắn event để highlight dòng khi chọn
     tr.addEventListener('click', (e) => {
-      if (e.shiftKey && lastSelectedIndex !== null) {
-        // chọn range
-        const trs = Array.from(tbody.querySelectorAll('tr'))
+      if (e.ctrlKey) {
+        // Multi-select với Ctrl
+        tr.classList.toggle('row-selected')
+      } else if (e.shiftKey && lastSelectedIndex !== null) {
+        // Chọn nhiều dòng liên tục với Shift
         const start = Math.min(lastSelectedIndex, rowIndex)
         const end = Math.max(lastSelectedIndex, rowIndex)
-        for (let i = start; i <= end; i++) {
-          trs[i].classList.add('selected-row')
-        }
-      } else if (e.ctrlKey || e.metaKey) {
-        // toggle
-        tr.classList.toggle('selected-row')
-        lastSelectedIndex = rowIndex
+        tbody.querySelectorAll('tr').forEach((r, i) => {
+          if (i >= start && i <= end) {
+            r.classList.add('row-selected')
+          }
+        })
       } else {
-        // chỉ chọn 1
+        // Chọn 1 dòng
         tbody
           .querySelectorAll('tr')
-          .forEach((tr2) => tr2.classList.remove('selected-row'))
-        tr.classList.add('selected-row')
-        lastSelectedIndex = rowIndex
+          .forEach((r) => r.classList.remove('row-selected'))
+        tr.classList.add('row-selected')
       }
+      lastSelectedIndex = rowIndex
     })
 
-    tbody.appendChild(tr)
+    fragment.appendChild(tr)
   })
-
-  // Copy khi Ctrl+C
-  document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.key.toLowerCase() === 'c') {
-      const selected = tbody.querySelectorAll('.selected-row')
-      if (selected.length > 0) {
-        const text = Array.from(selected)
-          .map((tr) => tr.innerText) // lấy toàn bộ nội dung dòng
-          .join('\n')
-
-        // --- Fallback cách cổ điển ---
-        const textarea = document.createElement('textarea')
-        textarea.value = text
-        document.body.appendChild(textarea)
-        textarea.select()
-        try {
-          document.execCommand('copy')
-        } catch (err) {
-          console.error('Copy thất bại:', err)
-        }
-        document.body.removeChild(textarea)
-      }
-    }
-  })
+  tbody.appendChild(fragment)
 
   // === Dòng tổng cuối bảng ===
   const totals = []
@@ -520,5 +540,55 @@ document.addEventListener('DOMContentLoaded', () => {
           )
         })
       })
+  })
+
+  // Copy khi Ctrl+C
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key.toLowerCase() === 'c') {
+      const tbody = document.getElementById('table-body') // 👈 thêm dòng này
+      const selected = tbody.querySelectorAll('.row-selected')
+      if (selected.length > 0) {
+        const text = Array.from(selected)
+          .map((tr) => tr.innerText) // lấy toàn bộ nội dung dòng
+          .join('\n')
+
+        // --- Fallback cách cổ điển ---
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        document.body.appendChild(textarea)
+        textarea.select()
+        try {
+          document.execCommand('copy')
+        } catch (err) {
+          console.error('Copy thất bại:', err)
+        }
+        document.body.removeChild(textarea)
+      }
+    }
+  })
+
+  document.addEventListener('click', (ev) => {
+    document.querySelectorAll('.dropdown-open').forEach((dd) => {
+      if (!dd.contains(ev.target)) {
+        dd.style.display = 'none'
+        dd.classList.remove('dropdown-open')
+      }
+    })
+  })
+
+  // === Export Excel ===
+  document.getElementById('btn-export').addEventListener('click', () => {
+    const table = document.getElementById('data-table')
+
+    if (!table) {
+      alert('Không tìm thấy bảng dữ liệu để export!')
+      return
+    }
+
+    // Tạo workbook từ HTML table
+    const wb = XLSX.utils.table_to_book(table, { sheet: 'Data' })
+
+    // Xuất ra file
+    XLSX.writeFile(wb, 'export.xlsx')
   })
 })
