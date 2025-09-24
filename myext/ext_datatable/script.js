@@ -2,6 +2,14 @@
 
 const activeFilters = {} // key: column index, value: array các giá trị được chọn
 
+function debounce(fn, delay) {
+  let timeout
+  return (...args) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => fn(...args), delay)
+  }
+}
+
 // Hàm chuẩn hóa chỉ để đồng bộ Unicode, không bỏ dấu
 function normalizeUnicode(str) {
   return str ? str.normalize('NFC').toLowerCase().trim() : ''
@@ -41,9 +49,14 @@ function renderTable(headers, data, colWidths, isMeasure) {
   tbody.innerHTML = ''
 
   // Xác định các cột cần ẩn
+
   const columnsToHide = headers
     .map((header, index) => ({ header, index }))
-    .filter((item) => item.header.toLowerCase().startsWith('hiden'))
+    .filter(
+      (item) =>
+        item.header.toLowerCase().startsWith('hiden') ||
+        item.header.startsWith('AGG')
+    )
     .map((item) => item.index)
 
   // Lọc chỉ các cột hiển thị
@@ -181,6 +194,7 @@ function renderTable(headers, data, colWidths, isMeasure) {
       distinct.forEach((v) => {
         const item = document.createElement('div')
         item.setAttribute('data-value', v)
+        item.setAttribute('data-normalized', normalizeUnicode(v)) // 👈 cache sẵn
         const cb = document.createElement('input')
         cb.type = 'checkbox'
         cb.value = v
@@ -202,13 +216,16 @@ function renderTable(headers, data, colWidths, isMeasure) {
       })
 
       // Lọc option theo search
-      searchBox.addEventListener('input', () => {
-        const keyword = normalizeUnicode(searchBox.value)
-        dropdown.querySelectorAll('div[data-value]').forEach((item) => {
-          const text = normalizeUnicode(item.innerText)
-          item.style.display = text.includes(keyword) ? '' : 'none'
-        })
-      })
+      searchBox.addEventListener(
+        'input',
+        debounce(() => {
+          const keyword = normalizeUnicode(searchBox.value)
+          dropdown.querySelectorAll('div[data-value]').forEach((item) => {
+            const text = item.getAttribute('data-normalized')
+            item.style.display = text.includes(keyword) ? '' : 'none'
+          })
+        }, 250) // 👈 debounce 250ms
+      )
 
       // mở/đóng dropdown
       display.onclick = (ev) => {
@@ -425,6 +442,8 @@ function renderTable(headers, data, colWidths, isMeasure) {
 
 // Pivot Measure Names/Values
 function pivotMeasureValues(table) {
+  console.log('table.columns', table.columns)
+
   const cols = table.columns.map((c) => c.fieldName)
   const rows = table.data.map((r) => r.map((c) => c.formattedValue))
 
@@ -579,16 +598,93 @@ document.addEventListener('DOMContentLoaded', () => {
   // === Export Excel ===
   document.getElementById('btn-export').addEventListener('click', () => {
     const table = document.getElementById('data-table')
-
     if (!table) {
       alert('Không tìm thấy bảng dữ liệu để export!')
       return
     }
 
-    // Tạo workbook từ HTML table
-    const wb = XLSX.utils.table_to_book(table, { sheet: 'Data' })
+    // Lấy header (chỉ dòng header chính)
+    const headerCells = Array.from(
+      table.querySelectorAll('thead tr#table-header th')
+    )
+    const columnsCount = headerCells.length
+    const headers = headerCells.map((th) => th.innerText.trim())
+    const rows = [headers]
 
-    // Xuất ra file
+    // Helper: chuyển text -> number nếu có thể (loại bỏ dấu phẩy)
+    function parseCellText(txt) {
+      const s = (txt || '').toString().trim()
+      if (s === '') return ''
+      // loại bỏ dấu phẩy/space
+      const n = s.replace(/,/g, '').replace(/\s+/g, '')
+      if (!isNaN(Number(n))) return Number(n)
+      return s
+    }
+
+    const tbodyRows = Array.from(table.querySelectorAll('tbody tr'))
+    let totalRowEl = null
+
+    // Duyệt body, skip .total-row (xử lý sau), chỉ lấy các dòng đang hiển thị
+    tbodyRows.forEach((tr) => {
+      if (tr.classList.contains('total-row')) {
+        totalRowEl = tr
+        return
+      }
+      if (tr.style.display === 'none') return // filter đã ẩn -> bỏ
+      const tds = Array.from(tr.querySelectorAll('td'))
+      const values = tds.map((td) => parseCellText(td.innerText))
+
+      // đảm bảo độ dài bằng columnsCount (pad/truncate nếu cần)
+      if (values.length < columnsCount) {
+        while (values.length < columnsCount) values.push('')
+      } else if (values.length > columnsCount) {
+        values.length = columnsCount
+      }
+      rows.push(values)
+    })
+
+    // Xử lý total-row (nếu có): mở rộng colspan để khớp column count
+    if (totalRowEl) {
+      const tds = Array.from(totalRowEl.querySelectorAll('td'))
+      if (tds.length > 0) {
+        const firstTd = tds[0]
+        const colspanAttr = firstTd.getAttribute('colspan')
+        const colspan = colspanAttr ? parseInt(colspanAttr, 10) || 1 : 1
+
+        const totalCells = []
+        // đặt nội dung ô đầu tiên, sau đó thêm (colspan-1) ô rỗng để "giả" colspan
+        totalCells.push(firstTd.innerText.trim())
+        for (let i = 1; i < colspan; i++) totalCells.push('')
+
+        // phần còn lại là các ô measures
+        for (let i = 1; i < tds.length; i++) {
+          totalCells.push(parseCellText(tds[i].innerText))
+        }
+
+        // pad/truncate để đạt đúng columnsCount
+        if (totalCells.length < columnsCount) {
+          while (totalCells.length < columnsCount) totalCells.push('')
+        } else if (totalCells.length > columnsCount) {
+          totalCells.length = columnsCount
+        }
+
+        // Cuối cùng push vào rows (luôn ở cuối giống trên web)
+        rows.push(totalCells)
+      }
+    }
+
+    // Tạo workbook và sheet từ array-of-arrays
+    const wb = XLSX.utils.book_new()
+    const ws = XLSX.utils.aoa_to_sheet(rows)
+
+    // Optional: set column widths dựa trên header hiển thị (wpx)
+    try {
+      ws['!cols'] = headerCells.map((th) => ({ wpx: th.offsetWidth || 80 }))
+    } catch (e) {
+      // ignore if offsetWidth không khả dụng
+    }
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Data')
     XLSX.writeFile(wb, 'export.xlsx')
   })
 })
