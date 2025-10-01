@@ -1,6 +1,6 @@
 'use strict'
 
-const activeFilters = {} // key: column index, value: array các giá trị được chọn
+const activeFilters = {} // key: column index, value: {mode: 'multi' | 'advanced', values: [] | {operator: '', value: ''}}
 
 function debounce(fn, delay) {
   let timeout
@@ -37,6 +37,49 @@ function formatNumber(value) {
   const num = Number(value.toString().replace(/,/g, ''))
   if (isNaN(num)) return value
   return num.toLocaleString('en-US') // có thể đổi sang 'vi-VN'
+}
+
+// Hàm apply advanced filter cho một row và cột
+function applyAdvancedFilter(cellValue, operator, filterValue, isMeasure) {
+  const numValue = Number(cellValue.toString().replace(/,/g, ''))
+  const strValue = normalizeUnicode(cellValue)
+
+  if (isMeasure) {
+    const numFilter = Number(filterValue)
+    if (isNaN(numValue) || isNaN(numFilter)) return false
+    switch (operator) {
+      case '=':
+        return numValue === numFilter
+      case '!=':
+        return numValue !== numFilter
+      case '>':
+        return numValue > numFilter
+      case '<':
+        return numValue < numFilter
+      case '>=':
+        return numValue >= numFilter
+      case '<=':
+        return numValue <= numFilter
+      default:
+        return true
+    }
+  } else {
+    const strFilter = normalizeUnicode(filterValue)
+    switch (operator) {
+      case 'contains':
+        return strValue.includes(strFilter)
+      case 'startsWith':
+        return strValue.startsWith(strFilter)
+      case 'endsWith':
+        return strValue.endsWith(strFilter)
+      case '=':
+        return strValue === strFilter
+      case '!=':
+        return strValue !== strFilter
+      default:
+        return true
+    }
+  }
 }
 
 // Render table
@@ -87,6 +130,7 @@ function renderTable(headers, data, colWidths, isMeasure) {
   })
 
   // filter căn giữa
+  // filter căn giữa
   visibleHeaders.forEach((h, idx) => {
     const th = document.createElement('th')
     th.style.minWidth = visibleColWidths[idx] + 'px'
@@ -105,6 +149,7 @@ function renderTable(headers, data, colWidths, isMeasure) {
 
       // wrapper
       const comboWrapper = document.createElement('div')
+      comboWrapper.className = 'combo-wrapper' // ✅ Thêm dòng này
       comboWrapper.style.position = 'relative'
       comboWrapper.style.width = '100%'
 
@@ -153,16 +198,34 @@ function renderTable(headers, data, colWidths, isMeasure) {
       const searchBox = document.createElement('input')
       searchBox.type = 'text'
       searchBox.placeholder = 'Tìm...'
-      searchBox.style.width = '100%' // Căng toàn bộ chiều ngang
-      searchBox.style.margin = '4px 0' // Chỉ giữ margin trên-dưới, bỏ trái-phải
-      searchBox.style.padding = '2px 8px' // Padding trái-phải để chữ không sát mép
+      searchBox.style.width = '100%'
+      searchBox.style.margin = '4px 0'
+      searchBox.style.padding = '2px 8px'
       searchBox.style.border = '1px solid #ccc'
       searchBox.style.position = 'sticky'
-      searchBox.style.top = '0' // Sửa '1' thành '0' cho chuẩn vị trí sticky
+      searchBox.style.top = '0'
       searchBox.style.background = '#ffb6c1' // Màu hồng phấn
       searchBox.style.zIndex = '1'
-      searchBox.style.boxSizing = 'border-box' // Đảm bảo padding không làm vượt kích thước
+      searchBox.style.boxSizing = 'border-box'
       dropdown.appendChild(searchBox)
+
+      // ✅ THÊM NÚT NÂNG CAO (sticky sau searchBox)
+      const advancedBtn = document.createElement('button')
+      advancedBtn.textContent = 'Nâng cao'
+      advancedBtn.style.display = 'block'
+      advancedBtn.style.width = '100%'
+      advancedBtn.style.padding = '4px 8px'
+      advancedBtn.style.background = '#4CAF50'
+      advancedBtn.style.color = 'white'
+      advancedBtn.style.border = 'none'
+      advancedBtn.style.borderRadius = '4px'
+      advancedBtn.style.margin = '4px 0'
+      advancedBtn.style.cursor = 'pointer'
+      advancedBtn.style.fontSize = '12px'
+      advancedBtn.style.position = 'sticky'
+      advancedBtn.style.top = '21px'
+      advancedBtn.style.zIndex = '1'
+      dropdown.appendChild(advancedBtn)
 
       // option: tất cả
       const allDiv = document.createElement('div')
@@ -175,35 +238,42 @@ function renderTable(headers, data, colWidths, isMeasure) {
       allDiv.appendChild(allCb)
       allDiv.appendChild(allLbl)
       allDiv.style.position = 'sticky'
-      allDiv.style.top = '21px' // Giữ nguyên nếu chiều cao searchBox không đổi
+      allDiv.style.top = '52px' // Điều chỉnh sau khi thêm advancedBtn (21px search + ~20px btn + margin)
       allDiv.style.background = '#b0c4de' // Màu xanh xám
       allDiv.style.zIndex = '1'
-      allDiv.style.padding = '4px 8px' // Padding trái-phải để chữ không sát mép, trên-dưới giữ nhỏ
-      allDiv.style.width = '100%' // Căng toàn bộ chiều ngang
-      allDiv.style.boxSizing = 'border-box' // Đảm bảo padding không làm vượt kích thước
+      allDiv.style.padding = '4px 8px'
+      allDiv.style.width = '100%'
+      allDiv.style.boxSizing = 'border-box'
       dropdown.appendChild(allDiv)
 
       const hr = document.createElement('hr')
       hr.style.margin = '0'
       hr.style.position = 'sticky'
-      hr.style.top = '45px' // Khoảng sau searchBox (30px) + allDiv (30px)
+      hr.style.top = '76px' // Điều chỉnh tương ứng
       hr.style.zIndex = '1'
       dropdown.appendChild(hr)
 
-      // options distinct
+      // options distinct (ban đầu hiển thị nếu mode multi)
+      const optionsContainer = document.createElement('div')
+      optionsContainer.id = `options-${idx}` // Để toggle visibility
       distinct.forEach((v) => {
         const item = document.createElement('div')
         item.setAttribute('data-value', v)
-        item.setAttribute('data-normalized', normalizeUnicode(v)) // 👈 cache sẵn
+        item.setAttribute('data-normalized', normalizeUnicode(v))
         const cb = document.createElement('input')
         cb.type = 'checkbox'
         cb.value = v
 
-        // ✅ giữ lại trạng thái đã chọn
+        // Khởi tạo activeFilters nếu chưa có
         if (!activeFilters[idx]) {
-          activeFilters[idx] = distinct.slice() // lần đầu thì chọn tất cả
+          activeFilters[idx] = { mode: 'multi', values: distinct.slice() }
         }
-        cb.checked = activeFilters[idx].includes(v)
+        const filter = activeFilters[idx]
+        if (filter.mode === 'multi') {
+          cb.checked = filter.values.includes(v)
+        } else {
+          cb.style.display = 'none' // Ẩn checkboxes nếu advanced mode
+        }
 
         cb.style.marginRight = '6px'
         const lbl = document.createElement('span')
@@ -212,20 +282,41 @@ function renderTable(headers, data, colWidths, isMeasure) {
         item.appendChild(lbl)
         item.style.padding = '6px 8px'
         item.style.margin = '2px 0'
-        dropdown.appendChild(item)
+        optionsContainer.appendChild(item)
       })
+      dropdown.appendChild(optionsContainer)
 
-      // Lọc option theo search
+      // Lọc option theo search (chỉ cho multi mode)
       searchBox.addEventListener(
         'input',
         debounce(() => {
+          if (activeFilters[idx]?.mode !== 'multi') return
           const keyword = normalizeUnicode(searchBox.value)
-          dropdown.querySelectorAll('div[data-value]').forEach((item) => {
-            const text = item.getAttribute('data-normalized')
-            item.style.display = text.includes(keyword) ? '' : 'none'
-          })
-        }, 250) // 👈 debounce 250ms
+          optionsContainer
+            .querySelectorAll('div[data-value]')
+            .forEach((item) => {
+              const text = item.getAttribute('data-normalized')
+              item.style.display = text.includes(keyword) ? '' : 'none'
+            })
+        }, 250)
       )
+
+      // Mở advanced modal
+      advancedBtn.onclick = (e) => {
+        e.stopPropagation()
+        openAdvancedModal(idx, visibleIsMeasure[idx], visibleData, distinct)
+      }
+
+      // Toggle dropdown visibility và mode
+      function toggleOptionsVisibility() {
+        const show = activeFilters[idx]?.mode === 'multi'
+        optionsContainer.style.display = show ? 'block' : 'none'
+        allDiv.style.display = show ? '' : 'none'
+        hr.style.display = show ? '' : 'none'
+        searchBox.style.display = show ? '' : 'none'
+        advancedBtn.style.display = show ? '' : 'block' // Luôn show nút nâng cao
+      }
+      toggleOptionsVisibility() // Khởi tạo
 
       // mở/đóng dropdown
       display.onclick = (ev) => {
@@ -236,39 +327,51 @@ function renderTable(headers, data, colWidths, isMeasure) {
         adjustHeaderContainerWidth()
       }
 
-      // áp dụng filter
+      // áp dụng filter (cập nhật để handle advanced)
       function applyFilter() {
-        const filterCols = Object.entries(activeFilters).filter(
-          ([_, v]) => v.length > 0
-        )
+        const filterCols = Object.entries(activeFilters).filter(([_, f]) => {
+          if (f.mode === 'multi') return f.values.length > 0
+          return f.mode === 'advanced' && f.operator && f.value !== ''
+        })
 
         // Reset tổng
         let totals = Array(visibleIsMeasure.length).fill(0)
 
         tbody.querySelectorAll('tr:not(.total-row)').forEach((tr, rowIndex) => {
           const row = visibleData[rowIndex]
-          const show = filterCols.every(([colIdx, values]) =>
-            values.includes(row[colIdx])
-          )
+          const show = filterCols.every(([colIdxStr, f]) => {
+            const colIdx = parseInt(colIdxStr)
+            if (f.mode === 'multi') {
+              return f.values.includes(row[colIdx])
+            } else if (f.mode === 'advanced') {
+              return applyAdvancedFilter(
+                row[colIdx],
+                f.operator,
+                f.value,
+                visibleIsMeasure[colIdx]
+              )
+            }
+            return true
+          })
           tr.style.display = show ? '' : 'none'
 
           // Nếu dòng được hiển thị thì cộng vào tổng
           if (show) {
-            row.forEach((cell, idx) => {
-              if (visibleIsMeasure[idx]) {
+            row.forEach((cell, cIdx) => {
+              if (visibleIsMeasure[cIdx]) {
                 const val = Number(cell.toString().replace(/,/g, ''))
-                if (!isNaN(val)) totals[idx] += val
+                if (!isNaN(val)) totals[cIdx] += val
               }
             })
           }
         })
 
-        // ✅ Cập nhật lại dòng tổng
+        // Cập nhật lại dòng tổng
         const totalRow = tbody.querySelector('.total-row')
         if (totalRow) {
           totalRow.innerHTML = ''
           let firstDimHandled = false
-          visibleIsMeasure.forEach((isM, idx) => {
+          visibleIsMeasure.forEach((isM, cIdx) => {
             if (!isM && !firstDimHandled) {
               const td = document.createElement('td')
               td.textContent = 'Tổng cộng'
@@ -278,69 +381,93 @@ function renderTable(headers, data, colWidths, isMeasure) {
               firstDimHandled = true
             } else if (isM) {
               const td = document.createElement('td')
-              td.textContent = formatNumber(totals[idx])
+              td.textContent = formatNumber(totals[cIdx])
               td.style.textAlign = 'right'
               totalRow.appendChild(td)
             }
           })
         }
+
+        // Cập nhật display label
+        updateDisplayLabel()
       }
 
-      // check/uncheck tất cả
-      allCb.onchange = () => {
-        const checked = allCb.checked
-        dropdown.querySelectorAll('input[type=checkbox]').forEach((cb) => {
-          if (cb !== allCb) cb.checked = checked
-        })
-
-        // cập nhật activeFilters
-        activeFilters[idx] = checked ? distinct.slice() : []
-
-        // 👉 cập nhật label hiển thị
-        if (checked) {
-          display.textContent = '(Tất cả)'
+      // Cập nhật label hiển thị (như code cũ cho multi, cải thiện advanced với icon + tooltip)
+      function updateDisplayLabel() {
+        const filter = activeFilters[idx]
+        if (filter.mode === 'multi') {
+          const selected = filter.values
+          if (selected.length === distinct.length) {
+            display.textContent = '(Tất cả)'
+          } else if (selected.length === 0) {
+            display.textContent = '(Trống)'
+          } else {
+            // Giữ nguyên code cũ: join bằng comma, CSS sẽ tự ellipsis nếu dài
+            display.textContent = selected.join(', ')
+          }
         } else {
-          display.textContent = '(Trống)'
+          // ✅ Cải thiện advanced: Thêm icon ⚙️, text ngắn gọn, và tooltip full info
+          // ✅ Fix: Thêm quote cho tất cả keys string
+          const operatorLabel =
+            {
+              '=': '=',
+              '!=': '≠',
+              '>': '>',
+              '<': '<',
+              '>=': '≥',
+              '<=': '≤',
+              contains: 'Chứa',
+              startsWith: 'Bắt đầu',
+              endsWith: 'Kết thúc'
+            }[filter.operator] || filter.operator // Symbol ngắn gọn cho operator
+          display.textContent = `⚙️ ${operatorLabel} ${filter.value}` // Icon + short label
+          // Tooltip: Hiển thị full khi hover (không cần mở dropdown)
+          const colType = visibleIsMeasure[idx] ? 'số' : 'chuỗi'
+          display.title = `Advanced Filter đang áp dụng: ${filter.operator} ${filter.value} (cột ${colType})`
         }
-        display.appendChild(arrow) // giữ lại icon ▼
+        display.appendChild(arrow)
+      }
 
+      // check/uncheck tất cả (chỉ cho multi)
+      allCb.onchange = () => {
+        if (activeFilters[idx]?.mode !== 'multi') return
+        const checked = allCb.checked
+        optionsContainer
+          .querySelectorAll('input[type=checkbox]')
+          .forEach((cb) => {
+            if (cb !== allCb) cb.checked = checked
+          })
+        activeFilters[idx].values = checked ? distinct.slice() : []
+        updateDisplayLabel()
         applyFilter()
       }
 
-      // gắn cho từng checkbox con
-      dropdown.querySelectorAll('input[type=checkbox]').forEach((cb) => {
-        if (cb !== allCb) {
-          cb.onchange = () => {
-            const allChildren = Array.from(
-              dropdown.querySelectorAll('input[type=checkbox]')
-            ).filter((x) => x !== allCb)
-
-            allCb.checked = allChildren.every((x) => x.checked)
-
-            const selected = allChildren
-              .filter((x) => x.checked)
-              .map((x) => x.value)
-            activeFilters[idx] = selected
-
-            // 👉 cập nhật label hiển thị
-            if (selected.length === distinct.length) {
-              display.textContent = '(Tất cả)'
-            } else if (selected.length === 0) {
-              display.textContent = '(Trống)'
-            } else {
-              display.textContent = selected.join(', ')
+      // gắn cho từng checkbox con (chỉ cho multi)
+      optionsContainer
+        .querySelectorAll('input[type=checkbox]')
+        .forEach((cb) => {
+          if (cb !== allCb) {
+            cb.onchange = () => {
+              if (activeFilters[idx]?.mode !== 'multi') return
+              const allChildren = Array.from(
+                optionsContainer.querySelectorAll('input[type=checkbox]')
+              ).filter((x) => x !== allCb)
+              allCb.checked = allChildren.every((x) => x.checked)
+              const selected = allChildren
+                .filter((x) => x.checked)
+                .map((x) => x.value)
+              activeFilters[idx].values = selected
+              updateDisplayLabel()
+              applyFilter()
             }
-            display.appendChild(arrow) // giữ lại icon ▼
-
-            applyFilter()
           }
-        }
-      })
+        })
 
       // click ra ngoài thì đóng dropdown
       document.addEventListener('click', function closeDropdown(ev) {
         if (!comboWrapper.contains(ev.target)) {
           dropdown.style.display = 'none'
+          dropdown.classList.remove('dropdown-open')
         }
       })
 
@@ -349,6 +476,7 @@ function renderTable(headers, data, colWidths, isMeasure) {
       th.appendChild(comboWrapper)
 
       adjustHeaderContainerWidth()
+      applyFilter() // Áp dụng initial filter
     }
 
     th.appendChild(btn)
@@ -365,7 +493,16 @@ function renderTable(headers, data, colWidths, isMeasure) {
     tr.innerHTML = row
       .map((cell, idx) => {
         const align = visibleIsMeasure[idx] ? 'right' : 'left'
-        const content = visibleIsMeasure[idx] ? formatNumber(cell) : cell
+        const safeCell =
+          !cell ||
+          (typeof cell === 'string' && cell.trim().toLowerCase() === 'null')
+            ? ''
+            : cell
+
+        const content = visibleIsMeasure[idx]
+          ? formatNumber(safeCell)
+          : safeCell
+
         return `<td style="min-width:${visibleColWidths[idx]}px;text-align:${align}">${content}</td>`
       })
       .join('')
@@ -440,12 +577,242 @@ function renderTable(headers, data, colWidths, isMeasure) {
   tbody.appendChild(totalRow)
 }
 
+// Modal cho advanced filter (global)
+let advancedModal = null
+function createAdvancedModal() {
+  if (advancedModal) return advancedModal
+
+  advancedModal = document.createElement('dialog')
+  advancedModal.style.position = 'fixed'
+  advancedModal.style.top = '50%'
+  advancedModal.style.left = '50%'
+  advancedModal.style.transform = 'translate(-50%, -50%)'
+  advancedModal.style.width = '300px'
+  advancedModal.style.padding = '20px'
+  advancedModal.style.border = 'none'
+  advancedModal.style.borderRadius = '8px'
+  advancedModal.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)'
+  advancedModal.style.background = '#fff'
+  advancedModal.innerHTML = `
+    <h3>Tìm kiếm nâng cao</h3>
+    <label>Điều kiện:</label>
+    <select id="adv-operator"></select>
+    <input type="text" id="adv-value" placeholder="Nhập giá trị..." style="width:100%; margin:10px 0; padding:5px;">
+    <div style="text-align:right;">
+      <button id="adv-apply" style="margin-right:10px;">Áp dụng</button>
+      <button id="adv-clear">Xóa</button>
+    </div>
+  `
+  document.body.appendChild(advancedModal)
+
+  // Close khi click outside (polyfill cho dialog cũ)
+  advancedModal.addEventListener('click', (e) => {
+    if (e.target === advancedModal) advancedModal.close()
+  })
+
+  return advancedModal
+}
+
+function openAdvancedModal(colIdx, isMeasure, visibleData, distinct) {
+  const modal = createAdvancedModal()
+  const operatorSelect = modal.querySelector('#adv-operator')
+  const valueInput = modal.querySelector('#adv-value')
+  const applyBtn = modal.querySelector('#adv-apply')
+  const clearBtn = modal.querySelector('#adv-clear')
+
+  // Operators tùy loại cột
+  const operators = isMeasure
+    ? [
+        { value: '=', label: 'Bằng (=)' },
+        { value: '!=', label: 'Không bằng (!=)' },
+        { value: '>', label: 'Lớn hơn (>)' },
+        { value: '<', label: 'Nhỏ hơn (<)' },
+        { value: '>=', label: 'Lớn hơn hoặc bằng (>=-)' },
+        { value: '<=', label: 'Nhỏ hơn hoặc bằng (<=)' }
+      ]
+    : [
+        { value: 'contains', label: 'Chứa (contains)' },
+        { value: 'startsWith', label: 'Bắt đầu bằng (startsWith)' },
+        { value: 'endsWith', label: 'Kết thúc bằng (endsWith)' },
+        { value: '=', label: 'Bằng (=)' },
+        { value: '!=', label: 'Không bằng (!=)' }
+      ]
+
+  operatorSelect.innerHTML = operators
+    .map((op) => `<option value="${op.value}">${op.label}</option>`)
+    .join('')
+
+  // Load current filter
+  const currentFilter = activeFilters[colIdx]
+  if (currentFilter?.mode === 'advanced') {
+    operatorSelect.value = currentFilter.operator
+    valueInput.value = currentFilter.value
+  } else {
+    // Default: contains hoặc = cho string/number
+    operatorSelect.value = isMeasure ? '=' : 'contains'
+    valueInput.value = ''
+  }
+
+  // Validate input cho number
+  valueInput.oninput = () => {
+    if (isMeasure && valueInput.value && isNaN(Number(valueInput.value))) {
+      valueInput.style.borderColor = 'red'
+    } else {
+      valueInput.style.borderColor = '#ccc'
+    }
+  }
+
+  // Apply
+  applyBtn.onclick = () => {
+    const operator = operatorSelect.value
+    const value = valueInput.value.trim()
+    if (!value) {
+      alert('Vui lòng nhập giá trị!')
+      return
+    }
+    if (isMeasure && isNaN(Number(value))) {
+      alert('Giá trị phải là số!')
+      return
+    }
+
+    activeFilters[colIdx] = { mode: 'advanced', operator, value }
+    applyFilterGlobal(colIdx) // Truyền colIdx để update label
+    modal.close()
+  }
+
+  // Clear
+  clearBtn.onclick = () => {
+    delete activeFilters[colIdx]
+    activeFilters[colIdx] = { mode: 'multi', values: distinct.slice() } // Reset về multi all
+    applyFilterGlobal(colIdx) // Truyền colIdx để update label
+    modal.close()
+  }
+
+  modal.showModal()
+}
+
+// Global applyFilter (gọi từ modal) – Fix: Update label thủ công cho changed col
+function applyFilterGlobal(changedColIdx = null) {
+  if (window.currentVisibleData && window.currentVisibleIsMeasure) {
+    const tbody = document.getElementById('table-body')
+    if (!tbody) return
+
+    const filterCols = Object.entries(activeFilters).filter(([_, f]) => {
+      if (f.mode === 'multi') return f.values.length > 0
+      return f.mode === 'advanced' && f.operator && f.value !== ''
+    })
+
+    let totals = Array(window.currentVisibleIsMeasure.length).fill(0)
+
+    tbody.querySelectorAll('tr:not(.total-row)').forEach((tr, rowIndex) => {
+      const row = window.currentVisibleData[rowIndex]
+      const show = filterCols.every(([colIdxStr, f]) => {
+        const colIdx = parseInt(colIdxStr)
+        if (f.mode === 'multi') {
+          return f.values.includes(row[colIdx])
+        } else if (f.mode === 'advanced') {
+          return applyAdvancedFilter(
+            row[colIdx],
+            f.operator,
+            f.value,
+            window.currentVisibleIsMeasure[colIdx]
+          )
+        }
+        return true
+      })
+      tr.style.display = show ? '' : 'none'
+
+      if (show) {
+        row.forEach((cell, cIdx) => {
+          if (window.currentVisibleIsMeasure[cIdx]) {
+            const val = Number(cell.toString().replace(/,/g, ''))
+            if (!isNaN(val)) totals[cIdx] += val
+          }
+        })
+      }
+    })
+
+    // Update total row (giữ nguyên)
+    const totalRow = tbody.querySelector('.total-row')
+    if (totalRow) {
+      totalRow.innerHTML = ''
+      let firstDimHandled = false
+      window.currentVisibleIsMeasure.forEach((isM, cIdx) => {
+        if (!isM && !firstDimHandled) {
+          const td = document.createElement('td')
+          td.textContent = 'Tổng cộng'
+          td.colSpan = window.currentVisibleIsMeasure.filter((v) => !v).length
+          td.style.textAlign = 'left'
+          totalRow.appendChild(td)
+          firstDimHandled = true
+        } else if (isM) {
+          const td = document.createElement('td')
+          td.textContent = formatNumber(totals[cIdx])
+          td.style.textAlign = 'right'
+          totalRow.appendChild(td)
+        }
+      })
+    }
+
+    // ✅ Fix: Update label cho cột thay đổi (thủ công, không hack click)
+    if (changedColIdx !== null && activeFilters[changedColIdx]) {
+      const filter = activeFilters[changedColIdx]
+      const th = document.querySelector(
+        `#table-filter th:nth-child(${changedColIdx + 1})`
+      ) // nth-child(1) cho col 0
+      if (th) {
+        // Tìm display: th > comboWrapper (div) > display (div đầu tiên)
+        const display = th.querySelector('div > div') // Selector ổn định dựa trên structure
+        if (display) {
+          const arrow = display.querySelector('span') // Giữ arrow nếu có
+          if (filter.mode === 'multi') {
+            // Cho multi: Cần distinct (lấy từ local, nhưng vì global apply, dùng length so sánh với total rows nếu approx)
+            // Để đơn giản (vì multi không gọi global), giữ "(Tất cả)" tạm hoặc skip – nhưng advanced là focus
+            display.textContent = '(Tất cả)' // Fallback, hoặc reload nếu cần
+          } else {
+            // Advanced: Compute như updateDisplayLabel
+            const operatorMap = {
+              '=': '=',
+              '!=': '≠',
+              '>': '>',
+              '<': '<',
+              '>=': '≥',
+              '<=': '≤',
+              contains: 'Chứa',
+              startsWith: 'Bắt đầu',
+              endsWith: 'Kết thúc'
+            }
+            const operatorLabel =
+              operatorMap[filter.operator] || filter.operator
+            const newText = `⚙️ ${operatorLabel} ${filter.value}`
+            display.textContent = newText
+            // Tooltip
+            const colType = window.currentVisibleIsMeasure[changedColIdx]
+              ? 'số'
+              : 'chuỗi'
+            display.title = `Advanced Filter đang áp dụng: ${filter.operator} ${filter.value} (cột ${colType})`
+          }
+          if (arrow) display.appendChild(arrow) // Đảm bảo arrow ở cuối
+        }
+      }
+    }
+  } else {
+    console.error('Global data not loaded!') // Debug
+  }
+}
+
 // Pivot Measure Names/Values
 function pivotMeasureValues(table) {
   console.log('table.columns', table.columns)
 
   const cols = table.columns.map((c) => c.fieldName)
-  const rows = table.data.map((r) => r.map((c) => c.formattedValue))
+  const rows = table.data.map((r) =>
+    r.map((c) =>
+      c.formattedValue === null || c.formattedValue === undefined
+        ? ''
+        : c.formattedValue
+    )
+  )
 
   const measureNameIdx = cols.findIndex((c) =>
     c.toLowerCase().includes('measure names')
@@ -507,6 +874,23 @@ function loadAndRender(worksheet) {
     })
 
     renderTable(headers, data, colWidths, isMeasure)
+
+    // Lưu global cho applyFilterGlobal
+    const columnsToHide = headers
+      .map((header, index) => ({ header, index }))
+      .filter(
+        (item) =>
+          item.header.toLowerCase().startsWith('hiden') ||
+          item.header.startsWith('AGG')
+      )
+      .map((item) => item.index)
+
+    window.currentVisibleData = data.map((row) =>
+      row.filter((cell, index) => !columnsToHide.includes(index))
+    ) // Sử dụng window để global
+    window.currentVisibleIsMeasure = isMeasure.filter(
+      (measure, index) => !columnsToHide.includes(index)
+    )
 
     // Sau khi render xong, lấy width thực của table
     const tableEl = document.getElementById('data-table')
