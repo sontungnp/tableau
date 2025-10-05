@@ -1,129 +1,103 @@
-<html lang="en">
+<!DOCTYPE html>
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tableau Extension Popup</title>
+    <title>AG Grid - Hiệu năng hiển thị dữ liệu lớn</title>
 
-    <!-- Tối ưu hóa: Gộp các resource và sử dụng phiên bản cụ thể -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- AG Grid Community -->
     <link
       rel="stylesheet"
-      href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"
+      href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css"
     />
     <link
       rel="stylesheet"
-      href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css"
+      href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css"
-    />
-
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
 
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
     <script src="script.js"></script>
+
     <style>
+      html,
       body {
-        font-family: Arial, sans-serif;
+        height: 100%;
         margin: 0;
-        /* padding: 10px; */
+        font-family: Arial, sans-serif;
+        background-color: #f5f6fa;
       }
-
-      /* Title + Search sticky */
-      .header-container {
-        position: sticky;
-        top: 0;
-        background: #fff;
-        /* padding: 10px 0; */
-        z-index: 20;
-        border-bottom: 1px solid #ddd;
-        width: 100%; /* chiếm hết chiều ngang */
-        background-color: #f2f2f2; /* xám nhạt */
-        box-sizing: border-box; /* tránh tràn khi có padding */
+      .container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 10px;
       }
-
-      #global-search {
-        /* margin-top: 6px;
-        padding: 6px; */
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      #myGrid {
+        flex: 1;
         width: 100%;
-        max-width: 400px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
       }
-
-      /* Table */
-      #data-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      #data-table th,
-      #data-table td {
-        border: 1px solid #ddd;
-        padding: 6px;
-        text-align: left;
-      }
-
-      /* Header dòng 1 */
-      #data-table thead tr:first-child th {
+      .footer {
         position: sticky;
-        top: 49px; /* chiều cao header-container */
-        background: #f5f5f5;
-        z-index: 10;
-      }
-
-      /* Filter dòng 2 */
-      #data-table thead tr:nth-child(2) th {
-        position: sticky;
-        top: 76px; /* = header-container (70px) + header (35px) */
-        background: #fafafa;
-        z-index: 9;
-      }
-
-      /* Dòng Tổng cộng sticky */
-      #data-table tbody tr.total-row {
-        position: sticky;
-        bottom: 0; /* dính đáy bảng */
-        background-color: #f2f2f2;
+        bottom: 0;
+        background-color: #f0f0f0;
         font-weight: bold;
-        z-index: 8; /* thấp hơn header nhưng cao hơn body */
+        border-top: 2px solid #ccc;
+        padding: 8px;
+        text-align: right;
       }
-
-      tr.row-selected {
-        background-color: #e6d3c6 !important; /* nâu nhạt */
+      .search-box {
+        padding: 5px;
+        width: 250px;
+        border-radius: 4px;
+        border: 1px solid #aaa;
+      }
+      button {
+        padding: 6px 12px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 5px;
+      }
+      button:hover {
+        background-color: #2980b9;
+      }
+      .controls {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
+      input[type='number'] {
+        width: 80px;
+        padding: 4px;
       }
     </style>
   </head>
+
   <body>
-    <div class="header-container">
-      <input
-        type="text"
-        id="global-search"
-        placeholder="Tìm kiếm dữ liệu..."
-        style="
-          margin: 10px 0;
-          padding: 6px;
-          width: 100%;
-          max-width: 400px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-        "
-      />
-      <button id="btn-export">Export Excel</button>
+    <div class="container">
+      <div class="toolbar">
+        <div class="controls">
+          <input
+            type="text"
+            id="searchBox"
+            class="search-box"
+            placeholder="Tìm kiếm..."
+          />
+        </div>
+        <button id="exportBtn">Xuất Excel</button>
+        <button id="copyBtn">Copy Selected Rows</button>
+      </div>
+
+      <div id="myGrid" class="ag-theme-alpine"></div>
+      <div id="footerRow" class="footer">Tổng cộng sẽ hiển thị ở đây</div>
     </div>
-    <table id="data-table">
-      <thead>
-        <tr id="table-header"></tr>
-        <tr id="table-filter"></tr>
-      </thead>
-      <tbody id="table-body"></tbody>
-    </table>
   </body>
 </html>
