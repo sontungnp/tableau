@@ -149,7 +149,7 @@ let gridApi = null
 // Load lại dữ liệu và render
 function loadAndRender(worksheet) {
   worksheet.getSummaryDataAsync({ maxRows: 0 }).then((sumData) => {
-    console.log('sumData', sumData)
+    // console.log('sumData', sumData)
 
     // Xác định cột cần loại bỏ
     const excludeCols = sumData.columns
@@ -165,9 +165,9 @@ function loadAndRender(worksheet) {
       excludeCols
     )
 
-    console.log('headers', headers)
-    console.log('columnDefs', columnDefs)
-    console.log('data', data)
+    // console.log('headers', headers)
+    // console.log('columnDefs', columnDefs)
+    // console.log('data', data)
     // console.log('result', result)
 
     console.log('isMeasure', isMeasure)
@@ -237,7 +237,8 @@ function loadAndRender(worksheet) {
     // ======= 6️⃣ EXPORT EXCEL =======
     document.getElementById('exportBtn').addEventListener('click', function () {
       gridApi.exportDataAsCsv({
-        fileName: 'data_export.csv'
+        fileName: 'data_export.csv',
+        processCellCallback: (params) => params.value // lấy raw value
       })
     })
 
@@ -327,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Lắng nghe filter và parameter change
     worksheet.addEventListener(tableau.TableauEventType.FilterChanged, () => {
-      console.log('vao day roi')
+      // console.log('vao day roi')
 
       loadAndRender(worksheet)
     })
@@ -337,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(function (parameters) {
         parameters.forEach(function (p) {
           p.addEventListener(tableau.TableauEventType.ParameterChanged, () => {
-            console.log('vao day roi 2')
+            // console.log('vao day roi 2')
             loadAndRender(worksheet)
           })
         })
