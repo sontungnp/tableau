@@ -78,6 +78,28 @@
         width: 80px;
         padding: 4px;
       }
+
+      /* css cho dòn tổng */
+      .ag-row-pinned {
+        font-weight: bold !important;
+        background-color: #f0f0f0 !important;
+      }
+
+      /* css xem kẽ dòng */
+      .ag-row:nth-child(even) {
+        background-color: #f9f9f9; /* màu cho dòng chẵn */
+      }
+
+      .ag-row:nth-child(odd) {
+        background-color: #ffffff; /* màu cho dòng lẻ */
+      }
+
+      /* them cái này để bôi đen được dòng*/
+      .ag-cell {
+        user-select: text !important;
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+      }
     </style>
   </head>
 
@@ -93,11 +115,11 @@
           />
         </div>
         <button id="exportBtn">Xuất Excel</button>
+        <button id="copyCellBtn">Copy Selected Cell</button>
         <button id="copyBtn">Copy Selected Rows</button>
       </div>
 
       <div id="myGrid" class="ag-theme-alpine"></div>
-      <div id="footerRow" class="footer">Tổng cộng sẽ hiển thị ở đây</div>
     </div>
   </body>
 </html>

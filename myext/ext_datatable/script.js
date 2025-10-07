@@ -1,5 +1,7 @@
 'use strict'
 
+let selectedCellValue = null
+
 // Hàm chuẩn hóa chỉ để đồng bộ Unicode, không bỏ dấu
 function normalizeUnicode(str) {
   return str ? str.normalize('NFC').toLowerCase().trim() : ''
@@ -203,12 +205,24 @@ function loadAndRender(worksheet) {
         checkboxes: true
       },
 
-      onRowClicked: (event) => {
+      // sự kiện click vào 1 cell
+      onCellClicked: (params) => {
+        selectedCellValue = params.value
+        console.log('Selected cell value:', selectedCellValue)
+
         // Bỏ chọn tất cả dòng khác
         gridApi.deselectAll()
         // Chọn dòng hiện tại
-        event.node.setSelected(true)
+        params.node.setSelected(true)
       },
+
+      // sự kiện click vào 1 dòng
+      // onRowClicked: (event) => {
+      //   // Bỏ chọn tất cả dòng khác
+      //   gridApi.deselectAll()
+      //   // Chọn dòng hiện tại
+      //   event.node.setSelected(true)
+      // },
 
       domLayout: 'normal',
       onGridReady: () => updateFooterTotals(),
@@ -253,13 +267,21 @@ function loadAndRender(worksheet) {
 
       const totals = calcTotals(allData, numericCols)
 
-      let footerHtml = 'Tổng cộng: '
-      numericCols.forEach((col) => {
-        footerHtml += `${col}: <b>${totals[
-          col
-        ].toLocaleString()}</b> &nbsp;&nbsp;`
+      // 🟢 Tạo 1 dòng "tổng cộng"
+      const totalRow = {}
+      columnDefs.forEach((col) => {
+        const field = col.field
+        if (numericCols.includes(field)) {
+          totalRow[field] = totals[field]
+        } else if (field === columnDefs[0].field) {
+          totalRow[field] = 'Tổng cộng'
+        } else {
+          totalRow[field] = ''
+        }
       })
-      document.getElementById('footerRow').innerHTML = footerHtml
+
+      // ✅ Gán dòng này thành pinned bottom row
+      gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
 
     // --- Copy bằng nút bấm ---
@@ -267,12 +289,44 @@ function loadAndRender(worksheet) {
       copySelectedRows()
     })
 
-    // --- Copy khi Ctrl + C ---
-    document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.key.toLowerCase() === 'c') {
-        copySelectedRows()
+    document.getElementById('copyCellBtn').addEventListener('click', () => {
+      if (selectedCellValue === null) {
+        alert('Chưa chọn ô nào để copy!')
+        return
       }
+
+      const text = selectedCellValue.toString()
+
+      // --- Fallback cổ điển ---
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.top = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+
+      try {
+        const success = document.execCommand('copy')
+        if (success) {
+          console.log(`✅ Đã copy ô: ${text}`)
+        } else {
+          console.log('⚠️ Copy không thành công.')
+        }
+      } catch (err) {
+        console.error('Copy lỗi:', err)
+        alert('❌ Không thể copy (trình duyệt không cho phép).')
+      }
+
+      document.body.removeChild(textarea)
     })
+
+    // --- Copy khi Ctrl + C ---
+    // document.addEventListener('keydown', (e) => {
+    //   if (e.ctrlKey && e.key.toLowerCase() === 'c') {
+    //     copySelectedRows()
+    //   }
+    // })
 
     // --- Hàm thực hiện copy ---
     function copySelectedRows() {
@@ -303,9 +357,9 @@ function loadAndRender(worksheet) {
       try {
         const success = document.execCommand('copy')
         if (success) {
-          alert(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
+          console.log(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
         } else {
-          alert('⚠️ Copy không thành công.')
+          console.log('⚠️ Copy không thành công.')
         }
       } catch (err) {
         console.error('Copy lỗi:', err)
