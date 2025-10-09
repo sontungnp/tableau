@@ -239,13 +239,19 @@ function loadAndRender(worksheet) {
       // ✅ Cập nhật lại dữ liệu
       gridApi.setGridOption('rowData', data)
       gridApi.setGridOption('columnDefs', columnDefs)
-      updateFooterTotals()
+      // updateFooterTotals()
+      setTimeout(() => {
+        updateFooterTotals()
+      }, 300)
     }
 
     // ======= 5️⃣ TÌM KIẾM =======
     document.getElementById('searchBox').addEventListener('input', function () {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(this.value))
-      updateFooterTotals()
+      // updateFooterTotals()
+      setTimeout(() => {
+        updateFooterTotals()
+      }, 300)
     })
 
     // ======= 6️⃣ EXPORT EXCEL =======
@@ -356,7 +362,6 @@ function loadAndRender(worksheet) {
 
       try {
         const success = document.execCommand('copy')
-
         if (success) {
           console.log(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
         } else {
