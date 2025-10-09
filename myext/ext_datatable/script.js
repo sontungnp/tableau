@@ -356,6 +356,7 @@ function loadAndRender(worksheet) {
 
       try {
         const success = document.execCommand('copy')
+
         if (success) {
           console.log(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
         } else {
