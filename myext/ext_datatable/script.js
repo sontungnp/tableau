@@ -1,6 +1,7 @@
 'use strict'
 
 let selectedCellValue = null
+let extractRefreshTime = ''
 
 // Hàm chuẩn hóa chỉ để đồng bộ Unicode, không bỏ dấu
 function normalizeUnicode(str) {
@@ -381,7 +382,33 @@ function loadAndRender(worksheet) {
 document.addEventListener('DOMContentLoaded', () => {
   tableau.extensions.initializeAsync().then(() => {
     const worksheet =
-      tableau.extensions.dashboardContent.dashboard.worksheets[0]
+      tableau.extensions.dashboardContent.dashboard.worksheets.find(
+        (ws) => ws.name === 'DataTableExtSheet'
+      )
+
+    if (!worksheet) {
+      console.error("❌ Không tìm thấy worksheet tên 'DataTableExtSheet'")
+      return
+    }
+
+    worksheet.getDataSourcesAsync().then((dataSources) => {
+      dataSources.forEach((ds) => {
+        // Thông tin metadata của extract (nếu có)
+        console.log('ds', ds)
+
+        console.log('Datasource name:', ds.name)
+        console.log('Extract refresh time:', ds.extractUpdateTime) // có thể null nếu live
+
+        if (ds.isExtract) {
+          extractRefreshTime = 'Extract Refresh Time: ' + ds.extractUpdateTime
+        } else {
+          extractRefreshTime = ''
+        }
+
+        document.getElementById('extractRefreshTime').innerText =
+          extractRefreshTime
+      })
+    })
 
     // Load lần đầu
     loadAndRender(worksheet)
@@ -403,5 +430,37 @@ document.addEventListener('DOMContentLoaded', () => {
           })
         })
       })
+
+    // ✅ Tính toán chiều cao khả dụng của extension
+    function adjustGridHeight() {
+      console.log('xxx')
+
+      const container = document.querySelector('.container')
+      const toolbar = document.querySelector('.toolbar')
+      // const notebar = document.querySelector('.notebar')
+      const gridContainer = document.getElementById('myGrid')
+
+      // Chiều cao toàn bộ extension
+      const totalHeight = window.innerHeight
+      console.log('totalHeight', totalHeight)
+
+      // Trừ phần toolbar + padding + margin
+      const toolbarHeight = toolbar.offsetHeight
+      const notebarHeight = notebar.offsetHeight
+      const padding = 20 // tổng trên + dưới
+      const extraSpacing = 10 // khoảng cách phụ nếu có
+
+      console.log('toolbarHeight', toolbarHeight)
+
+      const gridHeight =
+        totalHeight - toolbarHeight - notebarHeight - padding - extraSpacing
+
+      console.log('gridHeight', gridHeight)
+      gridContainer.style.height = `${gridHeight}px`
+    }
+
+    // Gọi khi load trang và khi resize
+    adjustGridHeight()
+    window.addEventListener('resize', adjustGridHeight)
   })
 })

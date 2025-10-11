@@ -39,7 +39,8 @@
         margin-bottom: 10px;
       }
       #myGrid {
-        flex: 1;
+        height: 530px;
+        /* flex: 1; */
         width: 100%;
       }
       .footer {
@@ -114,10 +115,13 @@
             placeholder="Tìm kiếm..."
           />
         </div>
-
         <button id="exportBtn">Xuất Excel</button>
         <button id="copyCellBtn">Copy Selected Cell</button>
         <button id="copyBtn">Copy Selected Rows</button>
+      </div>
+
+      <div id="notebar" style="text-align: right">
+        <label id="extractRefreshTime">extract refresh time: </label>
       </div>
 
       <div id="myGrid" class="ag-theme-alpine"></div>
