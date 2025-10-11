@@ -2,6 +2,7 @@
 
 let selectedCellValue = null
 let expandListenersBound = false // <-- thêm dòng này
+let extractRefreshTime = ''
 
 function setAllExpanded(nodes, expanded) {
   if (!nodes || !nodes.length) return
@@ -295,6 +296,31 @@ function loadAndRender(worksheet) {
       return node
     }
 
+    // 🔹 Cộng dồn giá trị từ con lên cha cho các cột measure
+    function aggregateTreeValues(nodes, numericCols) {
+      for (const node of nodes) {
+        // Nếu có children → xử lý đệ quy
+        if (node.children && node.children.length > 0) {
+          aggregateTreeValues(node.children, numericCols)
+
+          // Khởi tạo tổng của cha
+          numericCols.forEach((col) => {
+            node[col] = 0
+          })
+
+          // Cộng dồn từ các con
+          for (const child of node.children) {
+            numericCols.forEach((col) => {
+              const val = Number(child[col])
+              if (!isNaN(val)) {
+                node[col] += val
+              }
+            })
+          }
+        }
+      }
+    }
+
     // ======================
     // 3️⃣ Flatten tree (để hiển thị)
     // ======================
@@ -313,6 +339,15 @@ function loadAndRender(worksheet) {
     // 4️⃣ Tree data + Flatten ban đầu
     // ======================
     nestedData = buildTree(data)
+    // ✅ Xác định các cột numeric
+    const numericCols = columnDefs
+      .filter((col) => col.type === 'numericColumn')
+      .map((col) => col.field)
+
+    // ✅ Gọi hàm cộng dồn giá trị
+    aggregateTreeValues(nestedData, numericCols)
+
+    // ✅ Sau đó mới flatten để render
     let flatData = flattenTree(nestedData)
 
     console.log('data', data)
@@ -356,8 +391,28 @@ function loadAndRender(worksheet) {
       defaultColDef: {
         filter: true,
         sortable: true,
-        resizable: true
+        resizable: true,
+        filterParams: {
+          textFormatter: (value) => normalizeUnicode(value)
+        }
       },
+      // 🔹 Làm nổi bật các dòng tổng (cha)
+      getRowStyle: (params) => {
+        const node = params.data
+        if (!node) return null
+
+        // Dòng cha (có children) → in đậm
+        if (node.children && node.children.length > 0) {
+          return {
+            fontWeight: 'bold',
+            backgroundColor: '#f7f7f7' // nhẹ cho dễ nhìn, có thể bỏ
+          }
+        }
+
+        // Dòng leaf → style bình thường
+        return null
+      },
+
       rowSelection: {
         mode: 'multiRow',
         checkboxes: true
@@ -407,7 +462,7 @@ function loadAndRender(worksheet) {
           setAllExpanded(nestedData, true)
           const flat = flattenTree(nestedData)
           gridApi.setGridOption('rowData', flat)
-          updateFooterTotals && updateFooterTotals()
+          // updateFooterTotals && updateFooterTotals()
           // nếu muốn scroll tới đầu:
           // const vp = gridApi.gridBodyCtrl?.eBodyViewport; if (vp) vp.scrollTop = 0
         })
@@ -464,7 +519,7 @@ function loadAndRender(worksheet) {
     // 8️⃣ Tìm kiếm toàn bộ
     // ======================
     document.getElementById('globalSearch').addEventListener('input', (e) => {
-      gridApi.setGridOption('quickFilterText', e.target.value)
+      gridApi.setGridOption('quickFilterText', normalizeUnicode(e.target.value))
       updateFooterTotals()
     })
 
@@ -481,8 +536,6 @@ function loadAndRender(worksheet) {
     function updateFooterTotals() {
       const allData = []
       gridApi.forEachNodeAfterFilterAndSort((node) => allData.push(node.data))
-
-      console.log('allData', allData)
 
       const numericCols = columnDefs
         .filter((col) => col.type === 'numericColumn')
@@ -510,23 +563,27 @@ function loadAndRender(worksheet) {
     // ======================
     // 🔟 Copy dòng chọn
     // ======================
+    // document.getElementById('copyRow').addEventListener('click', () => {
+    //   const selected = gridApi.getSelectedRows()
+    //   if (!selected.length) {
+    //     alert('⚠️ Chưa chọn dòng nào để copy!')
+    //     return
+    //   }
+
+    //   const text = selected
+    //     .map(
+    //       (r) =>
+    //         `${r.name || ''}\t${r.col1 || ''}\t${r.col2 || ''}\t${r.col3 || ''}`
+    //     )
+    //     .join('\n')
+
+    //   navigator.clipboard.writeText(text).then(() => {
+    //     alert('✅ Đã copy ' + selected.length + ' dòng vào clipboard!')
+    //   })
+    // })
+    // --- Copy bằng nút bấm ---
     document.getElementById('copyRow').addEventListener('click', () => {
-      const selected = gridApi.getSelectedRows()
-      if (!selected.length) {
-        alert('⚠️ Chưa chọn dòng nào để copy!')
-        return
-      }
-
-      const text = selected
-        .map(
-          (r) =>
-            `${r.name || ''}\t${r.col1 || ''}\t${r.col2 || ''}\t${r.col3 || ''}`
-        )
-        .join('\n')
-
-      navigator.clipboard.writeText(text).then(() => {
-        alert('✅ Đã copy ' + selected.length + ' dòng vào clipboard!')
-      })
+      copySelectedRows()
     })
 
     document.getElementById('copyCellBtn').addEventListener('click', () => {
@@ -534,12 +591,73 @@ function loadAndRender(worksheet) {
         alert('Chưa chọn ô nào để copy!')
         return
       }
-      navigator.clipboard.writeText(selectedCellValue.toString()).then(() => {
-        alert(`Đã copy: ${selectedCellValue}`)
-      })
+
+      const text = selectedCellValue.toString()
+
+      // --- Fallback cổ điển ---
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.top = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+
+      try {
+        const success = document.execCommand('copy')
+        if (success) {
+          console.log(`✅ Đã copy ô: ${text}`)
+        } else {
+          console.log('⚠️ Copy không thành công.')
+        }
+      } catch (err) {
+        console.error('Copy lỗi:', err)
+        alert('❌ Không thể copy (trình duyệt không cho phép).')
+      }
+
+      document.body.removeChild(textarea)
     })
 
-    // xxx
+    // --- Hàm thực hiện copy ---
+    function copySelectedRows() {
+      const selectedNodes = []
+      gridApi.forEachNode((node) => {
+        if (node.isSelected()) selectedNodes.push(node)
+      })
+
+      if (selectedNodes.length === 0) {
+        alert('⚠️ Chưa chọn dòng nào!')
+        return
+      }
+
+      const selectedData = selectedNodes.map((node) => node.data)
+      const text = selectedData
+        .map((row) => Object.values(row).join('\t'))
+        .join('\n')
+
+      // --- Fallback cổ điển, tương thích mọi trình duyệt / Tableau Extension ---
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.top = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+
+      try {
+        const success = document.execCommand('copy')
+        if (success) {
+          console.log(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
+        } else {
+          console.log('⚠️ Copy không thành công.')
+        }
+      } catch (err) {
+        console.error('Copy lỗi:', err)
+        alert('❌ Không thể copy (trình duyệt không cho phép).')
+      }
+
+      document.body.removeChild(textarea)
+    }
   })
 }
 
@@ -547,9 +665,33 @@ function loadAndRender(worksheet) {
 document.addEventListener('DOMContentLoaded', () => {
   tableau.extensions.initializeAsync().then(() => {
     const worksheet =
-      tableau.extensions.dashboardContent.dashboard.worksheets[1]
+      tableau.extensions.dashboardContent.dashboard.worksheets.find(
+        (ws) => ws.name === 'DataTableExtSheet'
+      )
 
-    console.log('worksheet', worksheet)
+    if (!worksheet) {
+      console.error("❌ Không tìm thấy worksheet tên 'DataTableExtSheet'")
+      return
+    }
+
+    worksheet.getDataSourcesAsync().then((dataSources) => {
+      dataSources.forEach((ds) => {
+        // Thông tin metadata của extract (nếu có)
+        console.log('ds', ds)
+
+        console.log('Datasource name:', ds.name)
+        console.log('Extract refresh time:', ds.extractUpdateTime) // có thể null nếu live
+
+        if (ds.isExtract) {
+          extractRefreshTime = 'Extract Refresh Time: ' + ds.extractUpdateTime
+        } else {
+          extractRefreshTime = ''
+        }
+
+        document.getElementById('extractRefreshTime').innerText =
+          extractRefreshTime
+      })
+    })
 
     // Load lần đầu
     loadAndRender(worksheet)
@@ -576,6 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function adjustGridHeight() {
       const container = document.querySelector('.container')
       const toolbar = document.querySelector('.toolbar')
+      // const notebar = document.querySelector('.notebar')
       const gridContainer = document.getElementById('gridContainer')
 
       // Chiều cao toàn bộ extension
@@ -583,10 +726,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Trừ phần toolbar + padding + margin
       const toolbarHeight = toolbar.offsetHeight
+      const notebarHeight = notebar.offsetHeight
       const padding = 20 // tổng trên + dưới
       const extraSpacing = 10 // khoảng cách phụ nếu có
 
-      const gridHeight = totalHeight - toolbarHeight - padding - extraSpacing
+      const gridHeight =
+        totalHeight - toolbarHeight - notebarHeight - padding - extraSpacing
       gridContainer.style.height = `${gridHeight}px`
     }
 
