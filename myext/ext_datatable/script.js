@@ -255,13 +255,7 @@ function loadAndRender(worksheet) {
       }, 300)
     })
 
-    // ======= 6️⃣ EXPORT EXCEL =======
-    document.getElementById('exportBtn').addEventListener('click', function () {
-      gridApi.exportDataAsCsv({
-        fileName: 'data_export.csv',
-        processCellCallback: (params) => params.value // lấy raw value
-      })
-    })
+    // export cu
 
     // ======= 7️⃣ DÒNG TỔNG =======
     function updateFooterTotals() {
@@ -412,6 +406,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load lần đầu
     loadAndRender(worksheet)
+
+    // ======= 6️⃣ EXPORT EXCEL =======
+    document.getElementById('exportBtn').addEventListener('click', function () {
+      gridApi.exportDataAsCsv({
+        fileName: 'data_export.csv',
+        processCellCallback: (params) => params.value // lấy raw value
+      })
+    })
 
     // Lắng nghe filter và parameter change
     worksheet.addEventListener(tableau.TableauEventType.FilterChanged, () => {
