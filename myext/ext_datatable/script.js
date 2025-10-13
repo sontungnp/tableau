@@ -385,24 +385,28 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    worksheet.getDataSourcesAsync().then((dataSources) => {
-      dataSources.forEach((ds) => {
-        // Thông tin metadata của extract (nếu có)
-        console.log('ds', ds)
+    function refreshExtractTime() {
+      worksheet.getDataSourcesAsync().then((dataSources) => {
+        dataSources.forEach((ds) => {
+          // Thông tin metadata của extract (nếu có)
+          console.log('ds', ds)
 
-        console.log('Datasource name:', ds.name)
-        console.log('Extract refresh time:', ds.extractUpdateTime) // có thể null nếu live
+          console.log('Datasource name:', ds.name)
+          console.log('Extract refresh time:', ds.extractUpdateTime) // có thể null nếu live
 
-        if (ds.isExtract) {
-          extractRefreshTime = 'Extract Refresh Time: ' + ds.extractUpdateTime
-        } else {
-          extractRefreshTime = ''
-        }
+          if (ds.isExtract) {
+            extractRefreshTime = 'Extract Refresh Time: ' + ds.extractUpdateTime
+          } else {
+            extractRefreshTime = ''
+          }
 
-        document.getElementById('extractRefreshTime').innerText =
-          extractRefreshTime
+          document.getElementById('extractRefreshTime').innerText =
+            extractRefreshTime
+        })
       })
-    })
+    }
+
+    refreshExtractTime()
 
     // Load lần đầu
     loadAndRender(worksheet)
@@ -418,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lắng nghe filter và parameter change
     worksheet.addEventListener(tableau.TableauEventType.FilterChanged, () => {
       // console.log('vao day roi')
-
+      refreshExtractTime()
       loadAndRender(worksheet)
     })
 
@@ -428,6 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
         parameters.forEach(function (p) {
           p.addEventListener(tableau.TableauEventType.ParameterChanged, () => {
             // console.log('vao day roi 2')
+            refreshExtractTime()
             loadAndRender(worksheet)
           })
         })
