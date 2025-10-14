@@ -185,6 +185,20 @@ function pivotMeasureValues(
           // 🔹 Format với phân tách hàng nghìn, tối đa 2 chữ số thập phân
           return num.toLocaleString('vi-VN', { maximumFractionDigits: 2 })
         }
+
+        // 🔹 ĐỔI MÀU ĐỎ nếu giá trị âm
+        colDef.cellStyle = (params) => {
+          const val = Number(params.value)
+          if (!isNaN(val) && val < 0) {
+            return {
+              color: 'red',
+              textAlign: 'right',
+              fontVariantNumeric: 'tabular-nums'
+            }
+          }
+          // Mặc định vẫn căn phải, giữ format số
+          return { textAlign: 'right', fontVariantNumeric: 'tabular-nums' }
+        }
       }
 
       return colDef
@@ -526,6 +540,15 @@ function loadAndRender(worksheet) {
       getRowStyle: (params) => {
         const node = params.data
         if (!node) return null
+
+        // ✅ Nếu là dòng "Tổng cộng"
+        if (node[columnDefs[0].field] === 'Tổng cộng') {
+          return {
+            fontWeight: 'bold',
+            color: '#d00000',
+            backgroundColor: '#fabcbcff' // nền nhạt cho dễ nhìn
+          }
+        }
 
         // Dòng cha (có children) → in đậm
         if (node.children && node.children.length > 0) {
