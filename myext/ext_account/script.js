@@ -98,27 +98,27 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('clear').addEventListener('click', clearAccFilters)
 
     // check thay đổi lcalstorage do nut reset từ extension khác
-    window.addEventListener('storage', function (event) {
-      if (event.key === 'accountCode') {
-        console.log('accountCode đã thay đổi:', event.newValue)
-        if (event.newValue === null || event.newValue === 'ALL') {
-          objSelectedAccounts = objInitSelectedAccounts
-          localStorage.setItem(
-            'objSelectedAccounts',
-            JSON.stringify(objSelectedAccounts)
-          )
-          localStorage.setItem(
-            'accountCode',
-            objSelectedAccounts.strSelectedItems
-          )
-        } else {
-          objSelectedAccounts.strSelectedItems = event.newValue
-        }
+    // window.addEventListener('storage', function (event) {
+    //   if (event.key === 'accountCode') {
+    //     console.log('accountCode đã thay đổi:', event.newValue)
+    //     if (event.newValue === null || event.newValue === 'ALL') {
+    //       objSelectedAccounts = objInitSelectedAccounts
+    //       localStorage.setItem(
+    //         'objSelectedAccounts',
+    //         JSON.stringify(objSelectedAccounts)
+    //       )
+    //       localStorage.setItem(
+    //         'accountCode',
+    //         objSelectedAccounts.strSelectedItems
+    //       )
+    //     } else {
+    //       objSelectedAccounts.strSelectedItems = event.newValue
+    //     }
 
-        document.getElementById('selected-box').value =
-          objSelectedAccounts.strSelectedItems
-      }
-    })
+    //     document.getElementById('selected-box').value =
+    //       objSelectedAccounts.strSelectedItems
+    //   }
+    // })
 
     function fetchData() {
       // const worksheet = tableau.extensions.dashboardContent.dashboard.worksheets[0];
