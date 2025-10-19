@@ -376,7 +376,10 @@ function toggleNode(nodeId) {
 // --- Hàm thực hiện copy ---
 function copySelectedRows() {
   const selectedNodes = []
-  gridApi.forEachNode((node) => {
+  // gridApi.forEachNode((node) => {
+  //   if (node.isSelected()) selectedNodes.push(node)
+  // })
+  gridApi.forEachNodeAfterFilterAndSort((node) => {
     if (node.isSelected()) selectedNodes.push(node)
   })
 
