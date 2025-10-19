@@ -46,35 +46,40 @@ function pivotMeasureValues(
 
   const cols = table.columns.map((c) => c.fieldName)
   const rows = table.data.map((r) =>
-    r.map((c) =>
-      c.formattedValue === null || c.formattedValue === undefined
-        ? ''
-        : c.formattedValue
-    )
-  )
+    r.map((c) => {
+      if (c.nativeValue === null || c.nativeValue === undefined) return ''
 
-  // 🔹 Loại bỏ cột không cần
-  const filteredCols = cols.filter((_, i) => !excludeIndexes.includes(i))
-  const filteredRows = rows.map((r) =>
-    r.filter((_, i) => !excludeIndexes.includes(i))
+      // 🔹 Nếu là kiểu ngày hợp lệ (Date object hoặc chuỗi ngày)
+      if (c.nativeValue instanceof Date) {
+        // Định dạng dd/MM/yyyy có thêm số 0
+        return c.nativeValue.toLocaleDateString('vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        })
+      }
+
+      return c.formattedValue
+    })
   )
 
   // 🔹 Xác định vị trí Measure Names / Values
-  const measureNameIdx = filteredCols.findIndex((c) =>
+  const measureNameIdx = cols.findIndex((c) =>
     c.toLowerCase().includes('measure names')
   )
-  const measureValueIdx = filteredCols.findIndex((c) =>
+  const measureValueIdx = cols.findIndex((c) =>
     c.toLowerCase().includes('measure values')
   )
 
-  const dimensionIdxs = filteredCols
+  const dimensionIdxs = cols
     .map((c, i) => i)
     .filter((i) => i !== measureNameIdx && i !== measureValueIdx)
 
+  // 🔹 Pivot dữ liệu
   const pivotMap = new Map()
   const measureSet = new Set()
 
-  filteredRows.forEach((r) => {
+  rows.forEach((r) => {
     const dimKey = dimensionIdxs.map((i) => r[i]).join('||')
     const mName = r[measureNameIdx]
     const mValue = r[measureValueIdx]
@@ -90,30 +95,44 @@ function pivotMeasureValues(
     pivotMap.get(dimKey).measures[mName] = mValue
   })
 
+  // console.log('pivotMap', JSON.stringify(Object.fromEntries(pivotMap), null, 2))
+
   const measureNames = Array.from(measureSet)
-  const headers = [
-    ...dimensionIdxs.map((i) => filteredCols[i]),
-    ...measureNames
-  ]
+  const headers = [...dimensionIdxs.map((i) => cols[i]), ...measureNames]
   const isMeasure = [
     ...dimensionIdxs.map(() => false),
     ...measureNames.map(() => true)
   ]
 
-  console.log('header day', headers)
+  // 🔹 Loại bỏ các cột có tên bắt đầu bằng "hiden" hoặc "AGG("
+  const headerIndexesToKeep = headers
+    .map((header, index) => ({ header, index }))
+    .filter(({ header }) => {
+      const cleanHeader = header.replace(/\(\s*\d+\s*\)\s*$/, '').trim()
+      return (
+        !cleanHeader.toLowerCase().startsWith('hiden') &&
+        !cleanHeader.startsWith('AGG(')
+      )
+    })
+    .map(({ index }) => index)
 
-  // ⚡ Sinh dữ liệu dạng object (key = field format)
+  const filteredHeaders = headerIndexesToKeep.map((index) => headers[index])
+  const filteredIsMeasure = headerIndexesToKeep.map((index) => isMeasure[index])
+
+  // ⚡ Sinh dữ liệu dạng object (key = field format) - chỉ giữ các cột hợp lệ
   const data = Array.from(pivotMap.values()).map((entry) => {
     const row = {}
-    headers.forEach((h, idx) => {
-      // Bỏ phần (width) nếu có
+    filteredHeaders.forEach((h, idx) => {
+      const originalIdx = headerIndexesToKeep[idx]
       const cleanHeader = h.replace(/\(\s*\d+\s*\)\s*$/, '').trim()
       const key = formatField(cleanHeader)
 
-      if (idx < dimensionIdxs.length) {
-        row[key] = entry.dims[idx]
+      if (originalIdx < dimensionIdxs.length) {
+        // Là dimension
+        row[key] = entry.dims[originalIdx]
       } else {
-        const mName = measureNames[idx - dimensionIdxs.length]
+        // Là measure
+        const mName = measureNames[originalIdx - dimensionIdxs.length]
         const rawValue = entry.measures[mName] || ''
         const numValue = parseFloat(rawValue.toString().replace(/,/g, ''))
         row[key] = !isNaN(numValue) ? numValue : rawValue
@@ -129,7 +148,7 @@ function pivotMeasureValues(
     const width = widthMatch ? parseInt(widthMatch[1], 10) : 150 // mặc định 150
     const cleanHeader = h.replace(/\(\s*\d+\s*\)\s*$/, '').trim()
     const fieldName = formatField(cleanHeader)
-    console.log('demTree', demTree)
+    // console.log('demTree', demTree)
 
     if (fieldName.startsWith('tree_lv')) {
       if (demTree === 0) {
@@ -469,11 +488,11 @@ function loadAndRender(worksheet) {
       excludeCols
     )
 
-    console.log('headers', headers)
-    console.log('columnDefs', columnDefs)
-    console.log('data', data)
+    // console.log('headers', headers)
+    // console.log('columnDefs', columnDefs)
+    // console.log('data', data)
 
-    console.log('isMeasure', isMeasure)
+    // console.log('isMeasure', isMeasure)
 
     // ======= DÒNG TỔNG =======
     function updateFooterTotals() {
@@ -518,9 +537,9 @@ function loadAndRender(worksheet) {
     // ✅ Sau đó mới flatten để render
     let flatData = flattenTree(nestedData)
 
-    console.log('data', data)
-    console.log('nestedData', nestedData)
-    console.log('flatData', flatData)
+    // console.log('data', data)
+    // console.log('nestedData', nestedData)
+    // console.log('flatData', flatData)
 
     // ======================
     // 6️⃣ Cấu hình AG Grid
@@ -597,7 +616,10 @@ function loadAndRender(worksheet) {
       // ✅ Cập nhật lại dữ liệu
       gridApi.setGridOption('rowData', flatData)
       gridApi.setGridOption('columnDefs', columnDefs)
-      updateFooterTotals()
+      // updateFooterTotals()
+      setTimeout(() => {
+        updateFooterTotals()
+      }, 300)
     }
 
     // Code mở tất cả và đóng tất cả tree
@@ -611,7 +633,10 @@ function loadAndRender(worksheet) {
           setAllExpanded(nestedData, true)
           const flat = flattenTree(nestedData)
           gridApi.setGridOption('rowData', flat)
-          updateFooterTotals //&& updateFooterTotals()
+          // updateFooterTotals //&& updateFooterTotals()
+          setTimeout(() => {
+            updateFooterTotals()
+          }, 300)
           // nếu muốn scroll tới đầu:
           // const vp = gridApi.gridBodyCtrl?.eBodyViewport; if (vp) vp.scrollTop = 0
         })
@@ -623,7 +648,10 @@ function loadAndRender(worksheet) {
           setAllExpanded(nestedData, false)
           const flat = flattenTree(nestedData)
           gridApi.setGridOption('rowData', flat)
-          updateFooterTotals && updateFooterTotals()
+          // updateFooterTotals && updateFooterTotals()
+          setTimeout(() => {
+            updateFooterTotals()
+          }, 300)
         })
       }
 
@@ -635,8 +663,33 @@ function loadAndRender(worksheet) {
     // ======================
     document.getElementById('globalSearch').addEventListener('input', (e) => {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(e.target.value))
-      updateFooterTotals()
+      // updateFooterTotals()
+      setTimeout(() => {
+        updateFooterTotals()
+      }, 300)
     })
+
+    document
+      .getElementById('clearAllFilterBtn')
+      .addEventListener('click', () => {
+        if (!gridApi) return
+
+        // 🔹 1️⃣ Xoá toàn bộ filter theo cột
+        gridApi.setFilterModel(null)
+        gridApi.onFilterChanged()
+
+        // 🔹 2️⃣ Xoá luôn filter toàn cục (search box)
+        const globalSearch = document.getElementById('globalSearch')
+        if (globalSearch) {
+          globalSearch.value = ''
+          gridApi.setGridOption('quickFilterText', '')
+        }
+
+        // 🔹 3️⃣ Cập nhật lại dòng tổng
+        setTimeout(() => {
+          updateFooterTotals()
+        }, 300)
+      })
   })
 }
 
@@ -656,12 +709,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function refreshExtractTime() {
       worksheet.getDataSourcesAsync().then((dataSources) => {
         dataSources.forEach((ds) => {
-          // Thông tin metadata của extract (nếu có)
-          console.log('ds', ds)
-
-          console.log('Datasource name:', ds.name)
-          console.log('Extract refresh time:', ds.extractUpdateTime) // có thể null nếu live
-
           if (ds.isExtract) {
             extractRefreshTime = 'Extract Refresh Time: ' + ds.extractUpdateTime
           } else {

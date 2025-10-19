@@ -26,23 +26,82 @@
         font-family: Arial, sans-serif;
         background-color: #f5f6fa;
       }
+
       .container {
         display: flex;
         flex-direction: column;
         height: 100%;
         padding: 10px;
       }
+
+      /* === TOOLBAR === */
       .toolbar {
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
         margin-bottom: 10px;
+        gap: 10px;
       }
+
+      /* Phần tìm kiếm bên trái */
+      .toolbar-left {
+        display: flex;
+        align-items: center;
+        flex: 1; /* chiếm hết khoảng trống còn lại */
+      }
+
+      .search-container {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        /* max-width: 600px; */
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 4px 8px;
+      }
+
+      .search-container span {
+        margin-right: 6px;
+        font-size: 18px;
+        color: #555;
+      }
+
+      .search-container input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 6px;
+        font-size: 14px;
+        background: transparent;
+      }
+
+      /* Phần nút bên phải */
+      .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .toolbar-right button {
+        padding: 6px 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background-color: #fff;
+        cursor: pointer;
+      }
+
+      .toolbar-right button:hover {
+        background-color: #f0f0f0;
+      }
+
+      /* === GRID === */
       #myGrid {
         height: 530px;
-        /* flex: 1; */
         width: 100%;
       }
+
       .footer {
         position: sticky;
         bottom: 0;
@@ -52,50 +111,23 @@
         padding: 8px;
         text-align: right;
       }
-      .search-box {
-        padding: 5px;
-        width: 250px;
-        border-radius: 4px;
-        border: 1px solid #aaa;
-      }
-      button {
-        padding: 6px 12px;
-        background-color: #3498db;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-left: 5px;
-      }
-      button:hover {
-        background-color: #2980b9;
-      }
-      .controls {
-        display: flex;
-        gap: 5px;
-        align-items: center;
-      }
-      input[type='number'] {
-        width: 80px;
-        padding: 4px;
-      }
 
-      /* css cho dòn tổng */
+      /* === DÒNG TỔNG === */
       .ag-row-pinned {
         font-weight: bold !important;
         background-color: #f0f0f0 !important;
       }
 
-      /* css xem kẽ dòng */
+      /* === XEN KẼ DÒNG === */
       .ag-row:nth-child(even) {
-        background-color: #f9f9f9; /* màu cho dòng chẵn */
+        background-color: #f9f9f9;
       }
 
       .ag-row:nth-child(odd) {
-        background-color: #ffffff; /* màu cho dòng lẻ */
+        background-color: #ffffff;
       }
 
-      /* them cái này để bôi đen được dòng*/
+      /* Cho phép chọn text */
       .ag-cell {
         user-select: text !important;
         -webkit-user-select: text !important;
@@ -107,17 +139,21 @@
   <body>
     <div class="container">
       <div class="toolbar">
-        <div class="controls">
-          <input
-            type="text"
-            id="searchBox"
-            class="search-box"
-            placeholder="Tìm kiếm..."
-          />
+        <!-- Bên trái: ô tìm kiếm -->
+        <div class="toolbar-left">
+          <div class="search-container">
+            <span>🔍</span>
+            <input type="text" id="searchBox" placeholder="Tìm kiếm..." />
+          </div>
         </div>
-        <button id="exportBtn">Xuất Excel</button>
-        <button id="copyCellBtn">Copy Selected Cell</button>
-        <button id="copyBtn">Copy Selected Rows</button>
+
+        <!-- Bên phải: các nút chỉ hiển thị icon -->
+        <div class="toolbar-right">
+          <button id="clearAllFilterBtn" title="Xoá bộ lọc">🚫</button>
+          <button id="exportBtn" title="Xuất Excel">📤</button>
+          <button id="copyCellBtn" title="Copy ô được chọn">📋</button>
+          <button id="copyBtn" title="Copy dòng được chọn">📄</button>
+        </div>
       </div>
 
       <div id="notebar" style="text-align: right">

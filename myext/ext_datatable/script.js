@@ -32,35 +32,40 @@ function pivotMeasureValues(
 
   const cols = table.columns.map((c) => c.fieldName)
   const rows = table.data.map((r) =>
-    r.map((c) =>
-      c.formattedValue === null || c.formattedValue === undefined
-        ? ''
-        : c.formattedValue
-    )
-  )
+    r.map((c) => {
+      if (c.nativeValue === null || c.nativeValue === undefined) return ''
 
-  // 🔹 Loại bỏ cột không cần
-  const filteredCols = cols.filter((_, i) => !excludeIndexes.includes(i))
-  const filteredRows = rows.map((r) =>
-    r.filter((_, i) => !excludeIndexes.includes(i))
+      // 🔹 Nếu là kiểu ngày hợp lệ (Date object hoặc chuỗi ngày)
+      if (c.nativeValue instanceof Date) {
+        // Định dạng dd/MM/yyyy có thêm số 0
+        return c.nativeValue.toLocaleDateString('vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        })
+      }
+
+      return c.formattedValue
+    })
   )
 
   // 🔹 Xác định vị trí Measure Names / Values
-  const measureNameIdx = filteredCols.findIndex((c) =>
+  const measureNameIdx = cols.findIndex((c) =>
     c.toLowerCase().includes('measure names')
   )
-  const measureValueIdx = filteredCols.findIndex((c) =>
+  const measureValueIdx = cols.findIndex((c) =>
     c.toLowerCase().includes('measure values')
   )
 
-  const dimensionIdxs = filteredCols
+  const dimensionIdxs = cols
     .map((c, i) => i)
     .filter((i) => i !== measureNameIdx && i !== measureValueIdx)
 
+  // 🔹 Pivot dữ liệu
   const pivotMap = new Map()
   const measureSet = new Set()
 
-  filteredRows.forEach((r) => {
+  rows.forEach((r) => {
     const dimKey = dimensionIdxs.map((i) => r[i]).join('||')
     const mName = r[measureNameIdx]
     const mValue = r[measureValueIdx]
@@ -76,28 +81,44 @@ function pivotMeasureValues(
     pivotMap.get(dimKey).measures[mName] = mValue
   })
 
+  // console.log('pivotMap', JSON.stringify(Object.fromEntries(pivotMap), null, 2))
+
   const measureNames = Array.from(measureSet)
-  const headers = [
-    ...dimensionIdxs.map((i) => filteredCols[i]),
-    ...measureNames
-  ]
+  const headers = [...dimensionIdxs.map((i) => cols[i]), ...measureNames]
   const isMeasure = [
     ...dimensionIdxs.map(() => false),
     ...measureNames.map(() => true)
   ]
 
-  // ⚡ Sinh dữ liệu dạng object (key = field format)
+  // 🔹 Loại bỏ các cột có tên bắt đầu bằng "hiden" hoặc "AGG("
+  const headerIndexesToKeep = headers
+    .map((header, index) => ({ header, index }))
+    .filter(({ header }) => {
+      const cleanHeader = header.replace(/\(\s*\d+\s*\)\s*$/, '').trim()
+      return (
+        !cleanHeader.toLowerCase().startsWith('hiden') &&
+        !cleanHeader.startsWith('AGG(')
+      )
+    })
+    .map(({ index }) => index)
+
+  const filteredHeaders = headerIndexesToKeep.map((index) => headers[index])
+  const filteredIsMeasure = headerIndexesToKeep.map((index) => isMeasure[index])
+
+  // ⚡ Sinh dữ liệu dạng object (key = field format) - chỉ giữ các cột hợp lệ
   const data = Array.from(pivotMap.values()).map((entry) => {
     const row = {}
-    headers.forEach((h, idx) => {
-      // Bỏ phần (width) nếu có
+    filteredHeaders.forEach((h, idx) => {
+      const originalIdx = headerIndexesToKeep[idx]
       const cleanHeader = h.replace(/\(\s*\d+\s*\)\s*$/, '').trim()
       const key = formatField(cleanHeader)
 
-      if (idx < dimensionIdxs.length) {
-        row[key] = entry.dims[idx]
+      if (originalIdx < dimensionIdxs.length) {
+        // Là dimension
+        row[key] = entry.dims[originalIdx]
       } else {
-        const mName = measureNames[idx - dimensionIdxs.length]
+        // Là measure
+        const mName = measureNames[originalIdx - dimensionIdxs.length]
         const rawValue = entry.measures[mName] || ''
         const numValue = parseFloat(rawValue.toString().replace(/,/g, ''))
         row[key] = !isNaN(numValue) ? numValue : rawValue
@@ -106,8 +127,8 @@ function pivotMeasureValues(
     return row
   })
 
-  // ⚡ columnDefs khớp field format, có xử lý width và numericColumn
-  const columnDefs = headers.map((h, idx) => {
+  // ⚡ columnDefs khớp field format, có xử lý width và numericColumn - chỉ giữ các cột hợp lệ
+  const columnDefs = filteredHeaders.map((h, idx) => {
     const widthMatch = h.match(/\((\d+)\)/)
     const width = widthMatch ? parseInt(widthMatch[1], 10) : 150 // mặc định 150
     const cleanHeader = h.replace(/\(\s*\d+\s*\)\s*$/, '').trim()
@@ -123,13 +144,13 @@ function pivotMeasureValues(
       maxWidth: 500,
       cellStyle: (params) => {
         // Căn phải cho số, căn trái cho text
-        return isMeasure[idx]
+        return filteredIsMeasure[idx]
           ? { textAlign: 'right', fontVariantNumeric: 'tabular-nums' }
           : { textAlign: 'left' }
       }
     }
 
-    if (isMeasure[idx]) {
+    if (filteredIsMeasure[idx]) {
       colDef.type = 'numericColumn'
       colDef.valueFormatter = (params) => {
         const v = params.value
@@ -144,7 +165,10 @@ function pivotMeasureValues(
     return colDef
   })
 
-  return { headers, data, isMeasure, columnDefs }
+  return {
+    data,
+    columnDefs
+  }
 }
 
 let gridApi = null
@@ -154,26 +178,14 @@ function loadAndRender(worksheet) {
   worksheet.getSummaryDataAsync({ maxRows: 0 }).then((sumData) => {
     // console.log('sumData', sumData)
 
-    // Xác định cột cần loại bỏ
-    const excludeCols = sumData.columns
-      .map((col, idx) => ({ name: col.fieldName, idx }))
-      .filter(
-        (c) =>
-          c.name.toLowerCase().startsWith('hiden') || c.name.startsWith('AGG')
-      )
-      .map((c) => c.idx)
-
-    const { headers, data, isMeasure, columnDefs } = pivotMeasureValues(
-      sumData,
-      excludeCols
-    )
+    const { data, columnDefs } = pivotMeasureValues(sumData)
 
     // console.log('headers', headers)
     // console.log('columnDefs', columnDefs)
     // console.log('data', data)
     // console.log('result', result)
 
-    console.log('isMeasure', isMeasure)
+    // console.log('isMeasure', isMeasure)
 
     // ======= 3️⃣ TÍNH TỔNG =======
     function calcTotals(data, numericCols) {
@@ -322,6 +334,28 @@ function loadAndRender(worksheet) {
       document.body.removeChild(textarea)
     })
 
+    document
+      .getElementById('clearAllFilterBtn')
+      .addEventListener('click', () => {
+        if (!gridApi) return
+
+        // 🔹 1️⃣ Xoá toàn bộ filter theo cột
+        gridApi.setFilterModel(null)
+        gridApi.onFilterChanged()
+
+        // 🔹 2️⃣ Xoá luôn filter toàn cục (search box)
+        const searchBox = document.getElementById('searchBox')
+        if (searchBox) {
+          searchBox.value = ''
+          gridApi.setGridOption('quickFilterText', '')
+        }
+
+        // 🔹 3️⃣ Cập nhật lại dòng tổng
+        setTimeout(() => {
+          updateFooterTotals()
+        }, 300)
+      })
+
     // --- Copy khi Ctrl + C ---
     // document.addEventListener('keydown', (e) => {
     //   if (e.ctrlKey && e.key.toLowerCase() === 'c') {
@@ -388,12 +422,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function refreshExtractTime() {
       worksheet.getDataSourcesAsync().then((dataSources) => {
         dataSources.forEach((ds) => {
-          // Thông tin metadata của extract (nếu có)
-          console.log('ds', ds)
-
-          console.log('Datasource name:', ds.name)
-          console.log('Extract refresh time:', ds.extractUpdateTime) // có thể null nếu live
-
           if (ds.isExtract) {
             extractRefreshTime = 'Extract Refresh Time: ' + ds.extractUpdateTime
           } else {
@@ -440,8 +468,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ✅ Tính toán chiều cao khả dụng của extension
     function adjustGridHeight() {
-      console.log('xxx')
-
       const container = document.querySelector('.container')
       const toolbar = document.querySelector('.toolbar')
       // const notebar = document.querySelector('.notebar')
@@ -449,7 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Chiều cao toàn bộ extension
       const totalHeight = window.innerHeight
-      console.log('totalHeight', totalHeight)
+      // console.log('totalHeight', totalHeight)
 
       // Trừ phần toolbar + padding + margin
       const toolbarHeight = toolbar.offsetHeight
@@ -457,12 +483,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const padding = 20 // tổng trên + dưới
       const extraSpacing = 10 // khoảng cách phụ nếu có
 
-      console.log('toolbarHeight', toolbarHeight)
+      // console.log('toolbarHeight', toolbarHeight)
 
       const gridHeight =
         totalHeight - toolbarHeight - notebarHeight - padding - extraSpacing
 
-      console.log('gridHeight', gridHeight)
+      // console.log('gridHeight', gridHeight)
       gridContainer.style.height = `${gridHeight}px`
     }
 
