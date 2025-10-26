@@ -133,6 +133,18 @@
         -webkit-user-select: text !important;
         -moz-user-select: text !important;
       }
+
+      /* chỉnh màu nền header */
+      /* === HEADER TABLE === */
+      .ag-theme-alpine .ag-header,
+      .ag-theme-alpine .ag-header-cell {
+        background-color: #c4e1f1 !important;
+      }
+
+      .ag-theme-alpine .ag-header-cell-text {
+        font-weight: bold;
+        color: #000;
+      }
     </style>
   </head>
 
@@ -149,10 +161,10 @@
 
         <!-- Bên phải: các nút chỉ hiển thị icon -->
         <div class="toolbar-right">
-          <button id="clearAllFilterBtn" title="Xoá bộ lọc">🚫</button>
-          <button id="exportBtn" title="Xuất Excel">📤</button>
-          <button id="copyCellBtn" title="Copy ô được chọn">📋</button>
-          <button id="copyBtn" title="Copy dòng được chọn">📄</button>
+          <button id="clearAllFilterBtn" title="Clear All Filter">🚫</button>
+          <button id="exportBtn" title="Export CSV">📤</button>
+          <button id="copyCellBtn" title="Copy selected cell">📋</button>
+          <button id="copyBtn" title="Copy selected rows">📄</button>
         </div>
       </div>
 

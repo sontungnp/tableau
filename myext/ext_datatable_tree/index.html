@@ -138,6 +138,23 @@
         -webkit-user-select: text !important;
         -moz-user-select: text !important;
       }
+
+      /* Chỉnh màu nền header */
+      /* === HEADER TABLE === */
+      .ag-theme-quartz .ag-header,
+      .ag-theme-quartz .ag-header-cell {
+        background-color: #c4e1f1 !important; /* màu nền header */
+      }
+
+      .ag-theme-quartz .ag-header-cell-text {
+        font-weight: bold;
+        color: #000; /* màu chữ */
+      }
+
+      /* Viền ngăn cách giữa các cột header (tuỳ chọn, cho đẹp hơn) */
+      .ag-theme-quartz .ag-header-cell::after {
+        border-right: 1px solid #ccc;
+      }
     </style>
   </head>
 
@@ -164,10 +181,10 @@
 
         <!-- Phải: export + copy -->
         <div class="toolbar-right">
-          <button id="clearAllFilterBtn" title="Xoá bộ lọc">🚫</button>
-          <button id="exportExcel" title="Xuất CSV">📤</button>
-          <button id="copyCellBtn" title="Copy ô">📋</button>
-          <button id="copyRow" title="Copy dòng">📄</button>
+          <button id="clearAllFilterBtn" title="Clear All Filter">🚫</button>
+          <button id="exportExcel" title="Export CSV">📤</button>
+          <button id="copyCellBtn" title="Copy selected cell">📋</button>
+          <button id="copyRow" title="Copy selected rows">📄</button>
         </div>
       </div>
 

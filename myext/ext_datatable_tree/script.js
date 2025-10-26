@@ -170,7 +170,8 @@ function pivotMeasureValues(
               const symbol = node.expanded ? '➖' : '➕'
               return (
                 indent +
-                `<span class="toggle-btn" data-id="${node.id}">${symbol}</span> 📁 ` +
+                // `<span class="toggle-btn" data-id="${node.id}">${symbol}</span> 📁 ` +
+                `<span class="toggle-btn" data-id="${node.id}">${symbol}</span> ` +
                 node.name
               )
             }
@@ -202,7 +203,8 @@ function pivotMeasureValues(
           const num = Number(v)
           if (isNaN(num)) return v
           // 🔹 Format với phân tách hàng nghìn, tối đa 2 chữ số thập phân
-          return num.toLocaleString('vi-VN', { maximumFractionDigits: 2 })
+          // return num.toLocaleString('vi-VN', { maximumFractionDigits: 2 })
+          return num.toLocaleString('en-US', { maximumFractionDigits: 2 })
         }
 
         // 🔹 ĐỔI MÀU ĐỎ nếu giá trị âm
@@ -606,8 +608,8 @@ function loadAndRender(worksheet) {
         }
       },
       onGridReady: () => updateFooterTotals(),
-      onFilterChanged: () => updateFooterTotals(),
-      onSortChanged: () => updateFooterTotals()
+      onFilterChanged: () => setTimeout(updateFooterTotals, 500),
+      onSortChanged: () => setTimeout(updateFooterTotals, 500)
     }
 
     const eGridDiv = document.querySelector('#gridContainer')
@@ -622,7 +624,7 @@ function loadAndRender(worksheet) {
       // updateFooterTotals()
       setTimeout(() => {
         updateFooterTotals()
-      }, 300)
+      }, 500)
     }
 
     // Code mở tất cả và đóng tất cả tree
@@ -639,7 +641,7 @@ function loadAndRender(worksheet) {
           // updateFooterTotals //&& updateFooterTotals()
           setTimeout(() => {
             updateFooterTotals()
-          }, 300)
+          }, 500)
           // nếu muốn scroll tới đầu:
           // const vp = gridApi.gridBodyCtrl?.eBodyViewport; if (vp) vp.scrollTop = 0
         })
@@ -654,7 +656,7 @@ function loadAndRender(worksheet) {
           // updateFooterTotals && updateFooterTotals()
           setTimeout(() => {
             updateFooterTotals()
-          }, 300)
+          }, 500)
         })
       }
 
@@ -669,7 +671,7 @@ function loadAndRender(worksheet) {
       // updateFooterTotals()
       setTimeout(() => {
         updateFooterTotals()
-      }, 300)
+      }, 500)
     })
 
     document
@@ -691,7 +693,7 @@ function loadAndRender(worksheet) {
         // 🔹 3️⃣ Cập nhật lại dòng tổng
         setTimeout(() => {
           updateFooterTotals()
-        }, 300)
+        }, 500)
       })
   })
 }
@@ -730,12 +732,68 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAndRender(worksheet)
 
     // ======================
-    // Export CSV
+    // Export CSV -> tree không thò thụt được khi export csv
+    // ======================
+    // document.getElementById('exportExcel').addEventListener('click', () => {
+    //   gridApi.exportDataAsCsv({
+    //     fileName: 'tree_data.csv'
+    //   })
+    // })
+
+    // ======================
+    // Export CSV -> tree thò thụt được khi export csv
     // ======================
     document.getElementById('exportExcel').addEventListener('click', () => {
-      gridApi.exportDataAsCsv({
-        fileName: 'tree_data.csv'
+      const allRows = []
+      gridApi.forEachNodeAfterFilterAndSort((node) => {
+        allRows.push(node.data)
       })
+
+      // 🔹 Lấy pinned bottom rows (ví dụ: dòng tổng cộng)
+      const pinnedRows = gridApi.getPinnedBottomRowCount()
+        ? Array.from(
+            { length: gridApi.getPinnedBottomRowCount() },
+            (_, i) => gridApi.getPinnedBottomRow(i).data
+          )
+        : []
+
+      // 🔹 Gộp lại (dòng tổng ở cuối)
+      const exportRows = [...allRows, ...pinnedRows]
+
+      const displayedCols = gridApi.getColumnDefs().map((c) => c.field)
+      const headers = displayedCols.join(',')
+
+      const csvRows = exportRows.map((row) => {
+        return displayedCols
+          .map((col) => {
+            let val = row[col] ?? ''
+            if (col === 'name' && row.level) {
+              const indent = '  '.repeat(row.level - 1)
+              val = indent + val
+            }
+            // Escape CSV nếu có dấu phẩy, nháy kép hoặc xuống dòng
+            if (typeof val === 'string' && val.match(/[",\n]/)) {
+              val = '"' + val.replace(/"/g, '""') + '"'
+            }
+            return val
+          })
+          .join(',')
+      })
+
+      // ⚡ Thêm BOM UTF-8 để Excel đọc đúng tiếng Việt
+      const bom = '\uFEFF'
+      const csvContent = [headers, ...csvRows].join('\n')
+
+      const blob = new Blob([bom + csvContent], {
+        type: 'text/csv;charset=utf-8;'
+      })
+
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = 'tree_data.csv'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     })
 
     // --- Copy bằng nút bấm ---

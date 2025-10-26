@@ -158,7 +158,8 @@ function pivotMeasureValues(
         const num = Number(v)
         if (isNaN(num)) return v
         // 🔹 Format với phân tách hàng nghìn, tối đa 2 chữ số thập phân
-        return num.toLocaleString('vi-VN', { maximumFractionDigits: 2 })
+        return num.toLocaleString('en-US', { maximumFractionDigits: 2 })
+        // return num.toLocaleString('vi-VN', { maximumFractionDigits: 2 })
       }
     }
 
@@ -218,6 +219,18 @@ function loadAndRender(worksheet) {
         checkboxes: true
       },
 
+      getRowStyle: (params) => {
+        // Nếu là dòng pinned bottom (Tổng cộng)
+        if (params.node.rowPinned === 'bottom') {
+          return {
+            color: 'red', // chữ màu đỏ
+            fontWeight: 'bold', // đậm cho nổi bật
+            backgroundColor: '#fff5f5' // nền nhẹ (tùy chọn)
+          }
+        }
+        return null
+      },
+
       // sự kiện click vào 1 cell
       onCellClicked: (params) => {
         selectedCellValue = params.value
@@ -239,8 +252,8 @@ function loadAndRender(worksheet) {
 
       domLayout: 'normal',
       onGridReady: () => updateFooterTotals(),
-      onFilterChanged: () => updateFooterTotals(),
-      onSortChanged: () => updateFooterTotals()
+      onFilterChanged: () => setTimeout(updateFooterTotals, 500),
+      onSortChanged: () => setTimeout(updateFooterTotals, 500)
     }
 
     const eGridDiv = document.querySelector('#myGrid')
@@ -255,7 +268,7 @@ function loadAndRender(worksheet) {
       // updateFooterTotals()
       setTimeout(() => {
         updateFooterTotals()
-      }, 300)
+      }, 500)
     }
 
     // ======= 5️⃣ TÌM KIẾM =======
@@ -264,7 +277,7 @@ function loadAndRender(worksheet) {
       // updateFooterTotals()
       setTimeout(() => {
         updateFooterTotals()
-      }, 300)
+      }, 500)
     })
 
     // export cu
@@ -353,7 +366,7 @@ function loadAndRender(worksheet) {
         // 🔹 3️⃣ Cập nhật lại dòng tổng
         setTimeout(() => {
           updateFooterTotals()
-        }, 300)
+        }, 500)
       })
 
     // --- Copy khi Ctrl + C ---
