@@ -527,6 +527,12 @@ function loadAndRender(worksheet) {
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
 
+    function safeUpdateTotals(gridApi, delay = 300) {
+      requestAnimationFrame(() => {
+        setTimeout(() => updateFooterTotals(gridApi), delay)
+      })
+    }
+
     // ======================
     // 4️⃣ Tree data + Flatten ban đầu
     // ======================
@@ -607,9 +613,9 @@ function loadAndRender(worksheet) {
           params.node.setSelected(true)
         }
       },
-      onGridReady: () => updateFooterTotals(),
-      onFilterChanged: () => setTimeout(updateFooterTotals, 500),
-      onSortChanged: () => setTimeout(updateFooterTotals, 500)
+      onGridReady: () => safeUpdateTotals(params.api),
+      onFilterChanged: () => safeUpdateTotals(params.api),
+      onSortChanged: () => safeUpdateTotals(params.api)
     }
 
     const eGridDiv = document.querySelector('#gridContainer')
@@ -622,9 +628,7 @@ function loadAndRender(worksheet) {
       gridApi.setGridOption('rowData', flatData)
       gridApi.setGridOption('columnDefs', columnDefs)
       // updateFooterTotals()
-      setTimeout(() => {
-        updateFooterTotals()
-      }, 500)
+      safeUpdateTotals(gridApi)
     }
 
     // Code mở tất cả và đóng tất cả tree
@@ -639,9 +643,7 @@ function loadAndRender(worksheet) {
           const flat = flattenTree(nestedData)
           gridApi.setGridOption('rowData', flat)
           // updateFooterTotals //&& updateFooterTotals()
-          setTimeout(() => {
-            updateFooterTotals()
-          }, 500)
+          safeUpdateTotals(gridApi)
           // nếu muốn scroll tới đầu:
           // const vp = gridApi.gridBodyCtrl?.eBodyViewport; if (vp) vp.scrollTop = 0
         })
@@ -654,9 +656,7 @@ function loadAndRender(worksheet) {
           const flat = flattenTree(nestedData)
           gridApi.setGridOption('rowData', flat)
           // updateFooterTotals && updateFooterTotals()
-          setTimeout(() => {
-            updateFooterTotals()
-          }, 500)
+          safeUpdateTotals(gridApi)
         })
       }
 
@@ -669,9 +669,7 @@ function loadAndRender(worksheet) {
     document.getElementById('globalSearch').addEventListener('input', (e) => {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(e.target.value))
       // updateFooterTotals()
-      setTimeout(() => {
-        updateFooterTotals()
-      }, 500)
+      safeUpdateTotals(gridApi)
     })
 
     document
@@ -691,9 +689,7 @@ function loadAndRender(worksheet) {
         }
 
         // 🔹 3️⃣ Cập nhật lại dòng tổng
-        setTimeout(() => {
-          updateFooterTotals()
-        }, 500)
+        safeUpdateTotals(gridApi)
       })
   })
 }

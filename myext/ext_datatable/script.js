@@ -251,9 +251,9 @@ function loadAndRender(worksheet) {
       // },
 
       domLayout: 'normal',
-      onGridReady: () => updateFooterTotals(),
-      onFilterChanged: () => setTimeout(updateFooterTotals, 500),
-      onSortChanged: () => setTimeout(updateFooterTotals, 500)
+      onGridReady: () => safeUpdateTotals(gridApi),
+      onFilterChanged: () => safeUpdateTotals(gridApi),
+      onSortChanged: () => safeUpdateTotals(gridApi)
     }
 
     const eGridDiv = document.querySelector('#myGrid')
@@ -266,18 +266,14 @@ function loadAndRender(worksheet) {
       gridApi.setGridOption('rowData', data)
       gridApi.setGridOption('columnDefs', columnDefs)
       // updateFooterTotals()
-      setTimeout(() => {
-        updateFooterTotals()
-      }, 500)
+      safeUpdateTotals(gridApi)
     }
 
     // ======= 5️⃣ TÌM KIẾM =======
     document.getElementById('searchBox').addEventListener('input', function () {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(this.value))
       // updateFooterTotals()
-      setTimeout(() => {
-        updateFooterTotals()
-      }, 500)
+      safeUpdateTotals(gridApi)
     })
 
     // export cu
@@ -308,6 +304,12 @@ function loadAndRender(worksheet) {
 
       // ✅ Gán dòng này thành pinned bottom row
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
+    }
+
+    function safeUpdateTotals(gridApi, delay = 300) {
+      requestAnimationFrame(() => {
+        setTimeout(() => updateFooterTotals(gridApi), delay)
+      })
     }
 
     // --- Copy bằng nút bấm ---
@@ -364,9 +366,7 @@ function loadAndRender(worksheet) {
         }
 
         // 🔹 3️⃣ Cập nhật lại dòng tổng
-        setTimeout(() => {
-          updateFooterTotals()
-        }, 500)
+        safeUpdateTotals(gridApi)
       })
 
     // --- Copy khi Ctrl + C ---
