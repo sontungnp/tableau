@@ -304,8 +304,8 @@ function loadAndRender(worksheet) {
       })
 
       // ✅ Gán dòng này thành pinned bottom row
-      gridApi.setGridOption('pinnedBottomRowData', [totalRow])
-      // gridApi.setPinnedBottomRowData([totalRow])
+      // gridApi.setGridOption('pinnedBottomRowData', [totalRow])
+      gridApi.setPinnedBottomRowData([totalRow])
     }
 
     function safeUpdateTotals(gridApi, delay = 300) {
