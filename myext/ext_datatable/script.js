@@ -251,8 +251,8 @@ function loadAndRender(worksheet) {
       // },
 
       domLayout: 'normal',
-      // onGridReady: () => safeUpdateTotals(gridApi),
-      onFirstDataRendered: () => safeUpdateTotals(gridApi),
+      onGridReady: () => updateFooterTotals(),
+      // onFirstDataRendered: () => safeUpdateTotals(gridApi),
       onFilterChanged: () => safeUpdateTotals(gridApi),
       onSortChanged: () => safeUpdateTotals(gridApi)
     }
