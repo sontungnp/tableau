@@ -501,8 +501,15 @@ function loadAndRender(worksheet) {
 
     // ======= DÒNG TỔNG =======
     function updateFooterTotals() {
+      if (!gridApi) return
+
       const allData = []
-      gridApi.forEachNodeAfterFilterAndSort((node) => allData.push(node.data))
+      gridApi.forEachNodeAfterFilterAndSort((node) => {
+        if (!node.rowPinned) {
+          // Chỉ lấy dòng thường, không lấy dòng pinned
+          allData.push(node.data)
+        }
+      })
 
       const numericCols = columnDefs
         .filter((col) => col.type === 'numericColumn')
@@ -510,7 +517,6 @@ function loadAndRender(worksheet) {
 
       const totals = calcTotalsTree(allData, numericCols)
 
-      // 🟢 Tạo 1 dòng "tổng cộng"
       const totalRow = {}
       columnDefs.forEach((col) => {
         const field = col.field
@@ -523,13 +529,14 @@ function loadAndRender(worksheet) {
         }
       })
 
-      // ✅ Gán dòng này thành pinned bottom row
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
 
-    function safeUpdateTotals(gridApi, delay = 300) {
+    function safeUpdateTotals(delay = 300) {
+      if (!gridApi) return
+
       requestAnimationFrame(() => {
-        setTimeout(() => updateFooterTotals(gridApi), delay)
+        setTimeout(() => updateFooterTotals(), delay)
       })
     }
 
@@ -613,9 +620,13 @@ function loadAndRender(worksheet) {
           params.node.setSelected(true)
         }
       },
-      onGridReady: () => safeUpdateTotals(params.api),
-      onFilterChanged: () => safeUpdateTotals(params.api),
-      onSortChanged: () => safeUpdateTotals(params.api)
+      onGridReady: (params) => {
+        gridApi = params.api
+        safeUpdateTotals()
+      },
+      onFirstDataRendered: () => safeUpdateTotals(),
+      onFilterChanged: () => safeUpdateTotals(),
+      onSortChanged: () => safeUpdateTotals()
     }
 
     const eGridDiv = document.querySelector('#gridContainer')
@@ -628,7 +639,9 @@ function loadAndRender(worksheet) {
       gridApi.setGridOption('rowData', flatData)
       gridApi.setGridOption('columnDefs', columnDefs)
       // updateFooterTotals()
-      safeUpdateTotals(gridApi)
+      setTimeout(() => {
+        safeUpdateTotals()
+      }, 100)
     }
 
     // Code mở tất cả và đóng tất cả tree
@@ -643,7 +656,7 @@ function loadAndRender(worksheet) {
           const flat = flattenTree(nestedData)
           gridApi.setGridOption('rowData', flat)
           // updateFooterTotals //&& updateFooterTotals()
-          safeUpdateTotals(gridApi)
+          safeUpdateTotals()
           // nếu muốn scroll tới đầu:
           // const vp = gridApi.gridBodyCtrl?.eBodyViewport; if (vp) vp.scrollTop = 0
         })
@@ -668,8 +681,7 @@ function loadAndRender(worksheet) {
     // ======================
     document.getElementById('globalSearch').addEventListener('input', (e) => {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(e.target.value))
-      // updateFooterTotals()
-      safeUpdateTotals(gridApi)
+      safeUpdateTotals() // ✅ gọi đúng
     })
 
     document
@@ -689,7 +701,7 @@ function loadAndRender(worksheet) {
         }
 
         // 🔹 3️⃣ Cập nhật lại dòng tổng
-        safeUpdateTotals(gridApi)
+        safeUpdateTotals() // ✅ gọi đúng
       })
   })
 }
