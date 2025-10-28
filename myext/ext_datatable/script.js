@@ -251,7 +251,10 @@ function loadAndRender(worksheet) {
       // },
 
       domLayout: 'normal',
-      onGridReady: () => updateFooterTotals(),
+      onGridReady: (params) => {
+        gridApi = params.api
+        updateFooterTotals()
+      },
       // onFirstDataRendered: () => safeUpdateTotals(gridApi),
       onFilterChanged: () => safeUpdateTotals(gridApi),
       onSortChanged: () => safeUpdateTotals(gridApi)
@@ -260,29 +263,37 @@ function loadAndRender(worksheet) {
     const eGridDiv = document.querySelector('#myGrid')
     // const gridApi = agGrid.createGrid(eGridDiv, gridOptions)
     if (!gridApi) {
-      // ❗ Chỉ tạo grid 1 lần
       gridApi = agGrid.createGrid(eGridDiv, gridOptions)
     } else {
-      // ✅ Cập nhật lại dữ liệu
+      // ✅ Cập nhật lại dữ liệu và đảm bảo tổng được tính
       gridApi.setGridOption('rowData', data)
       gridApi.setGridOption('columnDefs', columnDefs)
-      // updateFooterTotals()
-      safeUpdateTotals(gridApi)
+
+      // Đảm bảo tổng được tính lại sau khi set dữ liệu mới
+      setTimeout(() => {
+        safeUpdateTotals()
+      }, 100)
     }
 
     // ======= 5️⃣ TÌM KIẾM =======
     document.getElementById('searchBox').addEventListener('input', function () {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(this.value))
-      // updateFooterTotals()
-      safeUpdateTotals(gridApi)
+      safeUpdateTotals() // Đảm bảo gọi đúng hàm
     })
 
     // export cu
 
     // ======= 7️⃣ DÒNG TỔNG =======
     function updateFooterTotals() {
+      if (!gridApi) return
+
       const allData = []
-      gridApi.forEachNodeAfterFilterAndSort((node) => allData.push(node.data))
+      gridApi.forEachNodeAfterFilterAndSort((node) => {
+        if (!node.rowPinned) {
+          // Chỉ lấy dòng thường, không lấy dòng pinned
+          allData.push(node.data)
+        }
+      })
 
       const numericCols = columnDefs
         .filter((col) => col.type === 'numericColumn')
@@ -304,13 +315,14 @@ function loadAndRender(worksheet) {
       })
 
       // ✅ Gán dòng này thành pinned bottom row
-      // gridApi.setGridOption('pinnedBottomRowData', [totalRow])
-      gridApi.setPinnedBottomRowData([totalRow])
+      gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
 
-    function safeUpdateTotals(gridApi, delay = 300) {
+    function safeUpdateTotals(delay = 300) {
+      if (!gridApi) return
+
       requestAnimationFrame(() => {
-        setTimeout(() => updateFooterTotals(gridApi), delay)
+        setTimeout(() => updateFooterTotals(), delay)
       })
     }
 
