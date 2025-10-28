@@ -251,7 +251,8 @@ function loadAndRender(worksheet) {
       // },
 
       domLayout: 'normal',
-      onGridReady: () => safeUpdateTotals(gridApi),
+      // onGridReady: () => safeUpdateTotals(gridApi),
+      onFirstDataRendered: () => safeUpdateTotals(gridApi),
       onFilterChanged: () => safeUpdateTotals(gridApi),
       onSortChanged: () => safeUpdateTotals(gridApi)
     }
@@ -303,8 +304,8 @@ function loadAndRender(worksheet) {
       })
 
       // ✅ Gán dòng này thành pinned bottom row
-      // gridApi.setGridOption('pinnedBottomRowData', [totalRow])
-      gridApi.setPinnedBottomRowData([totalRow])
+      gridApi.setGridOption('pinnedBottomRowData', [totalRow])
+      // gridApi.setPinnedBottomRowData([totalRow])
     }
 
     function safeUpdateTotals(gridApi, delay = 300) {
