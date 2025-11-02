@@ -155,6 +155,43 @@
       .ag-theme-quartz .ag-header-cell::after {
         border-right: 1px solid #ccc;
       }
+
+      /* === THÊM MỚI: chỉnh kích thước icon + - nhỏ lại === */
+      .toggle-btn {
+        font-size: 10px; /* kích thước phù hợp */
+        width: 14px; /* ô vuông nhỏ gọn */
+        height: 14px;
+        line-height: 12px; /* căn giữa theo chiều dọc */
+        display: inline-flex; /* dùng flex để căn giữa tuyệt đối */
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ccc; /* viền xám nhẹ */
+        border-radius: 2px; /* bo nhẹ góc */
+        background-color: #fff; /* nền trắng */
+        color: #000 !important;
+        cursor: pointer;
+        user-select: none;
+        vertical-align: middle;
+        box-sizing: border-box;
+      }
+
+      .toggle-btn:hover {
+        background-color: #f0f0f0; /* đổi màu nền khi hover */
+        border-color: #888;
+        color: #000 !important; /* 👈 giữ nguyên màu đen khi hover */
+      }
+
+      .ag-theme-quartz .ag-cell .toggle-btn,
+      .ag-theme-quartz .toggle-btn,
+      .toggle-btn {
+        color: #000 !important; /* ép tuyệt đối */
+      }
+
+      .ag-icon,
+      .ag-icon-expanded,
+      .ag-icon-contracted {
+        color: #000 !important;
+      }
     </style>
   </head>
 
