@@ -272,7 +272,7 @@ function loadAndRender(worksheet) {
       // Đảm bảo tổng được tính lại sau khi set dữ liệu mới
       setTimeout(() => {
         safeUpdateTotals()
-      }, 100)
+      }, 300)
     }
 
     // ======= 5️⃣ TÌM KIẾM =======
