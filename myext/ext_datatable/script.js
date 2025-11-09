@@ -343,7 +343,7 @@ function loadAndRender(worksheet) {
       if (!gridApi) return
 
       // Đảm bảo grid DOM đã vẽ pinned container
-      gridApi.ensurePinnedBottomDisplayed()
+      // gridApi.ensurePinnedBottomDisplayed()
 
       const allData = []
       gridApi.forEachNodeAfterFilterAndSort((node) => {
