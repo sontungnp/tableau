@@ -263,7 +263,6 @@ function loadAndRender(worksheet) {
       },
       onModelUpdated: () => {
         console.log('Model updated -> rows might change 2')
-        updateFooterTotalsSafe()
       },
       onRowDataUpdated: () => {
         console.log('Row data updated -> safe to calculate totals')
@@ -386,6 +385,11 @@ function loadAndRender(worksheet) {
     // --- Copy bằng nút bấm ---
     document.getElementById('copyBtn').addEventListener('click', () => {
       copySelectedRows()
+    })
+
+    // --- Copy bằng nút bấm ---
+    document.getElementById('updateTotal').addEventListener('click', () => {
+      updateFooterTotals()
     })
 
     document.getElementById('copyCellBtn').addEventListener('click', () => {
