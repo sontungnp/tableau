@@ -262,7 +262,8 @@ function loadAndRender(worksheet) {
         console.log('Filter changed -> model updated incoming')
       },
       onModelUpdated: () => {
-        console.log('Model updated -> rows might change')
+        console.log('Model updated -> rows might change 2')
+        updateFooterTotalsSafe()
       },
       onRowDataUpdated: () => {
         console.log('Row data updated -> safe to calculate totals')
