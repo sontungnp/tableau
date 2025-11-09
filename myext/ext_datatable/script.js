@@ -259,9 +259,9 @@ function loadAndRender(worksheet) {
       },
       // onFirstDataRendered: () => safeUpdateTotals(gridApi),
       onFilterChanged: () => {
-        console.log('Timeout - 261 - x2')
+        console.log('Timeout - 261 - modelUpdated')
         // safeUpdateTotals(gridApi)
-        gridApi.addEventListener('firstDataRendered', () => {
+        gridApi.addEventListener('modelUpdated', () => {
           console.log('da fix tai day')
 
           safeUpdateTotals()
