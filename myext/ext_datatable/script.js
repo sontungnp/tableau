@@ -206,6 +206,8 @@ function loadAndRender(worksheet) {
       columnDefs,
       rowData: data,
       animateRows: true,
+      suppressAggFuncInHeader: true,
+      alwaysShowHorizontalScroll: true,
       defaultColDef: {
         sortable: true,
         filter: true,
@@ -257,12 +259,11 @@ function loadAndRender(worksheet) {
       },
       // onFirstDataRendered: () => safeUpdateTotals(gridApi),
       onFilterChanged: () => {
-        console.log('Timeout - 261 - new')
+        console.log('Timeout - 261 - x2')
         // safeUpdateTotals(gridApi)
-        clearTimeout(window._filterTimeout)
-        window._filterTimeout = setTimeout(() => {
+        gridApi.addEventListener('firstDataRendered', () => {
           safeUpdateTotals()
-        }, 500)
+        })
       },
       onSortChanged: () => {
         console.log('Timeout - 268')
