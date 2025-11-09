@@ -257,12 +257,12 @@ function loadAndRender(worksheet) {
       },
       // onFirstDataRendered: () => safeUpdateTotals(gridApi),
       onFilterChanged: () => {
-        console.log('Timeout - 261-2')
+        console.log('Timeout - 261 - new')
         // safeUpdateTotals(gridApi)
-        safeUpdateTotals()
-        setTimeout(() => {
+        clearTimeout(window._filterTimeout)
+        window._filterTimeout = setTimeout(() => {
           safeUpdateTotals()
-        }, 300)
+        }, 500)
       },
       onSortChanged: () => {
         console.log('Timeout - 268')
@@ -291,7 +291,7 @@ function loadAndRender(worksheet) {
     document.getElementById('searchBox').addEventListener('input', function () {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(this.value))
       // console.log('Timeout - 289')
-      // safeUpdateTotals() // Đảm bảo gọi đúng hàm
+      safeUpdateTotals() // Đảm bảo gọi đúng hàm
     })
 
     // export cu
