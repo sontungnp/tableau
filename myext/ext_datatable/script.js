@@ -259,6 +259,7 @@ function loadAndRender(worksheet) {
       },
       onFilterChanged: () => {
         console.log(`[${new Date().toISOString()}] Filter changed`)
+        renderActiveFilters() // ✅ cập nhật danh sách button filter
         funcTionWait4ToUpdateTotal(3000)
       },
       onSortChanged: () => {
@@ -326,6 +327,41 @@ function loadAndRender(worksheet) {
 
       // ✅ Gán dòng này thành pinned bottom row
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
+    }
+
+    function renderActiveFilters() {
+      if (!gridApi) return
+
+      const filterModel = gridApi.getFilterModel()
+      console.log('filterModel', filterModel)
+      const filterArea = document.getElementById('filter-area')
+
+      // Xoá hết các button cũ
+      filterArea.innerHTML = ''
+
+      // Nếu không có filter nào
+      if (Object.keys(filterModel).length === 0) {
+        filterArea.innerHTML = `<span style="color:#888;">Không có filter nào</span>`
+        return
+      }
+
+      // Tạo các button cho mỗi cột
+      Object.keys(filterModel).forEach((col) => {
+        const btn = document.createElement('button')
+        btn.textContent = col
+
+        // Khi click: xoá filter cho cột đó
+        btn.addEventListener('click', () => {
+          const model = gridApi.getFilterModel()
+          delete model[col] // xoá filter cho cột này
+          gridApi.setFilterModel(model)
+          gridApi.onFilterChanged() // cập nhật lại lưới
+
+          renderActiveFilters() // cập nhật lại danh sách nút
+        })
+
+        filterArea.appendChild(btn)
+      })
     }
 
     // --- Copy bằng nút bấm ---

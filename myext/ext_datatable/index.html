@@ -39,7 +39,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
         gap: 10px;
       }
 
@@ -145,6 +145,38 @@
         font-weight: bold;
         color: #000;
       }
+
+      /* Thêm css cho nut filter */
+      #notebar {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end; /* bám đáy */
+      }
+      #filter-area {
+        margin-top: 2px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: center;
+      }
+
+      #filter-area button {
+        padding: 2px 2px;
+        margin: 2px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: #eef6ff;
+        cursor: pointer;
+        font-size: 11px;
+        color: #333;
+        line-height: 1.2;
+        transition: all 0.2s ease;
+      }
+
+      #filter-area button:hover {
+        background: #d9ecff;
+      }
     </style>
   </head>
 
@@ -165,13 +197,22 @@
           <button id="exportBtn" title="Export CSV">📤</button>
           <button id="copyCellBtn" title="Copy selected cell">📋</button>
           <button id="copyBtn" title="Copy selected rows">📄</button>
-          <button id="updateTotal" title="Copy selected rows">
-            UpdateTotal
-          </button>
+          <button id="updateTotal" title="Update Total">🔄</button>
         </div>
       </div>
 
       <div id="notebar" style="text-align: right">
+        <div
+          id="filter-area"
+          style="margin-top: 2px; display: flex; flex-wrap: wrap; gap: 0px"
+        >
+          <!-- <button id="updateTotal1" title="Copy selected rows">
+            UpdateTotal
+          </button>
+          <button id="updateTotal2" title="Copy selected rows">
+            UpdateTotal
+          </button> -->
+        </div>
         <label id="extractRefreshTime">extract refresh time: </label>
       </div>
 
