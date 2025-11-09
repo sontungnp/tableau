@@ -295,7 +295,8 @@ function loadAndRender(worksheet) {
       console.log(`[${new Date().toISOString()}] Start waiting 3 seconds...`)
       setTimeout(() => {
         console.log(`[${new Date().toISOString()}] hello`)
-      }, 3000)
+        document.getElementById('updateTotal').click() // 👈 tự động kích nút
+      }, 5000)
     }
 
     // ======= 7️⃣ DÒNG TỔNG =======
