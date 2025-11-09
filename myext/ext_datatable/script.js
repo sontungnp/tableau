@@ -287,7 +287,7 @@ function loadAndRender(worksheet) {
     document.getElementById('searchBox').addEventListener('input', function () {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(this.value))
       console.log('Timeout - 289')
-      safeUpdateTotals() // Đảm bảo gọi đúng hàm
+      // safeUpdateTotals() // Đảm bảo gọi đúng hàm
     })
 
     // export cu
