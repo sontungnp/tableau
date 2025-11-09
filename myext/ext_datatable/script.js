@@ -335,6 +335,7 @@ function loadAndRender(worksheet) {
 
       requestAnimationFrame(() => {
         setTimeout(() => updateFooterTotals(), delay)
+        console.log('xxxxxx')
       })
     }
 
