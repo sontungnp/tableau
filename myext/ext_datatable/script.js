@@ -257,30 +257,8 @@ function loadAndRender(worksheet) {
         gridApi = params.api
         updateFooterTotals()
       },
-      // onFirstDataRendered: () => safeUpdateTotals(gridApi),
       onFilterChanged: () => {
-        console.log(
-          `[${new Date().toISOString()}] Filter changed -> model updated incoming`
-        )
-      },
-
-      onModelUpdated: () => {
-        console.log(
-          `[${new Date().toISOString()}] Model updated -> rows might change 2`
-        )
-      },
-
-      onRowDataUpdated: () => {
-        console.log(
-          `[${new Date().toISOString()}] Row data updated -> safe to calculate totals`
-        )
-        safeUpdateTotals
-      },
-
-      onDisplayedColumnsChanged: () => {
-        console.log(
-          `[${new Date().toISOString()}] Displayed columns changed -> grid layout ready`
-        )
+        console.log(`[${new Date().toISOString()}] Filter changed`)
         safeUpdateTotals()
       },
       onSortChanged: () => {
@@ -385,7 +363,7 @@ function loadAndRender(worksheet) {
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
 
-    function safeUpdateTotals(delay = 300) {
+    function safeUpdateTotals(delay = 1000) {
       if (!gridApi) return
 
       requestAnimationFrame(() => {
