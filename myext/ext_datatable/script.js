@@ -268,11 +268,12 @@ function loadAndRender(worksheet) {
         // })
       },
       onModelUpdated: () => {
-        // Đợi grid hoàn tất render DOM (flush animation frame)
-        console.log('Timeout - 261 - modelUpdated')
+        console.log('Timeout - 261 onModelUpdated')
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            safeUpdateTotals()
+            setTimeout(() => {
+              safeUpdateTotals()
+            }, 150)
           })
         })
       },
