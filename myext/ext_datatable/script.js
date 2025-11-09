@@ -371,7 +371,7 @@ function loadAndRender(worksheet) {
         }
       })
 
-      gridApi.setPinnedBottomRowData([totalRow])
+      gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
 
     function safeUpdateTotals(delay = 300) {
