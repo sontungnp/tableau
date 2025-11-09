@@ -262,6 +262,8 @@ function loadAndRender(worksheet) {
         console.log('Timeout - 261 - x2')
         // safeUpdateTotals(gridApi)
         gridApi.addEventListener('firstDataRendered', () => {
+          console.log('da fix tai day')
+
           safeUpdateTotals()
         })
       },
