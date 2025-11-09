@@ -256,8 +256,14 @@ function loadAndRender(worksheet) {
         updateFooterTotals()
       },
       // onFirstDataRendered: () => safeUpdateTotals(gridApi),
-      onFilterChanged: () => safeUpdateTotals(gridApi),
-      onSortChanged: () => safeUpdateTotals(gridApi)
+      onFilterChanged: () => {
+        console.log('Timeout - 260')
+        safeUpdateTotals(gridApi)
+      },
+      onSortChanged: () => {
+        console.log('Timeout - 264')
+        safeUpdateTotals(gridApi)
+      }
     }
 
     const eGridDiv = document.querySelector('#myGrid')
@@ -270,6 +276,8 @@ function loadAndRender(worksheet) {
       gridApi.setGridOption('columnDefs', columnDefs)
 
       // Đảm bảo tổng được tính lại sau khi set dữ liệu mới
+      console.log('vong 2 timeout - 279')
+
       setTimeout(() => {
         safeUpdateTotals()
       }, 300)
@@ -278,6 +286,7 @@ function loadAndRender(worksheet) {
     // ======= 5️⃣ TÌM KIẾM =======
     document.getElementById('searchBox').addEventListener('input', function () {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(this.value))
+      console.log('Timeout - 289')
       safeUpdateTotals() // Đảm bảo gọi đúng hàm
     })
 
@@ -380,6 +389,7 @@ function loadAndRender(worksheet) {
         }
 
         // 🔹 3️⃣ Cập nhật lại dòng tổng
+        console.log('Timeout - 392')
         safeUpdateTotals(gridApi)
       })
 
