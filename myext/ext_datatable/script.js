@@ -259,23 +259,17 @@ function loadAndRender(worksheet) {
       },
       // onFirstDataRendered: () => safeUpdateTotals(gridApi),
       onFilterChanged: () => {
-        console.log('Timeout - 261')
-        // safeUpdateTotals(gridApi)
-        // gridApi.addEventListener('modelUpdated', () => {
-        //   console.log('da fix tai day')
-
-        //   safeUpdateTotals()
-        // })
+        console.log('Filter changed -> model updated incoming')
       },
       onModelUpdated: () => {
-        console.log('modelUpdated at', performance.now())
-        requestAnimationFrame(() => {
-          console.log('frame1 at', performance.now())
-          requestAnimationFrame(() => {
-            console.log('frame2 at', performance.now())
-            safeUpdateTotals()
-          })
-        })
+        console.log('Model updated -> rows might change')
+      },
+      onRowDataUpdated: () => {
+        console.log('Row data updated -> safe to calculate totals')
+      },
+      onDisplayedColumnsChanged: () => {
+        console.log('Displayed columns changed -> grid layout ready')
+        updateFooterTotalsSafe()
       },
       onSortChanged: () => {
         console.log('Timeout - 268')
@@ -342,6 +336,41 @@ function loadAndRender(worksheet) {
 
       // ✅ Gán dòng này thành pinned bottom row
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
+    }
+
+    function updateFooterTotalsSafe() {
+      if (!gridApi) return
+
+      // Đảm bảo grid DOM đã vẽ pinned container
+      gridApi.ensurePinnedBottomDisplayed()
+
+      const allData = []
+      gridApi.forEachNodeAfterFilterAndSort((node) => {
+        if (!node.rowPinned) allData.push(node.data)
+      })
+
+      const numericCols = gridApi
+        .getColumnDefs()
+        .filter((col) => col.type === 'numericColumn')
+        .map((col) => col.field)
+
+      const totals = {}
+      numericCols.forEach((col) => {
+        totals[col] = allData.reduce((sum, r) => sum + (Number(r[col]) || 0), 0)
+      })
+
+      const totalRow = {}
+      gridApi.getColumnDefs().forEach((col, idx) => {
+        if (numericCols.includes(col.field)) {
+          totalRow[col.field] = totals[col.field]
+        } else if (idx === 0) {
+          totalRow[col.field] = 'Tổng cộng'
+        } else {
+          totalRow[col.field] = ''
+        }
+      })
+
+      gridApi.setPinnedBottomRowData([totalRow])
     }
 
     function safeUpdateTotals(delay = 300) {
