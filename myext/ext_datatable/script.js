@@ -259,17 +259,29 @@ function loadAndRender(worksheet) {
       },
       // onFirstDataRendered: () => safeUpdateTotals(gridApi),
       onFilterChanged: () => {
-        console.log('Filter changed -> model updated incoming')
+        console.log(
+          `[${new Date().toISOString()}] Filter changed -> model updated incoming`
+        )
       },
+
       onModelUpdated: () => {
-        console.log('Model updated -> rows might change 2')
+        console.log(
+          `[${new Date().toISOString()}] Model updated -> rows might change 2`
+        )
       },
+
       onRowDataUpdated: () => {
-        console.log('Row data updated -> safe to calculate totals')
+        console.log(
+          `[${new Date().toISOString()}] Row data updated -> safe to calculate totals`
+        )
+        safeUpdateTotals
       },
+
       onDisplayedColumnsChanged: () => {
-        console.log('Displayed columns changed -> grid layout ready')
-        updateFooterTotalsSafe()
+        console.log(
+          `[${new Date().toISOString()}] Displayed columns changed -> grid layout ready`
+        )
+        safeUpdateTotals()
       },
       onSortChanged: () => {
         console.log('Timeout - 268')
