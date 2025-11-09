@@ -257,8 +257,8 @@ function loadAndRender(worksheet) {
       },
       // onFirstDataRendered: () => safeUpdateTotals(gridApi),
       onFilterChanged: () => {
-        console.log('Timeout - 262')
-        // safeUpdateTotals(gridApi)
+        console.log('Timeout - 261')
+        safeUpdateTotals(gridApi)
         setTimeout(() => {
           safeUpdateTotals()
         }, 300)
