@@ -206,8 +206,8 @@ function loadAndRender(worksheet) {
       columnDefs,
       rowData: data,
       animateRows: true,
-      suppressAggFuncInHeader: true,
-      alwaysShowHorizontalScroll: true,
+      // suppressAggFuncInHeader: true,
+      // alwaysShowHorizontalScroll: true,
       defaultColDef: {
         sortable: true,
         filter: true,
