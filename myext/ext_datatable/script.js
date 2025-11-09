@@ -259,7 +259,7 @@ function loadAndRender(worksheet) {
       },
       onFilterChanged: () => {
         console.log(`[${new Date().toISOString()}] Filter changed`)
-        safeUpdateTotals()
+        funcTionWait3secondToSayHello()
       },
       onSortChanged: () => {
         console.log('Timeout - 268')
@@ -291,7 +291,12 @@ function loadAndRender(worksheet) {
       safeUpdateTotals() // Đảm bảo gọi đúng hàm
     })
 
-    // export cu
+    function funcTionWait3secondToSayHello() {
+      console.log(`[${new Date().toISOString()}] Start waiting 3 seconds...`)
+      setTimeout(() => {
+        console.log(`[${new Date().toISOString()}] hello`)
+      }, 3000)
+    }
 
     // ======= 7️⃣ DÒNG TỔNG =======
     function updateFooterTotals() {
