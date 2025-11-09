@@ -268,12 +268,12 @@ function loadAndRender(worksheet) {
         // })
       },
       onModelUpdated: () => {
-        console.log('Timeout - 261 onModelUpdated')
+        console.log('modelUpdated at', performance.now())
         requestAnimationFrame(() => {
+          console.log('frame1 at', performance.now())
           requestAnimationFrame(() => {
-            setTimeout(() => {
-              safeUpdateTotals()
-            }, 150)
+            console.log('frame2 at', performance.now())
+            safeUpdateTotals()
           })
         })
       },
