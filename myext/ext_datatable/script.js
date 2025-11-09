@@ -259,11 +259,10 @@ function loadAndRender(worksheet) {
       },
       onFilterChanged: () => {
         console.log(`[${new Date().toISOString()}] Filter changed`)
-        funcTionWait3secondToSayHello()
+        funcTionWait3secondToSayHello(3000)
       },
       onSortChanged: () => {
-        console.log('Timeout - 268')
-        safeUpdateTotals(gridApi)
+        funcTionWait3secondToSayHello(1000)
       }
     }
 
@@ -288,15 +287,16 @@ function loadAndRender(worksheet) {
     document.getElementById('searchBox').addEventListener('input', function () {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(this.value))
       // console.log('Timeout - 289')
-      safeUpdateTotals() // Đảm bảo gọi đúng hàm
+      // safeUpdateTotals() // Đảm bảo gọi đúng hàm
     })
 
-    function funcTionWait3secondToSayHello() {
+    function funcTionWait3secondToSayHello(secondsamt) {
       console.log(`[${new Date().toISOString()}] Start waiting 3 seconds...`)
       setTimeout(() => {
         console.log(`[${new Date().toISOString()}] hello`)
         document.getElementById('updateTotal').click() // 👈 tự động kích nút
-      }, 5000)
+        console.log(`[${new Date().toISOString()}] done click updatetotal`)
+      }, secondsamt)
     }
 
     // ======= 7️⃣ DÒNG TỔNG =======
