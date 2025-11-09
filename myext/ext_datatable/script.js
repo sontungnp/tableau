@@ -259,12 +259,21 @@ function loadAndRender(worksheet) {
       },
       // onFirstDataRendered: () => safeUpdateTotals(gridApi),
       onFilterChanged: () => {
-        console.log('Timeout - 261 - modelUpdated')
+        console.log('Timeout - 261')
         // safeUpdateTotals(gridApi)
-        gridApi.addEventListener('modelUpdated', () => {
-          console.log('da fix tai day')
+        // gridApi.addEventListener('modelUpdated', () => {
+        //   console.log('da fix tai day')
 
-          safeUpdateTotals()
+        //   safeUpdateTotals()
+        // })
+      },
+      onModelUpdated: () => {
+        // Đợi grid hoàn tất render DOM (flush animation frame)
+        console.log('Timeout - 261 - modelUpdated')
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            safeUpdateTotals()
+          })
         })
       },
       onSortChanged: () => {
