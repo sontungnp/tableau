@@ -9,6 +9,8 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.4/styles/ag-theme-quartz.css"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
     <script src="script.js"></script>
 
@@ -157,22 +159,27 @@
       }
 
       /* === THÊM MỚI: chỉnh kích thước icon + - nhỏ lại === */
-      .toggle-btn {
-        font-size: 10px; /* kích thước phù hợp */
-        width: 14px; /* ô vuông nhỏ gọn */
+      /* .toggle-btn {
+        font-size: 10px;
+        width: 14px;
         height: 14px;
-        line-height: 12px; /* căn giữa theo chiều dọc */
-        display: inline-flex; /* dùng flex để căn giữa tuyệt đối */
+        line-height: 12px;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid #ccc; /* viền xám nhẹ */
-        border-radius: 2px; /* bo nhẹ góc */
-        background-color: #fff; /* nền trắng */
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        background-color: #fff;
         color: #000 !important;
         cursor: pointer;
         user-select: none;
         vertical-align: middle;
         box-sizing: border-box;
+      } */
+      .toggle-btn {
+        color: #666;
+        margin-right: 8px;
+        font-size: 18px;
       }
 
       .toggle-btn:hover {

@@ -17,6 +17,27 @@ function setAllExpanded(nodes, expanded) {
   }
 }
 
+// Mở rộng toàn bộ subtree của 1 node
+function setSubtreeExpanded(node, expanded) {
+  if (!node) return
+  node.expanded = expanded
+  if (node.children) {
+    node.children.forEach((child) => setSubtreeExpanded(child, expanded))
+  }
+}
+
+// Tìm node theo ID trong nestedData
+function findNodeById(nodes, id) {
+  for (const n of nodes) {
+    if (n.id == id) return n
+    if (n.children) {
+      const f = findNodeById(n.children, id)
+      if (f) return f
+    }
+  }
+  return null
+}
+
 // Hàm chuẩn hóa chỉ để đồng bộ Unicode, không bỏ dấu
 function normalizeUnicode(str) {
   return str ? str.normalize('NFC').toLowerCase().trim() : ''
@@ -165,9 +186,9 @@ function pivotMeasureValues(
               node.level - 1
             )
             if (node.leaf) {
-              return indent + '📄 ' + (node.name || '')
+              return indent + '' + (node.name || '')
             } else {
-              const symbol = node.expanded ? '➖' : '➕'
+              const symbol = node.expanded ? '▾' : '▸'
               return (
                 indent +
                 // `<span class="toggle-btn" data-id="${node.id}">${symbol}</span> 📁 ` +
@@ -468,6 +489,42 @@ function adjustGridHeight() {
   gridContainer.style.height = `${gridHeight}px`
 }
 
+// ======================
+// Helper cho export: Flatten tree với path và tính max level (FIX: không thừa level cho leaf)
+// ======================
+function exportFlattenWithPath(
+  nodes,
+  currentPath = [],
+  result = [],
+  maxLevelRef = { max: 0 }
+) {
+  for (const node of nodes) {
+    // Chỉ tính max cho non-leaf (cha có children), tránh thừa level từ leaf rỗng
+    if (!node.leaf && node.name) {
+      const nodePath = [...currentPath, node.name]
+      maxLevelRef.max = Math.max(maxLevelRef.max, nodePath.length)
+      const row = { ...node, path: nodePath } // Copy node + path cho cha
+      result.push(row)
+    } else if (node.leaf) {
+      // Leaf: dùng path của parent (không thêm level rỗng), copy data measures
+      const leafRow = { ...node, path: currentPath } // Path không thêm ''
+      // Copy measures từ leaf (nếu có aggregate từ con, nhưng leaf gốc có data)
+      result.push(leafRow)
+    }
+
+    // Recurse children (flatten hết cho export full)
+    if (node.children && node.children.length > 0) {
+      exportFlattenWithPath(
+        node.children,
+        node.children.length > 0 ? [...currentPath, node.name] : currentPath,
+        result,
+        maxLevelRef
+      )
+    }
+  }
+  return result
+}
+
 // Load lại dữ liệu và render
 function loadAndRender(worksheet) {
   worksheet.getSummaryDataAsync({ maxRows: 0 }).then((sumData) => {
@@ -528,6 +585,8 @@ function loadAndRender(worksheet) {
           totalRow[field] = ''
         }
       })
+
+      totalRow.leaf = true
 
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
@@ -626,7 +685,15 @@ function loadAndRender(worksheet) {
       },
       onFirstDataRendered: () => safeUpdateTotals(),
       onFilterChanged: () => safeUpdateTotals(),
-      onSortChanged: () => safeUpdateTotals()
+      onSortChanged: () => safeUpdateTotals(),
+      onCellContextMenu: (params) => {
+        const node = params.data
+        if (!node || !node.id) return
+
+        params.event.preventDefault() // chặn menu mặc định của trình duyệt
+
+        showContextMenu(params.event.pageX, params.event.pageY, node.id)
+      }
     }
 
     const eGridDiv = document.querySelector('#gridContainer')
@@ -651,25 +718,72 @@ function loadAndRender(worksheet) {
 
       if (btnExpand) {
         btnExpand.addEventListener('click', () => {
-          // mở toàn bộ cây
-          setAllExpanded(nestedData, true)
+          // Lấy node đang chọn
+          const selectedNodes = []
+          gridApi.forEachNode((node) => {
+            if (node.isSelected()) selectedNodes.push(node.data)
+          })
+
+          // Node mục tiêu để scroll lại (nếu có chọn)
+          const targetId = selectedNodes.length > 0 ? selectedNodes[0].id : null
+
+          // Expand logic
+          if (!targetId) {
+            setAllExpanded(nestedData, true)
+          } else {
+            const node = findNodeById(nestedData, targetId)
+            if (node) setSubtreeExpanded(node, true)
+          }
+
           const flat = flattenTree(nestedData)
           gridApi.setGridOption('rowData', flat)
-          // updateFooterTotals //&& updateFooterTotals()
-          safeUpdateTotals()
-          // nếu muốn scroll tới đầu:
-          // const vp = gridApi.gridBodyCtrl?.eBodyViewport; if (vp) vp.scrollTop = 0
+
+          // === GIỐNG toggleNode() ===
+          if (targetId) {
+            requestAnimationFrame(() => {
+              const idx = flat.findIndex((r) => r.id == targetId)
+              const rowNode = gridApi.getDisplayedRowAtIndex(idx)
+              if (rowNode) {
+                gridApi.ensureNodeVisible(rowNode, 'middle')
+              }
+            })
+          }
         })
       }
 
       if (btnCollapse) {
         btnCollapse.addEventListener('click', () => {
-          // đóng toàn bộ cây
-          setAllExpanded(nestedData, false)
+          // Lấy node đang chọn
+          const selectedNodes = []
+          gridApi.forEachNode((node) => {
+            if (node.isSelected()) selectedNodes.push(node.data)
+          })
+
+          // Node mục tiêu
+          const targetId = selectedNodes.length > 0 ? selectedNodes[0].id : null
+
+          if (!targetId) {
+            setAllExpanded(nestedData, false)
+          } else {
+            const node = findNodeById(nestedData, targetId)
+            if (node) setSubtreeExpanded(node, false)
+          }
+
           const flat = flattenTree(nestedData)
           gridApi.setGridOption('rowData', flat)
-          // updateFooterTotals && updateFooterTotals()
+
           safeUpdateTotals(gridApi)
+
+          // === GIỐNG toggleNode() ===
+          if (targetId) {
+            requestAnimationFrame(() => {
+              const idx = flat.findIndex((r) => r.id == targetId)
+              const rowNode = gridApi.getDisplayedRowAtIndex(idx)
+              if (rowNode) {
+                gridApi.ensureNodeVisible(rowNode, 'middle')
+              }
+            })
+          }
         })
       }
 
@@ -751,57 +865,234 @@ document.addEventListener('DOMContentLoaded', () => {
     // ======================
     // Export CSV -> tree thò thụt được khi export csv
     // ======================
+    // document.getElementById('exportExcel').addEventListener('click', () => {
+    //   const allRows = []
+    //   gridApi.forEachNodeAfterFilterAndSort((node) => {
+    //     allRows.push(node.data)
+    //   })
+
+    //   // 🔹 Lấy pinned bottom rows (ví dụ: dòng tổng cộng)
+    //   const pinnedRows = gridApi.getPinnedBottomRowCount()
+    //     ? Array.from(
+    //         { length: gridApi.getPinnedBottomRowCount() },
+    //         (_, i) => gridApi.getPinnedBottomRow(i).data
+    //       )
+    //     : []
+
+    //   // 🔹 Gộp lại (dòng tổng ở cuối)
+    //   const exportRows = [...allRows, ...pinnedRows]
+
+    //   const displayedCols = gridApi.getColumnDefs().map((c) => c.field)
+    //   const headers = displayedCols.join(',')
+
+    //   const csvRows = exportRows.map((row) => {
+    //     return displayedCols
+    //       .map((col) => {
+    //         let val = row[col] ?? ''
+    //         if (col === 'name' && row.level) {
+    //           const indent = '  '.repeat(row.level - 1)
+    //           val = indent + val
+    //         }
+    //         // Escape CSV nếu có dấu phẩy, nháy kép hoặc xuống dòng
+    //         if (typeof val === 'string' && val.match(/[",\n]/)) {
+    //           val = '"' + val.replace(/"/g, '""') + '"'
+    //         }
+    //         return val
+    //       })
+    //       .join(',')
+    //   })
+
+    //   // ⚡ Thêm BOM UTF-8 để Excel đọc đúng tiếng Việt
+    //   const bom = '\uFEFF'
+    //   const csvContent = [headers, ...csvRows].join('\n')
+
+    //   const blob = new Blob([bom + csvContent], {
+    //     type: 'text/csv;charset=utf-8;'
+    //   })
+
+    //   const link = document.createElement('a')
+    //   link.href = URL.createObjectURL(blob)
+    //   link.download = 'tree_data.csv'
+    //   document.body.appendChild(link)
+    //   link.click()
+    //   document.body.removeChild(link)
+    // })
+
+    // ======================
+    // Export CSV -> tree với mỗi level là cột riêng (chỉ sửa phần này)
+    // ======================
+    // document.getElementById('exportExcel').addEventListener('click', () => {
+    //   if (!gridApi || !nestedData || nestedData.length === 0) {
+    //     alert('⚠️ Không có dữ liệu để export!')
+    //     return
+    //   }
+
+    //   // Flatten tree với path (full data, ignore filter/sort cho export toàn bộ)
+    //   const maxLevelRef = { max: 0 }
+    //   const exportRows = exportFlattenWithPath(nestedData, [], [], maxLevelRef)
+    //   const maxTreeLevel = maxLevelRef.max
+
+    //   // Lấy pinned bottom rows (dòng tổng)
+    //   const pinnedRows =
+    //     gridApi.getPinnedBottomRowCount() > 0
+    //       ? Array.from(
+    //           { length: gridApi.getPinnedBottomRowCount() },
+    //           (_, i) => gridApi.getPinnedBottomRow(i).data
+    //         )
+    //       : []
+
+    //   // Gộp rows (thêm pinned ở cuối)
+    //   const allExportRows = [...exportRows, ...pinnedRows]
+
+    //   // Lấy columnDefs hiện tại (cột name là cột đầu, bỏ nó đi vì ta dùng levels thay thế)
+    //   const currentColumnDefs = gridApi.getColumnDefs()
+    //   const firstField = currentColumnDefs[0].field // 'name'
+    //   const otherCols = currentColumnDefs.slice(1).map((c) => c.field) // Các cột measure khác
+
+    //   // Headers: Level 1 to max + other cols
+    //   const levelHeaders = Array.from(
+    //     { length: maxTreeLevel },
+    //     (_, i) => `Level ${i + 1}`
+    //   )
+    //   const exportHeaders = [...levelHeaders, ...otherCols]
+    //   const headers = exportHeaders.join(',')
+
+    //   // Build CSV rows
+    //   const csvRows = allExportRows.map((row) => {
+    //     let rowVals = []
+    //     const isTotal = row[firstField] === 'Tổng cộng' // Dòng tổng
+    //     if (isTotal) {
+    //       // Dòng tổng: 'Tổng cộng' ở Level 1, rỗng các level khác
+    //       rowVals.push('Tổng cộng')
+    //       for (let i = 1; i < maxTreeLevel; i++) {
+    //         rowVals.push('')
+    //       }
+    //     } else {
+    //       // Dòng tree: dùng path để điền levels
+    //       const path = row.path || []
+    //       for (let i = 0; i < maxTreeLevel; i++) {
+    //         rowVals.push(path[i] || '')
+    //       }
+    //     }
+
+    //     // Thêm other cols (measures, v.v.)
+    //     otherCols.forEach((col) => {
+    //       let val = row[col] ?? ''
+    //       // Escape CSV nếu cần (phẩy, nháy, xuống dòng)
+    //       if (typeof val === 'string' && val.match(/[",\n]/)) {
+    //         val = '"' + val.replace(/"/g, '""') + '"'
+    //       }
+    //       rowVals.push(val)
+    //     })
+
+    //     return rowVals.join(',')
+    //   })
+
+    //   // Tạo file CSV với BOM UTF-8 cho tiếng Việt
+    //   const bom = '\uFEFF'
+    //   const csvContent = [headers, ...csvRows].join('\n')
+    //   const blob = new Blob([bom + csvContent], {
+    //     type: 'text/csv;charset=utf-8;'
+    //   })
+    //   const link = document.createElement('a')
+    //   link.href = URL.createObjectURL(blob)
+    //   link.download = 'tree_data.csv'
+    //   document.body.appendChild(link)
+    //   link.click()
+    //   document.body.removeChild(link)
+
+    //   console.log(
+    //     `✅ Đã export ${allExportRows.length} rows với ${maxTreeLevel} levels!`
+    //   )
+    // })
+
+    // ======================
+    // Export EXCEL -> tree với mỗi level là cột riêng (chỉ sửa phần này)
+    // fix lỗi liên quan đến mất số 0 ở đầu
+    // ======================
     document.getElementById('exportExcel').addEventListener('click', () => {
-      const allRows = []
-      gridApi.forEachNodeAfterFilterAndSort((node) => {
-        allRows.push(node.data)
+      if (!gridApi || !nestedData || nestedData.length === 0) {
+        alert('⚠️ Không có dữ liệu để export!')
+        return
+      }
+
+      // Flatten tree (full data)
+      const maxLevelRef = { max: 0 }
+      const exportRows = exportFlattenWithPath(nestedData, [], [], maxLevelRef)
+      const maxTreeLevel = maxLevelRef.max
+
+      // Pinned bottom rows
+      const pinnedRows =
+        gridApi.getPinnedBottomRowCount() > 0
+          ? Array.from(
+              { length: gridApi.getPinnedBottomRowCount() },
+              (_, i) => gridApi.getPinnedBottomRow(i).data
+            )
+          : []
+
+      const allExportRows = [...exportRows, ...pinnedRows]
+
+      const currentColumnDefs = gridApi.getColumnDefs()
+      const firstField = currentColumnDefs[0].field // 'name'
+      const otherCols = currentColumnDefs.slice(1).map((c) => c.field)
+
+      // Headers
+      const levelHeaders = Array.from(
+        { length: maxTreeLevel },
+        (_, i) => `Level ${i + 1}`
+      )
+      const exportHeaders = [...levelHeaders, ...otherCols]
+
+      // Build worksheet data
+      const worksheetData = []
+      worksheetData.push(exportHeaders)
+
+      allExportRows.forEach((row) => {
+        const rowVals = []
+        const isTotal = row[firstField] === 'Tổng cộng'
+
+        if (isTotal) {
+          rowVals.push('Tổng cộng')
+          for (let i = 1; i < maxTreeLevel; i++) rowVals.push('')
+        } else {
+          const path = row.path || []
+          for (let i = 0; i < maxTreeLevel; i++) rowVals.push(path[i] || '')
+        }
+
+        // Add other columns, giữ 0 đầu bằng cách ép thành string
+        otherCols.forEach((col) => {
+          let val = row[col] ?? ''
+          if (typeof val === 'number') {
+            rowVals.push(val)
+          } else {
+            // ép dạng text EXCEL để giữ 0 đầu
+            rowVals.push(val.toString())
+          }
+        })
+
+        worksheetData.push(rowVals)
       })
 
-      // 🔹 Lấy pinned bottom rows (ví dụ: dòng tổng cộng)
-      const pinnedRows = gridApi.getPinnedBottomRowCount()
-        ? Array.from(
-            { length: gridApi.getPinnedBottomRowCount() },
-            (_, i) => gridApi.getPinnedBottomRow(i).data
-          )
-        : []
+      // Tạo workbook XLSX
+      const ws = XLSX.utils.aoa_to_sheet(worksheetData)
 
-      // 🔹 Gộp lại (dòng tổng ở cuối)
-      const exportRows = [...allRows, ...pinnedRows]
-
-      const displayedCols = gridApi.getColumnDefs().map((c) => c.field)
-      const headers = displayedCols.join(',')
-
-      const csvRows = exportRows.map((row) => {
-        return displayedCols
-          .map((col) => {
-            let val = row[col] ?? ''
-            if (col === 'name' && row.level) {
-              const indent = '  '.repeat(row.level - 1)
-              val = indent + val
-            }
-            // Escape CSV nếu có dấu phẩy, nháy kép hoặc xuống dòng
-            if (typeof val === 'string' && val.match(/[",\n]/)) {
-              val = '"' + val.replace(/"/g, '""') + '"'
-            }
-            return val
-          })
-          .join(',')
+      // ⭐ Force tất cả dimension dạng text (giữ số 0 đầu)
+      Object.keys(ws).forEach((cell) => {
+        if (!cell.startsWith('!')) {
+          const value = ws[cell].v
+          if (typeof value === 'string' && /^\d+$/.test(value)) {
+            ws[cell].t = 's' // string
+          }
+        }
       })
 
-      // ⚡ Thêm BOM UTF-8 để Excel đọc đúng tiếng Việt
-      const bom = '\uFEFF'
-      const csvContent = [headers, ...csvRows].join('\n')
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'TreeData')
 
-      const blob = new Blob([bom + csvContent], {
-        type: 'text/csv;charset=utf-8;'
-      })
+      // Xuất file
+      XLSX.writeFile(wb, 'tree_data.xlsx')
 
-      const link = document.createElement('a')
-      link.href = URL.createObjectURL(blob)
-      link.download = 'tree_data.csv'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      console.log(`✅ Export Excel thành công (${allExportRows.length} dòng)!`)
     })
 
     // --- Copy bằng nút bấm ---
