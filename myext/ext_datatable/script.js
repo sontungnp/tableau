@@ -2,18 +2,34 @@
 
 let selectedCellValue = null
 let extractRefreshTime = ''
+let gridApi = null
 
 // Hàm chuẩn hóa chỉ để đồng bộ Unicode, không bỏ dấu
 function normalizeUnicode(str) {
   return str ? str.normalize('NFC').toLowerCase().trim() : ''
 }
 
-// Pivot Measure Names/Values
-function pivotMeasureValues(
-  table,
-  excludeIndexes = [],
-  fieldFormat = 'snake_case'
-) {
+// Hàm format ngày tháng (Date object) cho trường hợp đặc biệt
+function formatDate(date) {
+  if (!(date instanceof Date) || isNaN(date)) return ''
+  // Định dạng dd/MM/yyyy có thêm số 0
+  return date.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
+
+// Hàm format số cho tổng cộng và ô không có valueFormatter
+function formatNumber(num) {
+  if (num == null || isNaN(Number(num))) return num
+  const parsedNum = Number(num)
+  // Format với phân tách hàng nghìn, tối đa 2 chữ số thập phân
+  return parsedNum.toLocaleString('en-US', { maximumFractionDigits: 2 })
+}
+
+// 🎯 Hàm Pivot Measure Names/Values
+function pivotMeasureValues(table, fieldFormat = 'snake_case') {
   // 🔹 Hàm chuyển format cho key field
   const formatField = (str) => {
     switch (fieldFormat) {
@@ -31,23 +47,7 @@ function pivotMeasureValues(
   }
 
   const cols = table.columns.map((c) => c.fieldName)
-  const rows = table.data.map((r) =>
-    r.map((c) => {
-      if (c.nativeValue === null || c.nativeValue === undefined) return ''
-
-      // 🔹 Nếu là kiểu ngày hợp lệ (Date object hoặc chuỗi ngày)
-      if (c.nativeValue instanceof Date) {
-        // Định dạng dd/MM/yyyy có thêm số 0
-        return c.nativeValue.toLocaleDateString('vi-VN', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        })
-      }
-
-      return c.formattedValue
-    })
-  )
+  const rows = table.data
 
   // 🔹 Xác định vị trí Measure Names / Values
   const measureNameIdx = cols.findIndex((c) =>
@@ -61,27 +61,33 @@ function pivotMeasureValues(
     .map((c, i) => i)
     .filter((i) => i !== measureNameIdx && i !== measureValueIdx)
 
-  // 🔹 Pivot dữ liệu
+  // 🔹 Pivot dữ liệu (Tối ưu: chỉ lấy nativeValue/formattedValue thô, xử lý chuyển đổi sau)
   const pivotMap = new Map()
   const measureSet = new Set()
 
   rows.forEach((r) => {
-    const dimKey = dimensionIdxs.map((i) => r[i]).join('||')
-    const mName = r[measureNameIdx]
-    const mValue = r[measureValueIdx]
+    // Tối ưu: Chỉ lấy giá trị, không thực hiện định dạng phức tạp trong vòng lặp lớn
+    const dims = dimensionIdxs.map((i) => r[i])
+
+    // Key phải là chuỗi
+    const dimKey = dims
+      .map((c) => (c.nativeValue === null ? '' : c.nativeValue.toString()))
+      .join('||')
+
+    const mName = r[measureNameIdx].formattedValue
+    const mValue = r[measureValueIdx] // Giữ nguyên CellValue object
 
     measureSet.add(mName)
 
     if (!pivotMap.has(dimKey)) {
       pivotMap.set(dimKey, {
-        dims: dimensionIdxs.map((i) => r[i]),
+        dims: dims,
         measures: {}
       })
     }
+    // Lưu CellValue object để giữ cả nativeValue và formattedValue
     pivotMap.get(dimKey).measures[mName] = mValue
   })
-
-  // console.log('pivotMap', JSON.stringify(Object.fromEntries(pivotMap), null, 2))
 
   const measureNames = Array.from(measureSet)
   const headers = [...dimensionIdxs.map((i) => cols[i]), ...measureNames]
@@ -115,19 +121,40 @@ function pivotMeasureValues(
 
       if (originalIdx < dimensionIdxs.length) {
         // Là dimension
-        row[key] = entry.dims[originalIdx]
+        const cellValue = entry.dims[originalIdx]
+        if (cellValue.nativeValue instanceof Date) {
+          // Chỉ định dạng Date ở đây (ít tốn kém hơn so với định dạng chuỗi/số)
+          row[key] = formatDate(cellValue.nativeValue)
+        } else {
+          row[key] =
+            cellValue.formattedValue === 'Null' ? '' : cellValue.formattedValue
+        }
       } else {
         // Là measure
         const mName = measureNames[originalIdx - dimensionIdxs.length]
-        const rawValue = entry.measures[mName] || ''
-        const numValue = parseFloat(rawValue.toString().replace(/,/g, ''))
-        row[key] = !isNaN(numValue) ? numValue : rawValue
+        const cellValue = entry.measures[mName]
+
+        // 🟢 Tối ưu: Chỉ lấy nativeValue dạng số nếu có, để ag-Grid valueFormatter lo phần định dạng.
+        let value = ''
+        if (cellValue && cellValue.nativeValue !== null) {
+          if (typeof cellValue.nativeValue === 'number') {
+            value = cellValue.nativeValue
+          } else {
+            // Trường hợp Measure Value là chuỗi (ví dụ: "$100.00")
+            // Thử chuyển đổi chuỗi formattedValue sang số (cần làm sạch chuỗi)
+            const numValue = parseFloat(
+              cellValue.formattedValue.toString().replace(/[^0-9.-]+/g, '')
+            )
+            value = !isNaN(numValue) ? numValue : cellValue.formattedValue
+          }
+        }
+        row[key] = value
       }
     })
     return row
   })
 
-  // ⚡ columnDefs khớp field format, có xử lý width và numericColumn - chỉ giữ các cột hợp lệ
+  // ⚡ columnDefs khớp field format, có xử lý width và numericColumn
   const columnDefs = filteredHeaders.map((h, idx) => {
     const widthMatch = h.match(/\((\d+)\)/)
     const width = widthMatch ? parseInt(widthMatch[1], 10) : 150 // mặc định 150
@@ -142,8 +169,8 @@ function pivotMeasureValues(
       width: width,
       minWidth: 30,
       maxWidth: 500,
+      // Đảm bảo chỉ căn phải cho cột số
       cellStyle: (params) => {
-        // Căn phải cho số, căn trái cho text
         return filteredIsMeasure[idx]
           ? { textAlign: 'right', fontVariantNumeric: 'tabular-nums' }
           : { textAlign: 'left' }
@@ -157,9 +184,8 @@ function pivotMeasureValues(
         if (v == null || v === '') return ''
         const num = Number(v)
         if (isNaN(num)) return v
-        // 🔹 Format với phân tách hàng nghìn, tối đa 2 chữ số thập phân
-        return num.toLocaleString('en-US', { maximumFractionDigits: 2 })
-        // return num.toLocaleString('vi-VN', { maximumFractionDigits: 2 })
+        // 🔹 Dùng hàm formatNumber chung
+        return formatNumber(num)
       }
     }
 
@@ -172,42 +198,33 @@ function pivotMeasureValues(
   }
 }
 
-let gridApi = null
-
 // Load lại dữ liệu và render
 function loadAndRender(worksheet) {
+  // Bắt đầu đo thời gian xử lý JS
+  const startTime = performance.now()
+
   worksheet.getSummaryDataAsync({ maxRows: 0 }).then((sumData) => {
-    // console.log('sumData', sumData)
+    // ⏰ Thời gian tải dữ liệu Tableau (API call)
+    console.log(`[${new Date().toISOString()}] Tableau API returned data.`)
 
     const { data, columnDefs } = pivotMeasureValues(sumData)
 
-    // console.log('headers', headers)
-    // console.log('columnDefs', columnDefs)
-    // console.log('data', data)
-    // console.log('result', result)
+    // ⏰ Thời gian Pivot Dữ liệu
+    const pivotTime = performance.now()
+    console.log(
+      `[${new Date().toISOString()}] Pivot Time: ${(
+        pivotTime - startTime
+      ).toFixed(2)}ms`
+    )
 
-    // console.log('isMeasure', isMeasure)
+    // ======= 3️⃣ CẤU HÌNH & TÍNH TỔNG =======
+    // Logic tính tổng này sẽ chỉ chạy sau khi filter/sort đã ổn định.
 
-    // ======= 3️⃣ TÍNH TỔNG =======
-    function calcTotals(data, numericCols) {
-      const totals = {}
-      numericCols.forEach((col) => {
-        totals[col] = data.reduce(
-          (sum, row) => sum + (Number(row[col]) || 0),
-          0
-        )
-      })
-      return totals
-    }
-
-    // ======= 4️⃣ CẤU HÌNH GRID =======
     const gridOptions = {
       theme: 'legacy',
       columnDefs,
       rowData: data,
       animateRows: true,
-      // suppressAggFuncInHeader: true,
-      // alwaysShowHorizontalScroll: true,
       defaultColDef: {
         sortable: true,
         filter: true,
@@ -233,14 +250,10 @@ function loadAndRender(worksheet) {
         return null
       },
 
-      // sự kiện click vào 1 cell
       onCellClicked: (params) => {
         selectedCellValue = params.value
         console.log('Selected cell value:', selectedCellValue)
-
-        // Bỏ chọn tất cả dòng khác
         gridApi.deselectAll()
-        // Chọn dòng hiện tại
         params.node.setSelected(true)
       },
 
@@ -253,14 +266,17 @@ function loadAndRender(worksheet) {
       // },
 
       domLayout: 'normal',
+      // Thêm sự kiện sau khi grid đã render xong dữ liệu (tùy chọn)
       onGridReady: (params) => {
+        // Lần đầu tiên chạy
         gridApi = params.api
+        // Bắt đầu tính tổng
         updateFooterTotals()
       },
       onFilterChanged: () => {
         console.log(`[${new Date().toISOString()}] Filter changed`)
         renderActiveFilters() // ✅ cập nhật danh sách button filter
-        funcTionWait4ToUpdateTotal(3000)
+        funcTionWait4ToUpdateTotal(1000)
       },
       onSortChanged: () => {
         funcTionWait4ToUpdateTotal(1000)
@@ -268,40 +284,67 @@ function loadAndRender(worksheet) {
     }
 
     const eGridDiv = document.querySelector('#myGrid')
-    // const gridApi = agGrid.createGrid(eGridDiv, gridOptions)
+
     if (!gridApi) {
+      // 🟢 Khởi tạo lần đầu
       gridApi = agGrid.createGrid(eGridDiv, gridOptions)
     } else {
-      // ✅ Cập nhật lại dữ liệu và đảm bảo tổng được tính
-      gridApi.setGridOption('rowData', data)
+      // 🟢 Cập nhật (Tối ưu: Chỉ dùng setRowData và tránh set columnDefs nếu có thể)
+
+      // Cập nhật columnDefs CHỈ KHI CẦN (nếu cấu trúc worksheet thay đổi)
+      // Trong trường hợp này, vì pivot tạo ra cột động, ta vẫn phải cập nhật, nhưng
+      // ag-Grid sẽ tự tối ưu nếu cấu trúc tương tự.
       gridApi.setGridOption('columnDefs', columnDefs)
+
+      // Tối ưu quan trọng: dùng setRowData
+      gridApi.setRowData(data)
 
       // Đảm bảo tổng được tính lại sau khi set dữ liệu mới
       funcTionWait4ToUpdateTotal(1000)
     }
 
-    // ======= 5️⃣ TÌM KIẾM =======
-    document.getElementById('searchBox').addEventListener('input', function () {
-      gridApi.setGridOption('quickFilterText', normalizeUnicode(this.value))
-    })
+    // ⏰ Thời gian Render ag-Grid
+    const endTime = performance.now()
+    console.log(
+      `[${new Date().toISOString()}] Render Time (Total JS): ${(
+        endTime - startTime
+      ).toFixed(2)}ms`
+    )
+
+    // ======= 5️⃣ TÌM KIẾM (Chỉ khởi tạo listener 1 lần) =======
+    const searchBox = document.getElementById('searchBox')
+    if (searchBox && !searchBox.hasListener) {
+      searchBox.addEventListener('input', function () {
+        gridApi.setGridOption('quickFilterText', normalizeUnicode(this.value))
+      })
+      searchBox.hasListener = true // Đánh dấu đã gắn listener
+    }
 
     function funcTionWait4ToUpdateTotal(secondsamt) {
-      console.log(`[${new Date().toISOString()}] Start waiting 3 seconds...`)
       setTimeout(() => {
-        console.log(`[${new Date().toISOString()}] hello`)
-        document.getElementById('updateTotal').click() // 👈 tự động kích nút
-        console.log(`[${new Date().toISOString()}] done click updatetotal`)
+        document.getElementById('updateTotal').click() // 👈 Tự động kích nút
       }, secondsamt)
     }
 
-    // ======= 7️⃣ DÒNG TỔNG =======
+    // ======= 7️⃣ DÒNG TỔNG (Giữ nguyên, cần chạy sau khi filter/sort ổn định) =======
+    function calcTotals(data, numericCols) {
+      const totals = {}
+      numericCols.forEach((col) => {
+        totals[col] = data.reduce(
+          (sum, row) => sum + (Number(row[col]) || 0),
+          0
+        )
+      })
+      return totals
+    }
+
     function updateFooterTotals() {
       if (!gridApi) return
 
       const allData = []
+      // Tối ưu: ag-Grid nhanh hơn khi lặp qua node so với tính toán lại từ đầu
       gridApi.forEachNodeAfterFilterAndSort((node) => {
         if (!node.rowPinned) {
-          // Chỉ lấy dòng thường, không lấy dòng pinned
           allData.push(node.data)
         }
       })
@@ -317,6 +360,7 @@ function loadAndRender(worksheet) {
       columnDefs.forEach((col) => {
         const field = col.field
         if (numericCols.includes(field)) {
+          // Format tổng số bằng hàm chung
           totalRow[field] = totals[field]
         } else if (field === columnDefs[0].field) {
           totalRow[field] = 'Tổng cộng'
@@ -329,50 +373,99 @@ function loadAndRender(worksheet) {
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
 
+    // --- Các hàm và listener khác (chỉ khởi tạo 1 lần) ---
+    // const isListenersInitialized = document.body.getAttribute(
+    //   'data-listeners-initialized'
+    // )
+    // if (!isListenersInitialized) {
+    document
+      .getElementById('updateTotal')
+      .addEventListener('click', updateFooterTotals)
+
+    document
+      .getElementById('clearAllFilterBtn')
+      .addEventListener('click', () => {
+        if (!gridApi) return
+        gridApi.setFilterModel(null)
+        const searchBox = document.getElementById('searchBox')
+        if (searchBox) {
+          searchBox.value = ''
+          gridApi.setGridOption('quickFilterText', '')
+        }
+        gridApi.onFilterChanged()
+        funcTionWait4ToUpdateTotal(1000)
+      })
+
+    // Giữ nguyên các hàm renderActiveFilters, copySelectedRows, copyCellBtn, copyBtn...
+
     function renderActiveFilters() {
       if (!gridApi) return
 
       const filterModel = gridApi.getFilterModel()
-      console.log('filterModel', filterModel)
       const filterArea = document.getElementById('filter-area')
-
-      // Xoá hết các button cũ
       filterArea.innerHTML = ''
 
-      // Nếu không có filter nào
       if (Object.keys(filterModel).length === 0) {
         filterArea.innerHTML = `<span style="color:#888;">Không có filter nào</span>`
         return
       }
 
-      // Tạo các button cho mỗi cột
       Object.keys(filterModel).forEach((col) => {
         const btn = document.createElement('button')
         btn.textContent = col
-
-        // Khi click: xoá filter cho cột đó
         btn.addEventListener('click', () => {
           const model = gridApi.getFilterModel()
-          delete model[col] // xoá filter cho cột này
+          delete model[col]
           gridApi.setFilterModel(model)
-          gridApi.onFilterChanged() // cập nhật lại lưới
-
-          renderActiveFilters() // cập nhật lại danh sách nút
+          gridApi.onFilterChanged()
+          renderActiveFilters()
         })
-
         filterArea.appendChild(btn)
       })
     }
 
-    // --- Copy bằng nút bấm ---
-    document.getElementById('copyBtn').addEventListener('click', () => {
-      copySelectedRows()
-    })
+    function copySelectedRows() {
+      const selectedNodes = []
+      gridApi.forEachNodeAfterFilterAndSort((node) => {
+        if (node.isSelected()) selectedNodes.push(node)
+      })
 
-    // --- Copy bằng nút bấm ---
-    document.getElementById('updateTotal').addEventListener('click', () => {
-      updateFooterTotals()
-    })
+      if (selectedNodes.length === 0) {
+        alert('⚠️ Chưa chọn dòng nào!')
+        return
+      }
+
+      const selectedData = selectedNodes.map((node) => node.data)
+      const text = selectedData
+        .map((row) => Object.values(row).join('\t'))
+        .join('\n')
+
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.top = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+
+      try {
+        const success = document.execCommand('copy')
+        if (success) {
+          console.log(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
+        } else {
+          console.log('⚠️ Copy không thành công.')
+        }
+      } catch (err) {
+        console.error('Copy lỗi:', err)
+        alert('❌ Không thể copy (trình duyệt không cho phép).')
+      }
+
+      document.body.removeChild(textarea)
+    }
+
+    document
+      .getElementById('copyBtn')
+      .addEventListener('click', copySelectedRows)
 
     document.getElementById('copyCellBtn').addEventListener('click', () => {
       if (selectedCellValue === null) {
@@ -382,7 +475,6 @@ function loadAndRender(worksheet) {
 
       const text = selectedCellValue.toString()
 
-      // --- Fallback cổ điển ---
       const textarea = document.createElement('textarea')
       textarea.value = text
       textarea.style.position = 'fixed'
@@ -406,76 +498,8 @@ function loadAndRender(worksheet) {
       document.body.removeChild(textarea)
     })
 
-    document
-      .getElementById('clearAllFilterBtn')
-      .addEventListener('click', () => {
-        if (!gridApi) return
-
-        // 🔹 1️⃣ Xoá toàn bộ filter theo cột
-        gridApi.setFilterModel(null)
-        gridApi.onFilterChanged()
-
-        // 🔹 2️⃣ Xoá luôn filter toàn cục (search box)
-        const searchBox = document.getElementById('searchBox')
-        if (searchBox) {
-          searchBox.value = ''
-          gridApi.setGridOption('quickFilterText', '')
-        }
-
-        // 🔹 3️⃣ Cập nhật lại dòng tổng
-        funcTionWait4ToUpdateTotal(300)
-      })
-
-    // --- Copy khi Ctrl + C ---
-    // document.addEventListener('keydown', (e) => {
-    //   if (e.ctrlKey && e.key.toLowerCase() === 'c') {
-    //     copySelectedRows()
-    //   }
-    // })
-
-    // --- Hàm thực hiện copy ---
-    function copySelectedRows() {
-      const selectedNodes = []
-      // gridApi.forEachNode((node) => {
-      //   if (node.isSelected()) selectedNodes.push(node)
-      // })
-      gridApi.forEachNodeAfterFilterAndSort((node) => {
-        if (node.isSelected()) selectedNodes.push(node)
-      })
-
-      if (selectedNodes.length === 0) {
-        alert('⚠️ Chưa chọn dòng nào!')
-        return
-      }
-
-      const selectedData = selectedNodes.map((node) => node.data)
-      const text = selectedData
-        .map((row) => Object.values(row).join('\t'))
-        .join('\n')
-
-      // --- Fallback cổ điển, tương thích mọi trình duyệt / Tableau Extension ---
-      const textarea = document.createElement('textarea')
-      textarea.value = text
-      textarea.style.position = 'fixed'
-      textarea.style.top = '-9999px'
-      document.body.appendChild(textarea)
-      textarea.focus()
-      textarea.select()
-
-      try {
-        const success = document.execCommand('copy')
-        if (success) {
-          console.log(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
-        } else {
-          console.log('⚠️ Copy không thành công.')
-        }
-      } catch (err) {
-        console.error('Copy lỗi:', err)
-        alert('❌ Không thể copy (trình duyệt không cho phép).')
-      }
-
-      document.body.removeChild(textarea)
-    }
+    document.body.setAttribute('data-listeners-initialized', 'true')
+    // }
   })
 }
 
@@ -512,17 +536,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load lần đầu
     loadAndRender(worksheet)
 
-    // ======= 6️⃣ EXPORT EXCEL =======
-    document.getElementById('exportBtn').addEventListener('click', function () {
-      gridApi.exportDataAsCsv({
-        fileName: 'data_export.csv',
-        processCellCallback: (params) => params.value // lấy raw value
+    // ======= 6️⃣ EXPORT EXCEL (Chỉ khởi tạo listener 1 lần) =======
+    const exportBtn = document.getElementById('exportBtn')
+    if (exportBtn && !exportBtn.hasListener) {
+      exportBtn.addEventListener('click', function () {
+        gridApi.exportDataAsCsv({
+          fileName: 'data_export.csv',
+          processCellCallback: (params) => {
+            // Sử dụng raw value để export chính xác hơn
+            return params.value
+          }
+        })
       })
-    })
+      exportBtn.hasListener = true
+    }
 
     // Lắng nghe filter và parameter change
     worksheet.addEventListener(tableau.TableauEventType.FilterChanged, () => {
-      // console.log('vao day roi')
       refreshExtractTime()
       loadAndRender(worksheet)
     })
@@ -532,7 +562,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(function (parameters) {
         parameters.forEach(function (p) {
           p.addEventListener(tableau.TableauEventType.ParameterChanged, () => {
-            // console.log('vao day roi 2')
             refreshExtractTime()
             loadAndRender(worksheet)
           })
@@ -541,28 +570,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ✅ Tính toán chiều cao khả dụng của extension
     function adjustGridHeight() {
-      const container = document.querySelector('.container')
       const toolbar = document.querySelector('.toolbar')
-      // const notebar = document.querySelector('.notebar')
+      const notebar = document.querySelector('.notebar')
       const gridContainer = document.getElementById('myGrid')
 
-      // Chiều cao toàn bộ extension
       const totalHeight = window.innerHeight
-      // console.log('totalHeight', totalHeight)
-
-      // Trừ phần toolbar + padding + margin
-      const toolbarHeight = toolbar.offsetHeight
-      const notebarHeight = notebar.offsetHeight
+      const toolbarHeight = toolbar ? toolbar.offsetHeight : 0
+      const notebarHeight = notebar ? notebar.offsetHeight : 0
       const padding = 20 // tổng trên + dưới
       const extraSpacing = 10 // khoảng cách phụ nếu có
-
-      // console.log('toolbarHeight', toolbarHeight)
 
       const gridHeight =
         totalHeight - toolbarHeight - notebarHeight - padding - extraSpacing
 
-      // console.log('gridHeight', gridHeight)
-      gridContainer.style.height = `${gridHeight}px`
+      if (gridContainer) {
+        gridContainer.style.height = `${gridHeight}px`
+      }
+
+      // Kích hoạt ag-Grid điều chỉnh lại layout
+      if (gridApi) {
+        gridApi.sizeColumnsToFit()
+      }
     }
 
     // Gọi khi load trang và khi resize

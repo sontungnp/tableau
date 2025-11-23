@@ -7,6 +7,9 @@ let extractRefreshTime = ''
 let gridApi = null
 let nestedData = []
 
+let currentExpandedLevel = 1
+let maxTreeLevel = 1
+
 function setAllExpanded(nodes, expanded) {
   if (!nodes || !nodes.length) return
   for (const n of nodes) {
@@ -36,6 +39,30 @@ function findNodeById(nodes, id) {
     }
   }
   return null
+}
+
+function getMaxTreeLevel(nodes) {
+  let max = 1
+
+  function walk(list) {
+    for (const n of list) {
+      max = Math.max(max, n.level)
+      if (n.children) walk(n.children)
+    }
+  }
+
+  walk(nodes)
+  return max
+}
+
+function applyExpandLevel(nodes, level) {
+  for (const n of nodes) {
+    n.expanded = n.level < level // mở tất cả level < currentExpandedLevel
+
+    if (n.children) {
+      applyExpandLevel(n.children, level)
+    }
+  }
 }
 
 // Hàm chuẩn hóa chỉ để đồng bộ Unicode, không bỏ dấu
@@ -204,7 +231,7 @@ function pivotMeasureValues(
         field: fieldName,
         headerName: cleanHeader,
         wrapText: true,
-        autoHeight: true,
+        // autoHeight: true,
         width: width,
         minWidth: 30,
         maxWidth: 500,
@@ -603,6 +630,10 @@ function loadAndRender(worksheet) {
     // 4️⃣ Tree data + Flatten ban đầu
     // ======================
     nestedData = buildTree(data)
+
+    maxTreeLevel = getMaxTreeLevel(nestedData)
+    currentExpandedLevel = 1 // ban đầu chỉ hiển thị root
+
     // ✅ Xác định các cột numeric
     const numericCols = columnDefs
       .filter((col) => col.type === 'numericColumn')
@@ -625,12 +656,13 @@ function loadAndRender(worksheet) {
       columnDefs,
       rowData: flatData,
       defaultColDef: {
-        filter: true,
+        filter: false, // chuyển sang false vì ko dùng filter nữa
         sortable: true,
-        resizable: true,
-        filterParams: {
-          textFormatter: (value) => normalizeUnicode(value)
-        }
+        resizable: true
+        // bỏ tham số filter đi vì không dùng filter nữa
+        // filterParams: {
+        //   textFormatter: (value) => normalizeUnicode(value)
+        // }
       },
       // 🔹 Làm nổi bật các dòng tổng (cha)
       getRowStyle: (params) => {
@@ -716,6 +748,28 @@ function loadAndRender(worksheet) {
       const btnExpand = document.getElementById('btnExpandAll')
       const btnCollapse = document.getElementById('btnCollapseAll')
 
+      btnExpand1Level.addEventListener('click', () => {
+        if (currentExpandedLevel < maxTreeLevel) {
+          currentExpandedLevel += 1
+        }
+
+        applyExpandLevel(nestedData, currentExpandedLevel)
+
+        const flat = flattenTree(nestedData)
+        gridApi.setGridOption('rowData', flat)
+      })
+
+      btnCollapse1Level.addEventListener('click', () => {
+        if (currentExpandedLevel > 1) {
+          currentExpandedLevel -= 1
+        }
+
+        applyExpandLevel(nestedData, currentExpandedLevel)
+
+        const flat = flattenTree(nestedData)
+        gridApi.setGridOption('rowData', flat)
+      })
+
       if (btnExpand) {
         btnExpand.addEventListener('click', () => {
           // Lấy node đang chọn
@@ -748,6 +802,8 @@ function loadAndRender(worksheet) {
               }
             })
           }
+
+          currentExpandedLevel = maxTreeLevel
         })
       }
 
@@ -784,6 +840,8 @@ function loadAndRender(worksheet) {
               }
             })
           }
+
+          currentExpandedLevel = 1
         })
       }
 
@@ -804,7 +862,7 @@ function loadAndRender(worksheet) {
         if (!gridApi) return
 
         // 🔹 1️⃣ Xoá toàn bộ filter theo cột
-        gridApi.setFilterModel(null)
+        // gridApi.setFilterModel(null)  // bỏ đi vì không dùng filter nữa
         gridApi.onFilterChanged()
 
         // 🔹 2️⃣ Xoá luôn filter toàn cục (search box)
