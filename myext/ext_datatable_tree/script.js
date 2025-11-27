@@ -519,6 +519,42 @@ function adjustGridHeight() {
 // ======================
 // Helper cho export: Flatten tree với path và tính max level (FIX: không thừa level cho leaf)
 // ======================
+// function exportFlattenWithPath(
+//   nodes,
+//   currentPath = [],
+//   result = [],
+//   maxLevelRef = { max: 0 }
+// ) {
+//   for (const node of nodes) {
+//     // Chỉ tính max cho non-leaf (cha có children), tránh thừa level từ leaf rỗng
+//     if (!node.leaf && node.name) {
+//       const nodePath = [...currentPath, node.name]
+//       maxLevelRef.max = Math.max(maxLevelRef.max, nodePath.length)
+//       const row = { ...node, path: nodePath } // Copy node + path cho cha
+//       result.push(row)
+//     } else if (node.leaf) {
+//       // Leaf: dùng path của parent (không thêm level rỗng), copy data measures
+//       const leafRow = { ...node, path: currentPath } // Path không thêm ''
+//       // Copy measures từ leaf (nếu có aggregate từ con, nhưng leaf gốc có data)
+//       result.push(leafRow)
+//     }
+
+//     // Recurse children (flatten hết cho export full)
+//     if (node.children && node.children.length > 0) {
+//       exportFlattenWithPath(
+//         node.children,
+//         node.children.length > 0 ? [...currentPath, node.name] : currentPath,
+//         result,
+//         maxLevelRef
+//       )
+//     }
+//   }
+//   return result
+// }
+
+// ======================
+// Helper cho export: Flatten tree với path và tính max level (FIX: chỉ visible theo expanded, không thừa level cho leaf)
+// ======================
 function exportFlattenWithPath(
   nodes,
   currentPath = [],
@@ -526,8 +562,9 @@ function exportFlattenWithPath(
   maxLevelRef = { max: 0 }
 ) {
   for (const node of nodes) {
-    // Chỉ tính max cho non-leaf (cha có children), tránh thừa level từ leaf rỗng
+    // Luôn push node hiện tại (vì nếu đến đây thì node này visible)
     if (!node.leaf && node.name) {
+      // Non-leaf (cha): thêm name vào path
       const nodePath = [...currentPath, node.name]
       maxLevelRef.max = Math.max(maxLevelRef.max, nodePath.length)
       const row = { ...node, path: nodePath } // Copy node + path cho cha
@@ -535,15 +572,14 @@ function exportFlattenWithPath(
     } else if (node.leaf) {
       // Leaf: dùng path của parent (không thêm level rỗng), copy data measures
       const leafRow = { ...node, path: currentPath } // Path không thêm ''
-      // Copy measures từ leaf (nếu có aggregate từ con, nhưng leaf gốc có data)
       result.push(leafRow)
     }
 
-    // Recurse children (flatten hết cho export full)
-    if (node.children && node.children.length > 0) {
+    // Recurse children CHỈ NẾU expanded (để chỉ lấy visible)
+    if (node.expanded && node.children && node.children.length > 0) {
       exportFlattenWithPath(
         node.children,
-        node.children.length > 0 ? [...currentPath, node.name] : currentPath,
+        [...currentPath, node.name],
         result,
         maxLevelRef
       )
