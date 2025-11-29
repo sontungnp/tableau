@@ -621,47 +621,47 @@ function loadAndRender(worksheet) {
     // console.log('isMeasure', isMeasure)
 
     // ======= DÒNG TỔNG =======
-    function updateFooterTotals() {
-      if (!gridApi) return
+    // function updateFooterTotals() {
+    //   if (!gridApi) return
 
-      const allData = []
-      gridApi.forEachNodeAfterFilterAndSort((node) => {
-        if (!node.rowPinned) {
-          // Chỉ lấy dòng thường, không lấy dòng pinned
-          allData.push(node.data)
-        }
-      })
+    //   const allData = []
+    //   gridApi.forEachNodeAfterFilterAndSort((node) => {
+    //     if (!node.rowPinned) {
+    //       // Chỉ lấy dòng thường, không lấy dòng pinned
+    //       allData.push(node.data)
+    //     }
+    //   })
 
-      const numericCols = columnDefs
-        .filter((col) => col.type === 'numericColumn')
-        .map((col) => col.field)
+    //   const numericCols = columnDefs
+    //     .filter((col) => col.type === 'numericColumn')
+    //     .map((col) => col.field)
 
-      const totals = calcTotalsTree(allData, numericCols)
+    //   const totals = calcTotalsTree(allData, numericCols)
 
-      const totalRow = {}
-      columnDefs.forEach((col) => {
-        const field = col.field
-        if (numericCols.includes(field)) {
-          totalRow[field] = totals[field]
-        } else if (field === columnDefs[0].field) {
-          totalRow[field] = 'Tổng cộng'
-        } else {
-          totalRow[field] = ''
-        }
-      })
+    //   const totalRow = {}
+    //   columnDefs.forEach((col) => {
+    //     const field = col.field
+    //     if (numericCols.includes(field)) {
+    //       totalRow[field] = totals[field]
+    //     } else if (field === columnDefs[0].field) {
+    //       totalRow[field] = 'Tổng cộng'
+    //     } else {
+    //       totalRow[field] = ''
+    //     }
+    //   })
 
-      totalRow.leaf = true
+    //   totalRow.leaf = true
 
-      gridApi.setGridOption('pinnedBottomRowData', [totalRow])
-    }
+    //   gridApi.setGridOption('pinnedBottomRowData', [totalRow])
+    // }
 
-    function safeUpdateTotals(delay = 300) {
-      if (!gridApi) return
+    // function safeUpdateTotals(delay = 300) {
+    //   if (!gridApi) return
 
-      requestAnimationFrame(() => {
-        setTimeout(() => updateFooterTotals(), delay)
-      })
-    }
+    //   requestAnimationFrame(() => {
+    //     setTimeout(() => updateFooterTotals(), delay)
+    //   })
+    // }
 
     // ======================
     // 4️⃣ Tree data + Flatten ban đầu
@@ -872,22 +872,22 @@ function loadAndRender(worksheet) {
           }
 
           const flat = flattenTree(nestedData)
-          // ✅ FIX: Thêm setTimeout
-          setTimeout(() => {
-            gridApi.setGridOption('rowData', flat)
-            safeUpdateTotals(gridApi)
+          // ✅ FIX: Thêm setTimeout xxx
+          // setTimeout(() => {
+          //   gridApi.setGridOption('rowData', flat)
+          //   safeUpdateTotals(gridApi)
 
-            // === GIỐNG toggleNode() ===
-            if (targetId) {
-              requestAnimationFrame(() => {
-                const idx = flat.findIndex((r) => r.id == targetId)
-                const rowNode = gridApi.getDisplayedRowAtIndex(idx)
-                if (rowNode) {
-                  gridApi.ensureNodeVisible(rowNode, 'middle')
-                }
-              })
-            }
-          }, 0) // <-- Thêm setTimeout
+          //   // === GIỐNG toggleNode() ===
+          //   if (targetId) {
+          //     requestAnimationFrame(() => {
+          //       const idx = flat.findIndex((r) => r.id == targetId)
+          //       const rowNode = gridApi.getDisplayedRowAtIndex(idx)
+          //       if (rowNode) {
+          //         gridApi.ensureNodeVisible(rowNode, 'middle')
+          //       }
+          //     })
+          //   }
+          // }, 0) // <-- Thêm setTimeout
 
           currentExpandedLevel = 1
         })
