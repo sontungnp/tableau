@@ -931,7 +931,7 @@ function loadAndRender(worksheet) {
 
         // 🔹 3️⃣ Cập nhật lại dòng tổng
         // safeUpdateTotals() // ✅ gọi đúng xxx8
-        updateFooterTotals()
+        // updateFooterTotals()
       })
   })
 }
