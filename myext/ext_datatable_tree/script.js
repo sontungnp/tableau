@@ -759,6 +759,8 @@ function loadAndRender(worksheet) {
         // safeUpdateTotals()
         // updateFooterTotals()
         // setTimeout(() => updateFooterTotals(), 1000)
+        funcTionWait4ToUpdateTotal(1000)
+        console.log('run onGridReady.')
       },
       // onFirstDataRendered: () => updateFooterTotals(),
       onFirstDataRendered: (params) => {
