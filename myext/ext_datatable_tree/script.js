@@ -732,7 +732,7 @@ function loadAndRender(worksheet) {
         checkboxes: true
       },
       suppressRowClickSelection: false,
-      suppressInjectStyles: true, // ✅ fix bug injection CSS
+      // suppressInjectStyles: true, // ✅ fix bug injection CSS
 
       // sự kiện click vào 1 cell
       onCellClicked: (params) => {
