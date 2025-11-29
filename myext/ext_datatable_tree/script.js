@@ -655,13 +655,7 @@ function loadAndRender(worksheet) {
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
 
-    // function safeUpdateTotals(delay = 300) {
-    //   if (!gridApi) return
-
-    //   requestAnimationFrame(() => {
-    //     setTimeout(() => updateFooterTotals(), delay)
-    //   })
-    // }
+    funcTionWait4ToUpdateTotal(1000)
 
     // ======================
     // 4️⃣ Tree data + Flatten ban đầu
