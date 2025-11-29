@@ -758,9 +758,9 @@ function loadAndRender(worksheet) {
         gridApi = params.api
         // safeUpdateTotals()
         // updateFooterTotals()
-        setTimeout(() => updateFooterTotals(), 1000)
+        // setTimeout(() => updateFooterTotals(), 1000)
       },
-      // onFirstDataRendered: () => safeUpdateTotals(), xxx3
+      onFirstDataRendered: () => updateFooterTotals(),
       // onFilterChanged: () => safeUpdateTotals(), xxx4
       // onSortChanged: () => safeUpdateTotals(), xxx5
       onCellContextMenu: (params) => {
