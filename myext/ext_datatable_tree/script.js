@@ -760,7 +760,11 @@ function loadAndRender(worksheet) {
         // updateFooterTotals()
         // setTimeout(() => updateFooterTotals(), 1000)
       },
-      onFirstDataRendered: () => updateFooterTotals(),
+      // onFirstDataRendered: () => updateFooterTotals(),
+      onFirstDataRendered: (params) => {
+        updateFooterTotals()
+        console.log('run onFirstDataRendered.')
+      },
       // onFilterChanged: () => safeUpdateTotals(), xxx4
       // onSortChanged: () => safeUpdateTotals(), xxx5
       onCellContextMenu: (params) => {
