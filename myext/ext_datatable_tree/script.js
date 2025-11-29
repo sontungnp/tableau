@@ -621,39 +621,39 @@ function loadAndRender(worksheet) {
     // console.log('isMeasure', isMeasure)
 
     // ======= DÒNG TỔNG =======
-    // function updateFooterTotals() {
-    //   if (!gridApi) return
+    function updateFooterTotals() {
+      if (!gridApi) return
 
-    //   const allData = []
-    //   gridApi.forEachNodeAfterFilterAndSort((node) => {
-    //     if (!node.rowPinned) {
-    //       // Chỉ lấy dòng thường, không lấy dòng pinned
-    //       allData.push(node.data)
-    //     }
-    //   })
+      const allData = []
+      gridApi.forEachNodeAfterFilterAndSort((node) => {
+        if (!node.rowPinned) {
+          // Chỉ lấy dòng thường, không lấy dòng pinned
+          allData.push(node.data)
+        }
+      })
 
-    //   const numericCols = columnDefs
-    //     .filter((col) => col.type === 'numericColumn')
-    //     .map((col) => col.field)
+      const numericCols = columnDefs
+        .filter((col) => col.type === 'numericColumn')
+        .map((col) => col.field)
 
-    //   const totals = calcTotalsTree(allData, numericCols)
+      const totals = calcTotalsTree(allData, numericCols)
 
-    //   const totalRow = {}
-    //   columnDefs.forEach((col) => {
-    //     const field = col.field
-    //     if (numericCols.includes(field)) {
-    //       totalRow[field] = totals[field]
-    //     } else if (field === columnDefs[0].field) {
-    //       totalRow[field] = 'Tổng cộng'
-    //     } else {
-    //       totalRow[field] = ''
-    //     }
-    //   })
+      const totalRow = {}
+      columnDefs.forEach((col) => {
+        const field = col.field
+        if (numericCols.includes(field)) {
+          totalRow[field] = totals[field]
+        } else if (field === columnDefs[0].field) {
+          totalRow[field] = 'Tổng cộng'
+        } else {
+          totalRow[field] = ''
+        }
+      })
 
-    //   totalRow.leaf = true
+      totalRow.leaf = true
 
-    //   gridApi.setGridOption('pinnedBottomRowData', [totalRow])
-    // }
+      gridApi.setGridOption('pinnedBottomRowData', [totalRow])
+    }
 
     // function safeUpdateTotals(delay = 300) {
     //   if (!gridApi) return
@@ -755,7 +755,8 @@ function loadAndRender(worksheet) {
       },
       onGridReady: (params) => {
         gridApi = params.api
-        // safeUpdateTotals() xxx2
+        // safeUpdateTotals()
+        updateFooterTotals()
       },
       // onFirstDataRendered: () => safeUpdateTotals(), xxx3
       // onFilterChanged: () => safeUpdateTotals(), xxx4
@@ -907,6 +908,7 @@ function loadAndRender(worksheet) {
     document.getElementById('globalSearch').addEventListener('input', (e) => {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(e.target.value))
       // safeUpdateTotals() // ✅ gọi đúng xxx7
+      // updateFooterTotals()
     })
 
     document
@@ -927,6 +929,7 @@ function loadAndRender(worksheet) {
 
         // 🔹 3️⃣ Cập nhật lại dòng tổng
         // safeUpdateTotals() // ✅ gọi đúng xxx8
+        updateFooterTotals()
       })
   })
 }
