@@ -750,11 +750,11 @@ function loadAndRender(worksheet) {
       },
       onGridReady: (params) => {
         gridApi = params.api
-        safeUpdateTotals()
+        // safeUpdateTotals() xxx2
       },
-      onFirstDataRendered: () => safeUpdateTotals(),
-      onFilterChanged: () => safeUpdateTotals(),
-      onSortChanged: () => safeUpdateTotals(),
+      // onFirstDataRendered: () => safeUpdateTotals(), xxx3
+      // onFilterChanged: () => safeUpdateTotals(), xxx4
+      // onSortChanged: () => safeUpdateTotals(), xxx5
       onCellContextMenu: (params) => {
         const node = params.data
         if (!node || !node.id) return
@@ -775,9 +775,10 @@ function loadAndRender(worksheet) {
       gridApi.setGridOption('rowData', flatData)
       gridApi.setGridOption('columnDefs', columnDefs)
       // updateFooterTotals()
-      setTimeout(() => {
-        safeUpdateTotals()
-      }, 100)
+      // xxx1
+      // setTimeout(() => {
+      //   safeUpdateTotals()
+      // }, 100)
     }
 
     // Code mở tất cả và đóng tất cả tree
@@ -900,7 +901,7 @@ function loadAndRender(worksheet) {
     // ======================
     document.getElementById('globalSearch').addEventListener('input', (e) => {
       gridApi.setGridOption('quickFilterText', normalizeUnicode(e.target.value))
-      safeUpdateTotals() // ✅ gọi đúng
+      // safeUpdateTotals() // ✅ gọi đúng xxx7
     })
 
     document
@@ -920,7 +921,7 @@ function loadAndRender(worksheet) {
         }
 
         // 🔹 3️⃣ Cập nhật lại dòng tổng
-        safeUpdateTotals() // ✅ gọi đúng
+        // safeUpdateTotals() // ✅ gọi đúng xxx8
       })
   })
 }
