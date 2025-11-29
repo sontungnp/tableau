@@ -1252,6 +1252,10 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.removeChild(textarea)
     })
 
+    document
+      .getElementById('updateTotal')
+      .addEventListener('click', updateFooterTotals)
+
     // Lắng nghe filter và parameter change
     worksheet.addEventListener(tableau.TableauEventType.FilterChanged, () => {
       // console.log('vao day roi')
