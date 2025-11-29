@@ -734,9 +734,10 @@ function loadAndRender(worksheet) {
 
       rowSelection: {
         mode: 'multiRow',
-        checkboxes: true
+        checkboxes: true,
+        enableClickSelection: false
       },
-      suppressRowClickSelection: false,
+      // suppressRowClickSelection: false,
       // suppressInjectStyles: true, // ✅ fix bug injection CSS
 
       // sự kiện click vào 1 cell
@@ -756,7 +757,8 @@ function loadAndRender(worksheet) {
       onGridReady: (params) => {
         gridApi = params.api
         // safeUpdateTotals()
-        updateFooterTotals()
+        // updateFooterTotals()
+        setTimeout(() => updateFooterTotals(), 1000)
       },
       // onFirstDataRendered: () => safeUpdateTotals(), xxx3
       // onFilterChanged: () => safeUpdateTotals(), xxx4
