@@ -701,9 +701,9 @@ function loadAndRender(worksheet) {
         if (!node) return null
 
         // ✅ THÊM KIỂM TRA TẠI ĐÂY
-        if (!columnDefs || columnDefs.length === 0 || !columnDefs[0].field) {
-          return null
-        }
+        // if (!columnDefs || columnDefs.length === 0 || !columnDefs[0].field) {
+        //   return null
+        // }
 
         // ✅ Nếu là dòng "Tổng cộng"
         if (node[columnDefs[0].field] === 'Tổng cộng') {
