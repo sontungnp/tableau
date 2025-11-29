@@ -701,16 +701,17 @@ function loadAndRender(worksheet) {
         if (!node) return null
 
         // ✅ THÊM KIỂM TRA TẠI ĐÂY
-        // if (!columnDefs || columnDefs.length === 0 || !columnDefs[0].field) {
-        //   return null
-        // }
+        if (!columnDefs || columnDefs.length === 0 || !columnDefs[0].field) {
+          return null
+        }
 
         // ✅ Nếu là dòng "Tổng cộng"
-        if (node[columnDefs[0].field] === 'Tổng cộng') {
+        // Dòng tổng cộng
+        if (node.name === 'Tổng cộng') {
           return {
             fontWeight: 'bold',
             color: '#d00000',
-            backgroundColor: '#fabcbcff' // nền nhạt cho dễ nhìn
+            backgroundColor: '#fabcbcff'
           }
         }
 
