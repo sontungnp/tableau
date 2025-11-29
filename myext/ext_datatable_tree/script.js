@@ -762,7 +762,8 @@ function loadAndRender(worksheet) {
       },
       // onFirstDataRendered: () => updateFooterTotals(),
       onFirstDataRendered: (params) => {
-        updateFooterTotals()
+        // updateFooterTotals()
+        funcTionWait4ToUpdateTotal(1000)
         console.log('run onFirstDataRendered.')
       },
       // onFilterChanged: () => safeUpdateTotals(), xxx4
@@ -916,6 +917,12 @@ function loadAndRender(worksheet) {
       // safeUpdateTotals() // ✅ gọi đúng xxx7
       // updateFooterTotals()
     })
+
+    function funcTionWait4ToUpdateTotal(secondsamt) {
+      setTimeout(() => {
+        document.getElementById('updateTotal').click() // 👈 Tự động kích nút
+      }, secondsamt)
+    }
 
     document
       .getElementById('clearAllFilterBtn')
