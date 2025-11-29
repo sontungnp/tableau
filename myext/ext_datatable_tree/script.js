@@ -937,6 +937,10 @@ function loadAndRender(worksheet) {
         // safeUpdateTotals() // ✅ gọi đúng xxx8
         // updateFooterTotals()
       })
+
+    document
+      .getElementById('updateTotal')
+      .addEventListener('click', updateFooterTotals)
   })
 }
 
@@ -1251,10 +1255,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       document.body.removeChild(textarea)
     })
-
-    document
-      .getElementById('updateTotal')
-      .addEventListener('click', updateFooterTotals)
 
     // Lắng nghe filter và parameter change
     worksheet.addEventListener(tableau.TableauEventType.FilterChanged, () => {
