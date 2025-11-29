@@ -404,17 +404,18 @@ function toggleNode(nodeId) {
   recursiveToggle(nestedData)
 
   const flatData = flattenTree(nestedData)
-  gridApi.setGridOption('rowData', flatData)
+  // ✅ FIX: Đẩy việc cập nhật rowData vào event loop tiếp theo
+  setTimeout(() => {
+    gridApi.setGridOption('rowData', flatData)
 
-  // Sau khi render xong, cuộn đến đúng node vừa click
-  requestAnimationFrame(() => {
+    // Sau khi render xong, cuộn đến đúng node vừa click
     const rowNode = gridApi.getDisplayedRowAtIndex(
       flatData.findIndex((r) => r.id == nodeId)
     )
     if (rowNode) {
       gridApi.ensureNodeVisible(rowNode, 'middle')
     }
-  })
+  }, 0) // <--- Thêm setTimeout(..., 0)
 }
 
 // search cu
@@ -792,7 +793,9 @@ function loadAndRender(worksheet) {
         applyExpandLevel(nestedData, currentExpandedLevel)
 
         const flat = flattenTree(nestedData)
-        gridApi.setGridOption('rowData', flat)
+        setTimeout(() => {
+          gridApi.setGridOption('rowData', flat)
+        }, 0)
       })
 
       btnCollapse1Level.addEventListener('click', () => {
@@ -803,7 +806,9 @@ function loadAndRender(worksheet) {
         applyExpandLevel(nestedData, currentExpandedLevel)
 
         const flat = flattenTree(nestedData)
-        gridApi.setGridOption('rowData', flat)
+        setTimeout(() => {
+          gridApi.setGridOption('rowData', flat)
+        }, 0)
       })
 
       if (btnExpand) {
@@ -826,18 +831,22 @@ function loadAndRender(worksheet) {
           }
 
           const flat = flattenTree(nestedData)
-          gridApi.setGridOption('rowData', flat)
+          // ✅ FIX: Sử dụng setTimeout(..., 0) để cập nhật rowData bất đồng bộ
+          setTimeout(() => {
+            gridApi.setGridOption('rowData', flat)
 
-          // === GIỐNG toggleNode() ===
-          if (targetId) {
-            requestAnimationFrame(() => {
-              const idx = flat.findIndex((r) => r.id == targetId)
-              const rowNode = gridApi.getDisplayedRowAtIndex(idx)
-              if (rowNode) {
-                gridApi.ensureNodeVisible(rowNode, 'middle')
-              }
-            })
-          }
+            // === GIỐNG toggleNode() ===
+            if (targetId) {
+              // requestAnimationFrame được giữ lại bên trong setTimeout để đảm bảo grid đã render
+              requestAnimationFrame(() => {
+                const idx = flat.findIndex((r) => r.id == targetId)
+                const rowNode = gridApi.getDisplayedRowAtIndex(idx)
+                if (rowNode) {
+                  gridApi.ensureNodeVisible(rowNode, 'middle')
+                }
+              })
+            }
+          }, 0) // <-- Thêm setTimeout
 
           currentExpandedLevel = maxTreeLevel
         })
@@ -862,20 +871,22 @@ function loadAndRender(worksheet) {
           }
 
           const flat = flattenTree(nestedData)
-          gridApi.setGridOption('rowData', flat)
+          // ✅ FIX: Thêm setTimeout
+          setTimeout(() => {
+            gridApi.setGridOption('rowData', flat)
+            safeUpdateTotals(gridApi)
 
-          safeUpdateTotals(gridApi)
-
-          // === GIỐNG toggleNode() ===
-          if (targetId) {
-            requestAnimationFrame(() => {
-              const idx = flat.findIndex((r) => r.id == targetId)
-              const rowNode = gridApi.getDisplayedRowAtIndex(idx)
-              if (rowNode) {
-                gridApi.ensureNodeVisible(rowNode, 'middle')
-              }
-            })
-          }
+            // === GIỐNG toggleNode() ===
+            if (targetId) {
+              requestAnimationFrame(() => {
+                const idx = flat.findIndex((r) => r.id == targetId)
+                const rowNode = gridApi.getDisplayedRowAtIndex(idx)
+                if (rowNode) {
+                  gridApi.ensureNodeVisible(rowNode, 'middle')
+                }
+              })
+            }
+          }, 0) // <-- Thêm setTimeout
 
           currentExpandedLevel = 1
         })
