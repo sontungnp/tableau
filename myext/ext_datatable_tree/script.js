@@ -12,6 +12,7 @@ let maxTreeLevel = 1
 
 function setAllExpanded(nodes, expanded) {
   if (!nodes || !nodes.length) return
+
   for (const n of nodes) {
     if (n.children && n.children.length) {
       n.expanded = expanded
@@ -708,8 +709,6 @@ function loadAndRender(worksheet) {
         // ✅ Nếu là dòng "Tổng cộng"
         // Dòng tổng cộng
         if (node.name === 'Tổng cộng') {
-          console.log('vao day roi')
-
           return {
             fontWeight: 'bold',
             color: '#d00000',
@@ -885,21 +884,20 @@ function loadAndRender(worksheet) {
 
           const flat = flattenTree(nestedData)
           // ✅ FIX: Thêm setTimeout xxx
-          // setTimeout(() => {
-          //   gridApi.setGridOption('rowData', flat)
-          //   safeUpdateTotals(gridApi)
+          setTimeout(() => {
+            gridApi.setGridOption('rowData', flat)
 
-          //   // === GIỐNG toggleNode() ===
-          //   if (targetId) {
-          //     requestAnimationFrame(() => {
-          //       const idx = flat.findIndex((r) => r.id == targetId)
-          //       const rowNode = gridApi.getDisplayedRowAtIndex(idx)
-          //       if (rowNode) {
-          //         gridApi.ensureNodeVisible(rowNode, 'middle')
-          //       }
-          //     })
-          //   }
-          // }, 0) // <-- Thêm setTimeout
+            // === GIỐNG toggleNode() ===
+            if (targetId) {
+              requestAnimationFrame(() => {
+                const idx = flat.findIndex((r) => r.id == targetId)
+                const rowNode = gridApi.getDisplayedRowAtIndex(idx)
+                if (rowNode) {
+                  gridApi.ensureNodeVisible(rowNode, 'middle')
+                }
+              })
+            }
+          }, 0) // <-- Thêm setTimeout
 
           currentExpandedLevel = 1
         })
