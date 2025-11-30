@@ -297,7 +297,8 @@ function loadAndRender(worksheet) {
       gridApi.setGridOption('columnDefs', columnDefs)
 
       // Tối ưu quan trọng: dùng setRowData
-      gridApi.setRowData(data)
+      // gridApi.setRowData(data)
+      gridApi.setGridOption('rowData', data)
 
       // Đảm bảo tổng được tính lại sau khi set dữ liệu mới
       funcTionWait4ToUpdateTotal(1000)
