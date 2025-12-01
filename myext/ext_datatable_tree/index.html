@@ -10,6 +10,7 @@
       href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.4/styles/ag-theme-quartz.css"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/gh/DevExpress/DevExtreme/dist/js/excel-export/xlsx.with.styles.min.js"></script> -->
 
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
     <script src="script.js"></script>
@@ -25,7 +26,7 @@
         display: flex;
         flex-direction: column;
         height: 100%;
-        padding: 10px;
+        padding: 2px;
       }
 
       /* === TOOLBAR === */
@@ -33,8 +34,8 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 10px;
+        gap: 2px;
+        margin-bottom: 1px;
       }
 
       /* 3 phần trong toolbar */
@@ -52,12 +53,12 @@
 
       /* Nút bấm chung */
       button {
-        padding: 6px 8px;
+        padding: 3px 4px;
         border: 1px solid #ccc;
         background-color: #fff;
         cursor: pointer;
         border-radius: 6px;
-        font-size: 16px;
+        font-size: 12px;
       }
 
       button:hover {
@@ -76,11 +77,10 @@
       }
 
       /* Tìm kiếm */
-      .search-container {
+      /* .search-container {
         display: flex;
         align-items: center;
         flex: 1;
-        /* max-width: 600px; */
         width: 100%;
         background-color: white;
         border-radius: 6px;
@@ -100,7 +100,7 @@
         margin-right: 6px;
         font-size: 18px;
         color: #555;
-      }
+      } */
 
       .tree-indent {
         display: inline-block;
@@ -209,22 +209,25 @@
         <div class="toolbar-left">
           <!-- <button id="btnExpandAll" title="Mở tất cả">➕</button>
           <button id="btnCollapseAll" title="Thu tất cả">➖</button> -->
-          <button id="btnCollapseAll" title="Thu tất cả">⯇⯇</button>
-          <button id="btnCollapse1Level" title="Thu một cấp">⯇</button>
-          <button id="btnExpand1Level" title="Mở một cấp">⯈</button>
-          <button id="btnExpandAll" title="Mở tất cả">⯈⯈</button>
+          <button id="btnCollapseAll" title="Collapse All">⯇⯇</button>
+          <button id="btnCollapse1Level" title="Collapse 1 Level">⯇</button>
+          <button id="btnExpand1Level" title="Expand 1 Level">⯈</button>
+          <button id="btnExpandAll" title="Expand All">⯈⯈</button>
         </div>
 
         <!-- Giữa: search -->
         <div class="toolbar-center">
-          <div class="search-container">
-            <span>🔍</span>
-            <input
+          <!-- <div class="search-container"> -->
+          <!-- <span>🔍</span> -->
+          <!-- <input
               type="text"
               id="globalSearch"
               placeholder="Tìm kiếm toàn bộ..."
-            />
+            /> -->
+          <div id="notebar" style="text-align: right">
+            <label id="extractRefreshTime">Extract Refresh Time: </label>
           </div>
+          <!-- </div> -->
         </div>
 
         <!-- Phải: export + copy -->
@@ -233,13 +236,15 @@
           <button id="exportExcel" title="Export CSV">📤</button>
           <button id="copyCellBtn" title="Copy selected cell">📋</button>
           <button id="copyRow" title="Copy selected rows">📄</button>
-          <button id="updateTotal" title="Update Total">🔄</button>
+          <button id="updateTotal" title="Update Total" style="display: none">
+            🔄
+          </button>
         </div>
       </div>
 
-      <div id="notebar" style="text-align: right">
+      <!-- <div id="notebar" style="text-align: right">
         <label id="extractRefreshTime">Extract Refresh Time: </label>
-      </div>
+      </div> -->
 
       <div id="gridContainer" class="ag-theme-quartz"></div>
     </div>
