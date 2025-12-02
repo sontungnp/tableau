@@ -71,6 +71,15 @@ function normalizeUnicode(str) {
   return str ? str.normalize('NFC').toLowerCase().trim() : ''
 }
 
+// Helper: Extract tên cột từ định dạng tree_lvN("Tên")
+function extractTreeHeaderName(header) {
+  // Clean width nếu có: tree_lv1("Tên")(300) -> tree_lv1("Tên")
+  const cleanHeader = header.replace(/\(\s*\d+\s*\)\s*$/, '').trim()
+  // Parse ngoặc: tree_lv1("Cây tổ chức") -> "Cây tổ chức"
+  const match = cleanHeader.match(/tree_lv\d+\s*\(\s*(.+?)\s*\)/)
+  return match ? match[1].trim() : 'Cấu trúc cây' // Fallback nếu không match
+}
+
 // Pivot Measure Names/Values
 function pivotMeasureValues(
   table,
@@ -202,8 +211,9 @@ function pivotMeasureValues(
     if (fieldName.startsWith('tree_lv')) {
       if (demTree === 0) {
         demTree = demTree + 1
+        const treeHeaderName = extractTreeHeaderName(h)
         return {
-          headerName: 'Cấu trúc cây',
+          headerName: treeHeaderName,
           field: 'name',
           width: 300,
           cellRenderer: (params) => {
