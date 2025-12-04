@@ -156,7 +156,12 @@ function pivotMeasureValues(
   // console.log('pivotMap', JSON.stringify(Object.fromEntries(pivotMap), null, 2))
 
   const measureNames = Array.from(measureSet)
-  const headers = [...dimensionIdxs.map((i) => cols[i]), ...measureNames]
+  // const headers = [...dimensionIdxs.map((i) => cols[i]), ...measureNames]
+  const headers = [
+    ...dimensionIdxs.map((i) => cols[i]),
+    ...measureNames
+  ].filter((h) => h !== undefined && h !== null)
+
   const isMeasure = [
     ...dimensionIdxs.map(() => false),
     ...measureNames.map(() => true)
@@ -436,11 +441,51 @@ function toggleNode(nodeId) {
 // copy cu
 
 // --- Hàm thực hiện copy ---
+// function copySelectedRows() {
+//   const selectedNodes = []
+//   // gridApi.forEachNode((node) => {
+//   //   if (node.isSelected()) selectedNodes.push(node)
+//   // })
+//   gridApi.forEachNodeAfterFilterAndSort((node) => {
+//     if (node.isSelected()) selectedNodes.push(node)
+//   })
+
+//   if (selectedNodes.length === 0) {
+//     alert('⚠️ Chưa chọn dòng nào!')
+//     return
+//   }
+
+//   const selectedData = selectedNodes.map((node) => node.data)
+//   const text = selectedData
+//     .map((row) => Object.values(row).join('\t'))
+//     .join('\n')
+
+//   // --- Fallback cổ điển, tương thích mọi trình duyệt / Tableau Extension ---
+//   const textarea = document.createElement('textarea')
+//   textarea.value = text
+//   textarea.style.position = 'fixed'
+//   textarea.style.top = '-9999px'
+//   document.body.appendChild(textarea)
+//   textarea.focus()
+//   textarea.select()
+
+//   try {
+//     const success = document.execCommand('copy')
+//     if (success) {
+//       console.log(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
+//     } else {
+//       console.log('⚠️ Copy không thành công.')
+//     }
+//   } catch (err) {
+//     console.error('Copy lỗi:', err)
+//     alert('❌ Không thể copy (trình duyệt không cho phép).')
+//   }
+
+//   document.body.removeChild(textarea)
+// }
+
 function copySelectedRows() {
   const selectedNodes = []
-  // gridApi.forEachNode((node) => {
-  //   if (node.isSelected()) selectedNodes.push(node)
-  // })
   gridApi.forEachNodeAfterFilterAndSort((node) => {
     if (node.isSelected()) selectedNodes.push(node)
   })
@@ -450,12 +495,26 @@ function copySelectedRows() {
     return
   }
 
-  const selectedData = selectedNodes.map((node) => node.data)
-  const text = selectedData
-    .map((row) => Object.values(row).join('\t'))
+  // Lấy danh sách cột đang hiển thị trên giao diện
+  const displayedCols = gridApi.getColumnDefs().map((c) => c.field)
+
+  // Build text cần copy
+  const text = selectedNodes
+    .map((node) => {
+      return displayedCols
+        .map((col) => {
+          let v = node.data[col]
+
+          if (v === null || v === undefined) return ''
+          if (typeof v === 'object') return '' // tránh [object Object]
+
+          return v.toString()
+        })
+        .join('\t')
+    })
     .join('\n')
 
-  // --- Fallback cổ điển, tương thích mọi trình duyệt / Tableau Extension ---
+  // Copy vào clipboard
   const textarea = document.createElement('textarea')
   textarea.value = text
   textarea.style.position = 'fixed'
@@ -465,15 +524,9 @@ function copySelectedRows() {
   textarea.select()
 
   try {
-    const success = document.execCommand('copy')
-    if (success) {
-      console.log(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
-    } else {
-      console.log('⚠️ Copy không thành công.')
-    }
+    document.execCommand('copy')
   } catch (err) {
-    console.error('Copy lỗi:', err)
-    alert('❌ Không thể copy (trình duyệt không cho phép).')
+    alert('❌ Không thể copy.')
   }
 
   document.body.removeChild(textarea)
@@ -609,7 +662,7 @@ function loadAndRender(worksheet) {
     // 1️⃣ Dữ liệu gốc
     // ======================
 
-    // console.log('sumData', sumData)
+    console.log('sumData', sumData)
 
     // Xác định cột cần loại bỏ
     const excludeCols = sumData.columns

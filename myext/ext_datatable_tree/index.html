@@ -9,6 +9,10 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.4/styles/ag-theme-quartz.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/gh/DevExpress/DevExtreme/dist/js/excel-export/xlsx.with.styles.min.js"></script> -->
 
@@ -48,7 +52,7 @@
 
       .toolbar-center {
         flex: 1; /* chiếm hết khoảng còn lại */
-        justify-content: center;
+        justify-content: flex-end !important;
       }
 
       /* Nút bấm chung */
@@ -232,12 +236,22 @@
 
         <!-- Phải: export + copy -->
         <div class="toolbar-right">
-          <button id="clearAllFilterBtn" title="Clear All Filter">🚫</button>
-          <button id="exportExcel" title="Export CSV">📤</button>
-          <button id="copyCellBtn" title="Copy selected cell">📋</button>
-          <button id="copyRow" title="Copy selected rows">📄</button>
+          <button
+            id="clearAllFilterBtn"
+            title="Clear All Filter"
+            style="display: none"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+          <button id="exportExcel" title="Export Excel">
+            <i class="fas fa-file-export"></i>
+          </button>
+          <button id="copyCellBtn" title="Copy selected cell">⎘</button>
+          <button id="copyRow" title="Copy selected rows">
+            <i class="fas fa-copy"></i>
+          </button>
           <button id="updateTotal" title="Update Total" style="display: none">
-            🔄
+            <i class="fas fa-redo"></i>
           </button>
         </div>
       </div>
