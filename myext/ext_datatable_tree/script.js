@@ -156,11 +156,11 @@ function pivotMeasureValues(
   // console.log('pivotMap', JSON.stringify(Object.fromEntries(pivotMap), null, 2))
 
   const measureNames = Array.from(measureSet)
-  // const headers = [...dimensionIdxs.map((i) => cols[i]), ...measureNames]
-  const headers = [
-    ...dimensionIdxs.map((i) => cols[i]),
-    ...measureNames
-  ].filter((h) => h !== undefined && h !== null)
+  const headers = [...dimensionIdxs.map((i) => cols[i]), ...measureNames]
+  //const headers = [
+  //  ...dimensionIdxs.map((i) => cols[i]),
+  //  ...measureNames
+  //].filter((h) => h !== undefined && h !== null)
 
   const isMeasure = [
     ...dimensionIdxs.map(() => false),
