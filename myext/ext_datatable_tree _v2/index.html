@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AG Grid TreeView - Community Edition</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.4/dist/ag-grid-community.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.4/styles/ag-theme-quartz.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/gh/DevExpress/DevExtreme/dist/js/excel-export/xlsx.with.styles.min.js"></script> -->
+
+    <script src="../../lib/tableau.extensions.1.latest.js"></script>
+    <script src="script.js"></script>
+
+    <style>
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f5f6fa;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 2px;
+      }
+
+      /* === TOOLBAR === */
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2px;
+        margin-bottom: 1px;
+      }
+
+      /* 3 phần trong toolbar */
+      .toolbar-left,
+      .toolbar-center,
+      .toolbar-right {
+        display: flex;
+        align-items: center;
+      }
+
+      .toolbar-center {
+        flex: 1; /* chiếm hết khoảng còn lại */
+        justify-content: flex-end !important;
+      }
+
+      /* Nút bấm chung */
+      button {
+        padding: 3px 4px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        cursor: pointer;
+        border-radius: 6px;
+        font-size: 12px;
+      }
+
+      button:hover {
+        background-color: #f0f0f0;
+      }
+
+      /* Nút riêng cho expand/collapse */
+      #btnExpandAll {
+        background-color: #e6f4ea;
+        border: 1px solid #b7dfb9;
+      }
+
+      #btnCollapseAll {
+        background-color: #fceaea;
+        border: 1px solid #e2b0b0;
+      }
+
+      /* Tìm kiếm */
+      /* .search-container {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        width: 100%;
+        background-color: white;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+      }
+
+      .search-container input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 6px;
+        font-size: 14px;
+      }
+
+      .search-container span {
+        margin-right: 6px;
+        font-size: 18px;
+        color: #555;
+      } */
+
+      .tree-indent {
+        display: inline-block;
+        width: 18px;
+      }
+
+      .toggle-btn {
+        cursor: pointer;
+        font-weight: bold;
+        color: #0078d7;
+      }
+
+      /* Grid container */
+      #gridContainer {
+        height: 530px;
+        width: 100%;
+      }
+
+      /* CSS cho dòng tổng */
+      .ag-row-pinned {
+        font-weight: bold !important;
+        background-color: #f0f0f0 !important;
+      }
+
+      /* Xen kẽ dòng */
+      .ag-row:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      .ag-row:nth-child(odd) {
+        background-color: #ffffff;
+      }
+
+      /* them cái này để bôi đen được dòng*/
+      .ag-cell {
+        user-select: text !important;
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+      }
+
+      /* Chỉnh màu nền header */
+      /* === HEADER TABLE === */
+      .ag-theme-quartz .ag-header,
+      .ag-theme-quartz .ag-header-cell {
+        background-color: #c4e1f1 !important; /* màu nền header */
+      }
+
+      .ag-theme-quartz .ag-header-cell-text {
+        font-weight: bold;
+        color: #000; /* màu chữ */
+      }
+
+      /* Viền ngăn cách giữa các cột header (tuỳ chọn, cho đẹp hơn) */
+      .ag-theme-quartz .ag-header-cell::after {
+        border-right: 1px solid #ccc;
+      }
+
+      /* === THÊM MỚI: chỉnh kích thước icon + - nhỏ lại === */
+      /* .toggle-btn {
+        font-size: 10px;
+        width: 14px;
+        height: 14px;
+        line-height: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        background-color: #fff;
+        color: #000 !important;
+        cursor: pointer;
+        user-select: none;
+        vertical-align: middle;
+        box-sizing: border-box;
+      } */
+      .toggle-btn {
+        color: #666;
+        margin-right: 8px;
+        font-size: 18px;
+      }
+
+      .toggle-btn:hover {
+        background-color: #f0f0f0; /* đổi màu nền khi hover */
+        border-color: #888;
+        color: #000 !important; /* 👈 giữ nguyên màu đen khi hover */
+      }
+
+      .ag-theme-quartz .ag-cell .toggle-btn,
+      .ag-theme-quartz .toggle-btn,
+      .toggle-btn {
+        color: #000 !important; /* ép tuyệt đối */
+      }
+
+      .ag-icon,
+      .ag-icon-expanded,
+      .ag-icon-contracted {
+        color: #000 !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="toolbar">
+        <!-- Trái: expand / collapse -->
+        <div class="toolbar-left">
+          <!-- <button id="btnExpandAll" title="Mở tất cả">➕</button>
+          <button id="btnCollapseAll" title="Thu tất cả">➖</button> -->
+          <button id="btnCollapseAll" title="Collapse All">⯇⯇</button>
+          <button id="btnCollapse1Level" title="Collapse 1 Level">⯇</button>
+          <button id="btnExpand1Level" title="Expand 1 Level">⯈</button>
+          <button id="btnExpandAll" title="Expand All">⯈⯈</button>
+        </div>
+
+        <!-- Giữa: search -->
+        <div class="toolbar-center">
+          <!-- <div class="search-container"> -->
+          <!-- <span>🔍</span> -->
+          <!-- <input
+              type="text"
+              id="globalSearch"
+              placeholder="Tìm kiếm toàn bộ..."
+            /> -->
+          <div id="notebar" style="text-align: right">
+            <label id="extractRefreshTime">Extract Refresh Time: </label>
+          </div>
+          <!-- </div> -->
+        </div>
+
+        <!-- Phải: export + copy -->
+        <div class="toolbar-right">
+          <button
+            id="clearAllFilterBtn"
+            title="Clear All Filter"
+            style="display: none"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+          <button id="exportExcel" title="Export Excel">
+            <i class="fas fa-file-export"></i>
+          </button>
+          <button id="copyCellBtn" title="Copy selected cell">⎘</button>
+          <button id="copyRow" title="Copy selected rows">
+            <i class="fas fa-copy"></i>
+          </button>
+          <button id="updateTotal" title="Update Total" style="display: none">
+            <i class="fas fa-redo"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- <div id="notebar" style="text-align: right">
+        <label id="extractRefreshTime">Extract Refresh Time: </label>
+      </div> -->
+
+      <div id="gridContainer" class="ag-theme-quartz"></div>
+    </div>
+  </body>
+</html>
