@@ -51,69 +51,81 @@ const negativeCellStyle = (params) => {
 
 /**
  * Chuyển đổi cấu hình tuỳ chỉnh và danh sách cột pivot thành AG Grid columnDefs.
- * @param {Array<string>} dimensionColumns - Các cột dimension từ dữ liệu pivot.
- * @param {Array<string>} measureColumns - Các cột measure mới từ dữ liệu pivot.
- * @param {Array<object>} customConfig - Mảng cấu hình tuỳ chỉnh của người dùng (pivotColumnConfig).
- * @returns {Array<object>} - Mảng columnDefs hoàn chỉnh cho AG Grid.
+ * @param {Array<string>} dimensionColumns
+ * @param {Array<string>} measureColumns
+ * @param {Array<object>} customConfig
+ * @param {Array<string>} excludeColumns - Danh sách cột cần loại bỏ
+ * @returns {Array<object>}
  */
-function createColumnDefs(dimensionColumns, measureColumns, customConfig) {
-  // 1. Lọc bỏ các cột dimension có tiền tố 'tree_lv'
+function createColumnDefs(
+  dimensionColumns,
+  measureColumns,
+  customConfig,
+  excludeColumns = []
+) {
+  // 1. Lọc dimension columns
   const filteredDimensionColumns = dimensionColumns.filter(
-    (field) => !field.startsWith('tree_lv')
+    (field) => !field.startsWith('tree_lv') && !excludeColumns.includes(field)
   )
 
-  // 2. Tạo một Map từ cấu hình tuỳ chỉnh VÀ XÁC ĐỊNH THỨ TỰ CỘT MEASURE
+  const filteredMeasureColumns = measureColumns.filter(
+    (field) => !excludeColumns.includes(field)
+  )
+
+  // 2. Map custom config
   const configMap = new Map()
-  const orderedMeasureColumns = []
+  const orderedFieldsFromConfig = []
 
   customConfig.forEach((col) => {
+    if (excludeColumns.includes(col.field)) return
     configMap.set(col.field, col)
-
-    if (measureColumns.includes(col.field)) {
-      orderedMeasureColumns.push(col.field)
-    }
+    orderedFieldsFromConfig.push(col.field)
   })
 
-  // 3. Tạo danh sách tất cả các trường (field)
-  const allFields = [
-    'name',
-    ...filteredDimensionColumns,
-    ...orderedMeasureColumns
-  ]
+  // 3. Tạo danh sách field theo thứ tự:
+  // - field có trong customConfig trước
+  // - field còn lại (dimension + measure) xếp sau
+  const mergedFields = Array.from(
+    new Set([
+      'name',
+      ...orderedFieldsFromConfig,
+      ...filteredDimensionColumns,
+      ...filteredMeasureColumns
+    ])
+  ).filter((f) => !excludeColumns.includes(f))
 
-  // 4. Xây dựng columnDefs
-  const columnDefs = allFields.map((field) => {
+  // 4. Build columnDefs
+  const columnDefs = mergedFields.map((field) => {
     const customProps = configMap.get(field)
+
     const isDimensionOrName =
       filteredDimensionColumns.includes(field) || field === 'name'
-    const isMeasure = orderedMeasureColumns.includes(field)
+    const isMeasure = filteredMeasureColumns.includes(field)
 
-    // Cấu hình cơ bản (width, headerName, field)
+    // Default config
     let columnDef = {
-      field: field,
-      headerName: field,
-      width: isDimensionOrName ? 150 : 100
+      field,
+      headerName: field.replace(/_/g, '\n'),
+      width: isDimensionOrName ? 250 : 200,
+      wrapHeaderText: true,
+      autoHeaderHeight: true
     }
 
-    // ⭐ MẶC ĐỊNH: Căn lề
+    // Default alignment + formatter
     if (isDimensionOrName) {
-      // Mặc định: Căn trái cho Dimension
       columnDef.cellStyle = { textAlign: 'left' }
     } else if (isMeasure) {
-      // Mặc định: Căn phải cho Measure, và áp dụng định dạng số
-      columnDef.cellStyle = negativeCellStyle // Đã bao gồm textAlign: 'right' và màu đỏ
+      columnDef.cellStyle = negativeCellStyle
       columnDef.valueFormatter = (params) => {
         const v = params.value
         if (v == null || v === '') return ''
         const num = Number(v)
         if (isNaN(num)) return v
-        // 🔹 Format với phân tách hàng nghìn, tối đa 2 chữ số thập phân
-        // return num.toLocaleString('vi-VN', { maximumFractionDigits: 2 })
         return num.toLocaleString('en-US', { maximumFractionDigits: 2 })
       }
     }
 
-    // Logic đặc biệt cho cột 'name' (cellRenderer)
+    // Logic riêng cho cột 'name'
     if (field === 'name') {
       columnDef = {
         ...columnDef,
@@ -122,16 +134,15 @@ function createColumnDefs(dimensionColumns, measureColumns, customConfig) {
       }
     }
 
-    // ⭐ Ghi đè bằng cấu hình tuỳ chỉnh (customConfig)
+    // Override bằng customConfig
     if (customProps) {
-      // Dùng logic spread (...) để ghi đè (ví dụ: nếu customConfig định nghĩa cellStyle, nó sẽ ghi đè cellStyle mặc định)
       columnDef = {
         ...columnDef,
         ...customProps
       }
     }
 
-    // Đảm bảo headerName
+    // Ensure headerName
     if (!columnDef.headerName) {
       columnDef.headerName = field
     }
@@ -439,7 +450,7 @@ function adjustGridHeight() {
   const toolbarHeight = toolbar.offsetHeight
   const notebarHeight = notebar.offsetHeight
   const padding = 0 // tổng trên + dưới
-  const extraSpacing = -10 // khoảng cách phụ nếu có
+  const extraSpacing = -5 // khoảng cách phụ nếu có
 
   const gridHeight =
     totalHeight - toolbarHeight - notebarHeight - padding - extraSpacing
@@ -1127,12 +1138,17 @@ document.addEventListener('DOMContentLoaded', () => {
           case 'pivot_column_config':
             pivot_column_config = JSON.parse(item[1].formattedValue)
             break
+          case 'list_exclude_column_config':
+            list_exclude_column_config = item[1].formattedValue.split(',')
+            break
         }
       })
 
       console.log('list_column_horizontal', list_column_horizontal)
       console.log('list_column_vertical', list_column_vertical)
       console.log('list_column_measure', list_column_measure)
+      console.log('pivot_column_config', pivot_column_config)
+      console.log('list_exclude_column_config', list_exclude_column_config)
 
       if (!pivot_column_config) {
         pivot_column_config = JSON.parse(
