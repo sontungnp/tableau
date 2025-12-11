@@ -175,6 +175,10 @@ function createColumnDefs(
 
   const measureGroups = {} // { prefix: [childColumns] }
 
+  // Tạo map để lấy lại columnDef gốc
+  const columnDefMap = new Map()
+  columnDefs.forEach((col) => columnDefMap.set(col.field, col))
+
   filteredMeasureColumns.forEach((field) => {
     const parts = field.split('_')
     if (parts.length === 2) {
@@ -184,41 +188,44 @@ function createColumnDefs(
         measureGroups[prefix] = []
       }
 
-      measureGroups[prefix].push({
-        field,
-        headerName: suffix.padStart(2, '0') // 1 -> 01
-      })
+      // Lấy lại columnDef gốc
+      const originalDef = columnDefMap.get(field)
+
+      // Clone + override headerName
+      const childDef = {
+        ...originalDef,
+        headerName: suffix.padStart(2, '0')
+      }
+
+      measureGroups[prefix].push(childDef)
     }
   })
 
   // Nếu không có group nào → giữ nguyên
   if (Object.keys(measureGroups).length === 0) return columnDefs
 
-  // Áp dụng grouping: tạo column group rồi thay thế các cột lẻ
+  // Áp dụng grouping
   const finalColumnDefs = []
-  const measureFieldsSet = new Set(filteredMeasureColumns)
-
   const processedPrefixes = new Set()
 
   for (const col of columnDefs) {
     const field = col.field
 
-    // Nếu là measure dạng group PREFIX_SUFFIX → bỏ, sẽ thêm trong group
-    if (field && measureFieldsSet.has(field)) {
-      const parts = field.split('_')
-      if (parts.length === 2) {
-        const prefix = parts[0]
-        if (!processedPrefixes.has(prefix)) {
-          processedPrefixes.add(prefix)
+    const parts = field.split('_')
+    const prefix = parts[0]
 
-          finalColumnDefs.push({
-            headerName: prefix,
-            headerClass: 'header-center',
-            children: measureGroups[prefix]
-          })
-        }
-        continue
+    // Đây là measure dạng PREFIX_SUFFIX
+    if (parts.length === 2 && measureGroups[prefix]) {
+      if (!processedPrefixes.has(prefix)) {
+        processedPrefixes.add(prefix)
+
+        finalColumnDefs.push({
+          headerName: prefix,
+          headerClass: 'header-center',
+          children: measureGroups[prefix]
+        })
       }
+      continue // Không add cột lẻ nữa
     }
 
     // Không phải grouped measure → giữ nguyên

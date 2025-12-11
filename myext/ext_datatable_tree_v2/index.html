@@ -205,25 +205,61 @@
       }
 
       /* xuống dòng cho header */
-      .ag-header-cell-label {
+      /* .ag-header-cell-label {
         white-space: pre-line !important;
-        text-align: center; /* optional */
+        text-align: center;
         padding: 0px !important;
         margin: 0px !important;
-      }
+      } */
 
       /* căn giữa header level 1 */
       .ag-header-cell-comp-wrapper {
         justify-content: center !important; /* căn giữa ngang */
         text-align: center !important;
-        padding: 0px !important;
-        margin: 0px !important;
-        min-height: 18px !important; /* giảm chiều cao */
+      }
+
+      /* Căn giữa text cho header level 2 */
+      .ag-header-cell-label {
+        justify-content: center !important;
+        text-align: center !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
       }
 
       /* Text header level 1 */
       .ag-header-group-text {
         color: red !important; /* Thêm dòng này */
+      }
+
+      /* kẻ vạc ngăn cách cột header */
+      .ag-theme-quartz .ag-header-cell,
+      .ag-theme-quartz .ag-header-group-cell {
+        border-right: 1px solid #ccc !important;
+      }
+
+      /* kẻ vạc ngăn cách cột cell */
+      /* .ag-theme-quartz .ag-cell {
+        border-right: 1px solid #ccc !important;
+      } */
+
+      /* giảm chiều cao từng dòng header (group + normal) */
+      .ag-theme-quartz {
+        --ag-header-height: 20px; /* Header cấp 1 */
+        --ag-header-column-separator-display: block;
+        --ag-header-column-separator-height: 100%;
+        --ag-header-column-separator-width: 1px;
+        --ag-header-column-separator-color: #dde2eb;
+
+        /* Nếu có header cấp 2 */
+        --ag-header-row-height: 18px; /* Header cấp 2 */
+      }
+
+      /* Đảm bảo font không bị tràn */
+      .ag-theme-quartz .ag-header-cell-label,
+      .ag-theme-quartz .ag-header-group-cell-label {
+        line-height: var(--ag-header-height);
+        font-size: 13px;
       }
     </style>
   </head>
