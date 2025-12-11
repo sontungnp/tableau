@@ -3,6 +3,7 @@
 let list_column_horizontal
 let list_column_vertical
 let list_column_measure
+let list_exclude_column_config
 let datanew
 let newnestedData
 let dimensionColumns
@@ -10,6 +11,9 @@ let measureColumns
 let pivotDataOutput
 let pivot_column_config
 let numericCols
+
+let agGridColumnDefs
+let agGridColumnDefs_flat
 
 let selectedCellValue = null
 let expandListenersBound = false // <-- thêm dòng này
@@ -63,14 +67,17 @@ function createColumnDefs(
   customConfig,
   excludeColumns = []
 ) {
-  // 1. Lọc dimension columns
+  // 1. Lọc dimension và measure
   const filteredDimensionColumns = dimensionColumns.filter(
     (field) => !field.startsWith('tree_lv') && !excludeColumns.includes(field)
   )
 
-  const filteredMeasureColumns = measureColumns.filter(
-    (field) => !excludeColumns.includes(field)
-  )
+  const filteredMeasureColumns = measureColumns
+    .filter((field) => !excludeColumns.includes(field))
+    .sort() // Sắp xếp tăng dần theo thứ tự alphabet
+
+  console.log('filteredDimensionColumns', filteredDimensionColumns)
+  console.log('filteredMeasureColumns', filteredMeasureColumns)
 
   // 2. Map custom config
   const configMap = new Map()
@@ -78,13 +85,24 @@ function createColumnDefs(
 
   customConfig.forEach((col) => {
     if (excludeColumns.includes(col.field)) return
+
+    // Quan trọng: PHẢI CHỈ GIỮ col.field nếu nó nằm trong dimension/measure đã lọc
+    if (
+      col.field !== 'name' &&
+      !filteredDimensionColumns.includes(col.field) &&
+      !filteredMeasureColumns.includes(col.field)
+    ) {
+      return // bỏ khỏi output hoàn toàn
+    }
+
     configMap.set(col.field, col)
     orderedFieldsFromConfig.push(col.field)
   })
 
-  // 3. Tạo danh sách field theo thứ tự:
-  // - field có trong customConfig trước
-  // - field còn lại (dimension + measure) xếp sau
+  // 3. Merge field theo thứ tự:
+  // - name
+  // - customConfig hợp lệ
+  // - dimension + measure còn lại
   const mergedFields = Array.from(
     new Set([
       'name',
@@ -102,7 +120,6 @@ function createColumnDefs(
       filteredDimensionColumns.includes(field) || field === 'name'
     const isMeasure = filteredMeasureColumns.includes(field)
 
-    // Default config
     let columnDef = {
       field,
       headerName: field.replace(/_/g, '\n'),
@@ -111,7 +128,7 @@ function createColumnDefs(
       autoHeaderHeight: true
     }
 
-    // Default alignment + formatter
+    // Alignment & formatter
     if (isDimensionOrName) {
       columnDef.cellStyle = { textAlign: 'left' }
     } else if (isMeasure) {
@@ -125,7 +142,7 @@ function createColumnDefs(
       }
     }
 
-    // Logic riêng cho cột 'name'
+    // Cột name
     if (field === 'name') {
       columnDef = {
         ...columnDef,
@@ -150,7 +167,65 @@ function createColumnDefs(
     return columnDef
   })
 
-  return columnDefs
+  agGridColumnDefs_flat = columnDefs
+
+  // -----------------------------------------------------------
+  // 5. GROUPING các measure columns dạng PREFIX_SUFFIX
+  // -----------------------------------------------------------
+
+  const measureGroups = {} // { prefix: [childColumns] }
+
+  filteredMeasureColumns.forEach((field) => {
+    const parts = field.split('_')
+    if (parts.length === 2) {
+      const [prefix, suffix] = parts
+
+      if (!measureGroups[prefix]) {
+        measureGroups[prefix] = []
+      }
+
+      measureGroups[prefix].push({
+        field,
+        headerName: suffix.padStart(2, '0') // 1 -> 01
+      })
+    }
+  })
+
+  // Nếu không có group nào → giữ nguyên
+  if (Object.keys(measureGroups).length === 0) return columnDefs
+
+  // Áp dụng grouping: tạo column group rồi thay thế các cột lẻ
+  const finalColumnDefs = []
+  const measureFieldsSet = new Set(filteredMeasureColumns)
+
+  const processedPrefixes = new Set()
+
+  for (const col of columnDefs) {
+    const field = col.field
+
+    // Nếu là measure dạng group PREFIX_SUFFIX → bỏ, sẽ thêm trong group
+    if (field && measureFieldsSet.has(field)) {
+      const parts = field.split('_')
+      if (parts.length === 2) {
+        const prefix = parts[0]
+        if (!processedPrefixes.has(prefix)) {
+          processedPrefixes.add(prefix)
+
+          finalColumnDefs.push({
+            headerName: prefix,
+            headerClass: 'header-center',
+            children: measureGroups[prefix]
+          })
+        }
+        continue
+      }
+    }
+
+    // Không phải grouped measure → giữ nguyên
+    finalColumnDefs.push(col)
+  }
+
+  return finalColumnDefs
 }
 
 function setAllExpanded(nodes, expanded) {
@@ -791,11 +866,12 @@ function loadAndRender(worksheet) {
       const totals = calcTotalsTree(allData, numericCols)
 
       const totalRow = {}
-      agGridColumnDefs.forEach((col) => {
+      agGridColumnDefs_flat.forEach((col) => {
         const field = col.field
+
         if (numericCols.includes(field)) {
           totalRow[field] = totals[field]
-        } else if (field === agGridColumnDefs[0].field) {
+        } else if (field === agGridColumnDefs_flat[0].field) {
           totalRow[field] = 'Grand Total'
         } else {
           totalRow[field] = ''
@@ -803,8 +879,6 @@ function loadAndRender(worksheet) {
       })
 
       totalRow.leaf = true
-
-      console.log('totalRow', totalRow)
 
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
@@ -834,9 +908,6 @@ function loadAndRender(worksheet) {
       })
     )
 
-    console.log('cols', cols)
-    console.log('rows', rows)
-
     // Pivot table
     pivotDataOutput = pivotData(
       cols,
@@ -846,25 +917,25 @@ function loadAndRender(worksheet) {
       list_column_measure
     )
 
-    console.log('pivotDataOutput', pivotDataOutput)
+    // console.log('pivotDataOutput', pivotDataOutput)
 
     // 5. Build tree
 
     nestedData = buildTree(pivotDataOutput.pivotData)
-    console.log('nestedData', nestedData)
+    // console.log('nestedData', nestedData)
 
     // ✅ Gọi hàm cộng dồn giá trị
     aggregateTreeValues(nestedData, pivotDataOutput.measureColumns)
 
     // 6. Flat tree
     let flatData = flattenTree(nestedData)
-    console.log('flatData', flatData)
+    // console.log('flatData', flatData)
 
     maxTreeLevel = getMaxTreeLevel(nestedData)
     currentExpandedLevel = 1 // ban đầu chỉ hiển thị root
 
     // 7. Build cấu hình để truyền vào AG Grid
-    const agGridColumnDefs = createColumnDefs(
+    agGridColumnDefs = createColumnDefs(
       pivotDataOutput.dimensionColumns,
       pivotDataOutput.measureColumns,
       pivot_column_config
