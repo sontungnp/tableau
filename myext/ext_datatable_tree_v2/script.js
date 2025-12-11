@@ -1246,6 +1246,161 @@ document.addEventListener('DOMContentLoaded', () => {
     // fix lỗi liên quan đến mất số 0 ở đầu
     // merge row trong group và format number cho measure
     // ======================
+    // document.getElementById('exportExcel').addEventListener('click', () => {
+    //   if (!gridApi || !nestedData || nestedData.length === 0) {
+    //     alert('⚠️ Không có dữ liệu để export!')
+    //     return
+    //   }
+
+    //   const maxLevelRef = { max: 0 }
+    //   const exportRows = exportFlattenWithPath(nestedData, [], [], maxLevelRef)
+    //   const maxTreeLevel = maxLevelRef.max
+
+    //   const pinnedRows =
+    //     gridApi.getPinnedBottomRowCount() > 0
+    //       ? Array.from(
+    //           { length: gridApi.getPinnedBottomRowCount() },
+    //           (_, i) => gridApi.getPinnedBottomRow(i).data
+    //         )
+    //       : []
+
+    //   const allExportRows = [...exportRows, ...pinnedRows]
+
+    //   const currentColumnDefs = gridApi.getColumnDefs()
+    //   const firstField = currentColumnDefs[0].field
+    //   const otherCols = currentColumnDefs.slice(1).map((c) => c.field)
+
+    //   const levelHeaders = Array.from(
+    //     { length: maxTreeLevel },
+    //     (_, i) => `Level ${i + 1}`
+    //   )
+    //   const exportHeaders = [...levelHeaders, ...otherCols]
+
+    //   const wsData = []
+    //   wsData.push(exportHeaders)
+
+    //   allExportRows.forEach((row) => {
+    //     const rowVals = []
+    //     const isTotal = row[firstField] === 'Grand Total'
+
+    //     if (isTotal) {
+    //       rowVals.push('Grand Total')
+    //       for (let i = 1; i < maxTreeLevel; i++) rowVals.push('')
+    //     } else {
+    //       const path = row.path || []
+    //       for (let i = 0; i < maxTreeLevel; i++) {
+    //         rowVals.push(path[i] || '')
+    //       }
+    //     }
+
+    //     otherCols.forEach((col) => {
+    //       let val = row[col] ?? ''
+    //       if (typeof val === 'number') rowVals.push(val)
+    //       else rowVals.push(val.toString())
+    //     })
+
+    //     wsData.push(rowVals)
+    //   })
+
+    //   const ws = XLSX.utils.aoa_to_sheet(wsData)
+    //   ws['!merges'] = ws['!merges'] || []
+
+    //   // ======================================================
+    //   // ⭐ MERGE GROUP (GIỮ NHƯ CŨ)
+    //   // ======================================================
+    //   for (let col = 0; col < maxTreeLevel; col++) {
+    //     let start = 1
+    //     for (let row = 2; row <= wsData.length; row++) {
+    //       const curr = wsData[row - 1][col]
+    //       const prev = wsData[row - 2][col]
+
+    //       const isEmpty = (v) => v === null || v === undefined || v === ''
+
+    //       if (curr !== prev || isEmpty(prev)) {
+    //         if (row - 1 > start && !isEmpty(prev)) {
+    //           ws['!merges'].push({
+    //             s: { r: start, c: col },
+    //             e: { r: row - 2, c: col }
+    //           })
+    //         }
+    //         start = row - 1
+    //       }
+
+    //       if (row === wsData.length && row - 1 > start && !isEmpty(curr)) {
+    //         ws['!merges'].push({
+    //           s: { r: start, c: col },
+    //           e: { r: row - 1, c: col }
+    //         })
+    //       }
+    //     }
+    //   }
+
+    //   // ======================================================
+    //   // ⭐ VERTICAL TOP ALIGN
+    //   // ======================================================
+    //   for (let r = 1; r < wsData.length; r++) {
+    //     for (let c = 0; c < maxTreeLevel; c++) {
+    //       const cell = XLSX.utils.encode_cell({ r, c })
+    //       if (ws[cell]) {
+    //         ws[cell].s = ws[cell].s || {}
+    //         ws[cell].s.alignment = { vertical: 'top' }
+    //       }
+    //     }
+    //   }
+
+    //   // ======================================================
+    //   // ⭐ MEASURE COLUMNS ACCOUNTING FORMAT
+    //   // ======================================================
+    //   const accFmt = '_(* #,##0.00_);_(* (#,##0.00)_);_(* "-"??_);_(@_)'
+
+    //   for (let C = maxTreeLevel; C < exportHeaders.length; C++) {
+    //     for (let R = 1; R < wsData.length; R++) {
+    //       const ref = XLSX.utils.encode_cell({ r: R, c: C })
+    //       if (!ws[ref]) continue
+    //       if (typeof ws[ref].v === 'number') {
+    //         ws[ref].t = 'n'
+    //         ws[ref].z = accFmt
+    //       }
+    //     }
+    //   }
+
+    //   // ======================================================
+    //   // ⭐ NEW FEATURE: BOLD CÁC DÒNG NHÓM (NON-LEAF + CHILDREN)
+    //   // ======================================================
+    //   for (let R = 1; R < wsData.length; R++) {
+    //     const originalRow = allExportRows[R - 1]
+    //     const isGroup =
+    //       originalRow &&
+    //       !originalRow.leaf &&
+    //       originalRow.children &&
+    //       originalRow.children.length > 0
+
+    //     if (isGroup) {
+    //       for (let C = 0; C < exportHeaders.length; C++) {
+    //         const ref = XLSX.utils.encode_cell({ r: R, c: C })
+    //         if (!ws[ref]) continue
+
+    //         ws[ref].s = ws[ref].s || {}
+    //         ws[ref].s.font = { bold: true } // ⭐ IN ĐẬM GROUP
+    //       }
+    //     }
+    //   }
+
+    //   // ======================================================
+    //   // EXPORT
+    //   // ======================================================
+    //   const wb = XLSX.utils.book_new()
+    //   XLSX.utils.book_append_sheet(wb, ws, 'TreeData')
+    //   XLSX.writeFile(wb, 'tree_data.xlsx')
+
+    //   console.log('✅ Export Excel OK!')
+    // })
+
+    // ======================
+    // Export EXCEL -> tree với mỗi level là cột riêng (chỉ sửa phần này)
+    // fix lỗi liên quan đến mất số 0 ở đầu
+    // merge row trong group và format number cho measure
+    // ======================
     document.getElementById('exportExcel').addEventListener('click', () => {
       if (!gridApi || !nestedData || nestedData.length === 0) {
         alert('⚠️ Không có dữ liệu để export!')
@@ -1267,36 +1422,110 @@ document.addEventListener('DOMContentLoaded', () => {
       const allExportRows = [...exportRows, ...pinnedRows]
 
       const currentColumnDefs = gridApi.getColumnDefs()
-      const firstField = currentColumnDefs[0].field
-      const otherCols = currentColumnDefs.slice(1).map((c) => c.field)
 
-      const levelHeaders = Array.from(
-        { length: maxTreeLevel },
-        (_, i) => `Level ${i + 1}`
-      )
-      const exportHeaders = [...levelHeaders, ...otherCols]
+      // ======================================================
+      // ⭐ PHẦN SỬA: Xử lý header nhiều cấp (BỎ CỘT TREE ĐẦU TIÊN)
+      // ======================================================
 
-      const wsData = []
-      wsData.push(exportHeaders)
+      // Bỏ cột đầu tiên (tree column) và chỉ lấy các cột còn lại
+      const otherColumnDefs = currentColumnDefs.slice(1)
 
+      // Lấy tất cả các leaf columns (cột cuối cùng không có children)
+      const getLeafColumns = (cols, parentPath = []) => {
+        const leaves = []
+
+        cols.forEach((col) => {
+          if (!col.children || col.children.length === 0) {
+            // Nếu là leaf column, lấy đường dẫn đầy đủ
+            const fullPath = [...parentPath, col.headerName || col.field || '']
+            leaves.push({
+              field: col.field,
+              headerPath: fullPath,
+              colDef: col
+            })
+          } else {
+            // Nếu có children, đệ quy để lấy leaf columns
+            const childLeaves = getLeafColumns(col.children, [
+              ...parentPath,
+              col.headerName || ''
+            ])
+            leaves.push(...childLeaves)
+          }
+        })
+
+        return leaves
+      }
+
+      const leafColumns = getLeafColumns(otherColumnDefs)
+
+      // Tạo headers: chỉ cần level headers + các leaf columns
+      const headerRows = []
+
+      // Tìm max depth của header
+      const maxHeaderDepth =
+        leafColumns.length > 0
+          ? Math.max(...leafColumns.map((col) => col.headerPath.length))
+          : 0
+
+      // Tạo từng hàng header từ trên xuống
+      for (let depth = 0; depth < maxHeaderDepth; depth++) {
+        const headerRow = []
+
+        // Thêm các cột tree levels (bỏ cột tree gốc)
+        for (let i = 0; i < maxTreeLevel; i++) {
+          if (depth === 0) {
+            headerRow.push(`Level ${i + 1}`)
+          } else {
+            headerRow.push('')
+          }
+        }
+
+        // Thêm các cột leaf columns
+        leafColumns.forEach((col) => {
+          if (depth < col.headerPath.length) {
+            headerRow.push(col.headerPath[depth])
+          } else {
+            headerRow.push('')
+          }
+        })
+
+        headerRows.push(headerRow)
+      }
+
+      const wsData = [...headerRows]
+
+      // Thêm dữ liệu từng dòng
       allExportRows.forEach((row) => {
         const rowVals = []
+
+        // Kiểm tra xem có phải Grand Total không (không có cột tree gốc nữa)
+        // Lấy field của cột đầu tiên để check Grand Total
+        const firstField = currentColumnDefs[0].field
         const isTotal = row[firstField] === 'Grand Total'
 
         if (isTotal) {
+          // Đối với Grand Total: chỉ cần "Grand Total" ở cột đầu tiên
           rowVals.push('Grand Total')
-          for (let i = 1; i < maxTreeLevel; i++) rowVals.push('')
+          // Các cột level còn lại để trống
+          for (let i = 1; i < maxTreeLevel; i++) {
+            rowVals.push('')
+          }
         } else {
+          // Thêm các giá trị từ path (đã được duỗi thành các level)
           const path = row.path || []
           for (let i = 0; i < maxTreeLevel; i++) {
             rowVals.push(path[i] || '')
           }
         }
 
-        otherCols.forEach((col) => {
-          let val = row[col] ?? ''
-          if (typeof val === 'number') rowVals.push(val)
-          else rowVals.push(val.toString())
+        // Thêm giá trị cho các leaf columns
+        leafColumns.forEach((colDef) => {
+          let val = row[colDef.field] ?? ''
+          if (typeof val === 'number') {
+            rowVals.push(val)
+          } else {
+            rowVals.push(val.toString())
+          }
         })
 
         wsData.push(rowVals)
@@ -1306,11 +1535,89 @@ document.addEventListener('DOMContentLoaded', () => {
       ws['!merges'] = ws['!merges'] || []
 
       // ======================================================
-      // ⭐ MERGE GROUP (GIỮ NHƯ CŨ)
+      // ⭐ MERGE HEADER MULTI-LEVEL (PHẦN MỚI)
+      // ======================================================
+      if (maxHeaderDepth > 1) {
+        // Bắt đầu từ cột level cuối cùng + 1 (vì đã bỏ cột tree gốc)
+        const startDataCol = maxTreeLevel
+
+        // Merge các header cells theo chiều dọc (vertical merge)
+        for (
+          let col = startDataCol;
+          col < startDataCol + leafColumns.length;
+          col++
+        ) {
+          for (let row = 0; row < maxHeaderDepth; row++) {
+            // Tìm tất cả các cells có cùng parent header ở hàng trên
+            if (row < maxHeaderDepth - 1) {
+              const currentHeader = wsData[row][col]
+              if (currentHeader && currentHeader.trim() !== '') {
+                // Đếm số rows bên dưới có cùng giá trị
+                let mergeCount = 1
+                for (
+                  let nextRow = row + 1;
+                  nextRow < maxHeaderDepth;
+                  nextRow++
+                ) {
+                  if (
+                    wsData[nextRow][col] === '' &&
+                    wsData[nextRow][col - 1] === ''
+                  ) {
+                    mergeCount++
+                  } else {
+                    break
+                  }
+                }
+
+                if (mergeCount > 1) {
+                  ws['!merges'].push({
+                    s: { r: row, c: col },
+                    e: { r: row + mergeCount - 1, c: col }
+                  })
+                }
+              }
+            }
+          }
+        }
+
+        // Merge các header cells theo chiều ngang (horizontal merge) cho cùng level
+        for (let row = 0; row < maxHeaderDepth; row++) {
+          let startCol = startDataCol
+          let currentHeader = wsData[row][startCol]
+
+          for (
+            let col = startDataCol + 1;
+            col < startDataCol + leafColumns.length;
+            col++
+          ) {
+            if (wsData[row][col] === currentHeader && currentHeader !== '') {
+              // Tiếp tục tìm cho đến khi khác
+              if (col === startDataCol + leafColumns.length - 1) {
+                ws['!merges'].push({
+                  s: { r: row, c: startCol },
+                  e: { r: row, c: col }
+                })
+              }
+            } else {
+              if (col - 1 > startCol) {
+                ws['!merges'].push({
+                  s: { r: row, c: startCol },
+                  e: { r: row, c: col - 1 }
+                })
+              }
+              startCol = col
+              currentHeader = wsData[row][col]
+            }
+          }
+        }
+      }
+
+      // ======================================================
+      // ⭐ MERGE GROUP (GIỮ NHƯ CŨ) - CHỈ MERGE CÁC CỘT LEVEL
       // ======================================================
       for (let col = 0; col < maxTreeLevel; col++) {
-        let start = 1
-        for (let row = 2; row <= wsData.length; row++) {
+        let start = maxHeaderDepth // Bắt đầu từ sau header rows
+        for (let row = maxHeaderDepth + 2; row <= wsData.length; row++) {
           const curr = wsData[row - 1][col]
           const prev = wsData[row - 2][col]
 
@@ -1336,25 +1643,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // ======================================================
-      // ⭐ VERTICAL TOP ALIGN
-      // ======================================================
-      for (let r = 1; r < wsData.length; r++) {
-        for (let c = 0; c < maxTreeLevel; c++) {
-          const cell = XLSX.utils.encode_cell({ r, c })
-          if (ws[cell]) {
-            ws[cell].s = ws[cell].s || {}
-            ws[cell].s.alignment = { vertical: 'top' }
-          }
-        }
-      }
-
-      // ======================================================
       // ⭐ MEASURE COLUMNS ACCOUNTING FORMAT
       // ======================================================
       const accFmt = '_(* #,##0.00_);_(* (#,##0.00)_);_(* "-"??_);_(@_)'
 
-      for (let C = maxTreeLevel; C < exportHeaders.length; C++) {
-        for (let R = 1; R < wsData.length; R++) {
+      // Chỉ format các cột measure (bắt đầu từ sau các cột level)
+      const startMeasureCol = maxTreeLevel
+      for (
+        let C = startMeasureCol;
+        C < startMeasureCol + leafColumns.length;
+        C++
+      ) {
+        for (let R = maxHeaderDepth; R < wsData.length; R++) {
           const ref = XLSX.utils.encode_cell({ r: R, c: C })
           if (!ws[ref]) continue
           if (typeof ws[ref].v === 'number') {
@@ -1365,33 +1665,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // ======================================================
-      // ⭐ NEW FEATURE: BOLD CÁC DÒNG NHÓM (NON-LEAF + CHILDREN)
-      // ======================================================
-      for (let R = 1; R < wsData.length; R++) {
-        const originalRow = allExportRows[R - 1]
-        const isGroup =
-          originalRow &&
-          !originalRow.leaf &&
-          originalRow.children &&
-          originalRow.children.length > 0
-
-        if (isGroup) {
-          for (let C = 0; C < exportHeaders.length; C++) {
-            const ref = XLSX.utils.encode_cell({ r: R, c: C })
-            if (!ws[ref]) continue
-
-            ws[ref].s = ws[ref].s || {}
-            ws[ref].s.font = { bold: true } // ⭐ IN ĐẬM GROUP
-          }
-        }
-      }
-
-      // ======================================================
       // EXPORT
       // ======================================================
       const wb = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(wb, ws, 'TreeData')
-      XLSX.writeFile(wb, 'tree_data.xlsx')
+
+      // Tạo tên file với timestamp
+      const timestamp = new Date()
+        .toISOString()
+        .replace(/[:.]/g, '-')
+        .slice(0, 19)
+      const filename = `tree_data_${timestamp}.xlsx`
+
+      XLSX.writeFile(wb, filename)
 
       console.log('✅ Export Excel OK!')
     })
