@@ -1037,7 +1037,7 @@ function loadAndRender(worksheet) {
     } else {
       // ✅ Cập nhật lại dữ liệu
       gridApi.setGridOption('rowData', flatData)
-      gridApi.setGridOption('columnDefs', columnDefs)
+      gridApi.setGridOption('columnDefs', agGridColumnDefs)
     }
 
     // Code mở tất cả và đóng tất cả tree
