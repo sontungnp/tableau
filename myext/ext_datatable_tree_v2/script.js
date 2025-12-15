@@ -442,53 +442,102 @@ function toggleNode(nodeId) {
   }, 0) // <--- Thêm setTimeout(..., 0)
 }
 
+// function copySelectedRows() {
+//   const selectedNodes = []
+//   gridApi.forEachNodeAfterFilterAndSort((node) => {
+//     if (node.isSelected()) selectedNodes.push(node)
+//   })
+
+//   if (selectedNodes.length === 0) {
+//     alert('⚠️ Chưa chọn dòng nào!')
+//     return
+//   }
+
+//   // Lấy danh sách cột đang hiển thị trên giao diện
+//   const displayedCols = gridApi.getColumnDefs().map((c) => c.field)
+
+//   // Build text cần copy
+//   const text = selectedNodes
+//     .map((node) => {
+//       return displayedCols
+//         .map((col) => {
+//           let v = node.data[col]
+
+//           if (v === null || v === undefined) return ''
+//           if (typeof v === 'object') return '' // tránh [object Object]
+
+//           return v.toString()
+//         })
+//         .join('\t')
+//     })
+//     .join('\n')
+
+//   // Copy vào clipboard
+//   const textarea = document.createElement('textarea')
+//   textarea.value = text
+//   textarea.style.position = 'fixed'
+//   textarea.style.top = '-9999px'
+//   document.body.appendChild(textarea)
+//   textarea.focus()
+//   textarea.select()
+
+//   try {
+//     document.execCommand('copy')
+//   } catch (err) {
+//     alert('❌ Không thể copy.')
+//   }
+
+//   document.body.removeChild(textarea)
+// }
+
 function copySelectedRows() {
-  const selectedNodes = []
+  const selectedNodes = [];
   gridApi.forEachNodeAfterFilterAndSort((node) => {
-    if (node.isSelected()) selectedNodes.push(node)
-  })
+    if (node.isSelected()) selectedNodes.push(node);
+  });
 
   if (selectedNodes.length === 0) {
-    alert('⚠️ Chưa chọn dòng nào!')
-    return
+    alert('⚠️ Chưa chọn dòng nào!');
+    return;
   }
 
-  // Lấy danh sách cột đang hiển thị trên giao diện
-  const displayedCols = gridApi.getColumnDefs().map((c) => c.field)
+  // Lấy danh sách cột đang hiển thị (flattened, bao gồm các cột con)
+  const displayedCols = gridApi.getAllDisplayedColumns();
 
   // Build text cần copy
   const text = selectedNodes
     .map((node) => {
       return displayedCols
         .map((col) => {
-          let v = node.data[col]
+          let v = node.data[col.getColId()];
 
-          if (v === null || v === undefined) return ''
-          if (typeof v === 'object') return '' // tránh [object Object]
+          if (v === null || v === undefined) return '';
+          if (typeof v === 'object') return ''; // tránh [object Object]
 
-          return v.toString()
+          return v.toString();
         })
-        .join('\t')
+        .join('\t');
     })
-    .join('\n')
+    .join('\n');
 
   // Copy vào clipboard
-  const textarea = document.createElement('textarea')
-  textarea.value = text
-  textarea.style.position = 'fixed'
-  textarea.style.top = '-9999px'
-  document.body.appendChild(textarea)
-  textarea.focus()
-  textarea.select()
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.top = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
 
   try {
-    document.execCommand('copy')
+    document.execCommand('copy');
   } catch (err) {
-    alert('❌ Không thể copy.')
+    alert('❌ Không thể copy.');
   }
 
-  document.body.removeChild(textarea)
+  document.body.removeChild(textarea);
 }
+
 
 // ======= 3️⃣ TÍNH TỔNG =======
 function calcTotalsTree(nodes, numericCols) {
