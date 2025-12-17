@@ -1050,14 +1050,14 @@ function loadAndRender(worksheet) {
     // 5. Build tree
 
     nestedData = buildTree(pivotDataOutput.pivotData)
-    console.log('nestedData', nestedData)
+    // console.log('nestedData', nestedData)
 
     // ✅ Gọi hàm cộng dồn giá trị
     aggregateTreeValues(nestedData, pivotDataOutput.measureColumns)
 
     // 6. Flat tree
     let flatData = flattenTree(nestedData)
-    console.log('flatData', flatData)
+    // console.log('flatData', flatData)
 
     maxTreeLevel = getMaxTreeLevel(nestedData)
     currentExpandedLevel = 1 // ban đầu chỉ hiển thị root
