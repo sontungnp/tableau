@@ -1069,6 +1069,9 @@ function loadAndRender(worksheet) {
       pivot_column_config
     )
 
+    console.log('agGridColumnDefs', agGridColumnDefs);
+    
+
     // ======================
     // 6️⃣ Cấu hình AG Grid
     // ======================
