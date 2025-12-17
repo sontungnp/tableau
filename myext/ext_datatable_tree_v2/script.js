@@ -1083,6 +1083,7 @@ function loadAndRender(worksheet) {
         sortable: true,
         resizable: true
       },
+      suppressFieldDotNotation: true,
       // 🔹 Làm nổi bật các dòng tổng (cha)
       getRowStyle: (params) => {
         const node = params.data
