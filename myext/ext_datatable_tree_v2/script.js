@@ -140,9 +140,11 @@ function createColumnDefs(
     (field) => !field.startsWith('tree_lv') && !excludeColumns.includes(field)
   )
 
-  const filteredMeasureColumns = measureColumns
-    .filter((field) => !excludeColumns.includes(field))
-    .sort() // Sắp xếp tăng dần theo thứ tự alphabet
+  // const filteredMeasureColumns = measureColumns
+  //   .filter((field) => !excludeColumns.includes(field))
+  //   .sort() // Sắp xếp tăng dần theo thứ tự alphabet
+
+  const filteredMeasureColumns = sortColumns(measureColumns.filter((field) => !excludeColumns.includes(field)), order_lv1, order_lv2)
 
   console.log('filteredDimensionColumns', filteredDimensionColumns)
   console.log('filteredMeasureColumns', filteredMeasureColumns)
