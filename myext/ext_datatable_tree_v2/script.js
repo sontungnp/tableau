@@ -4,6 +4,8 @@ let list_column_horizontal
 let list_column_vertical
 let list_column_measure
 let list_exclude_column_config
+let order_lv1
+let order_lv2
 let datanew
 let newnestedData
 let dimensionColumns
@@ -53,6 +55,72 @@ const negativeCellStyle = (params) => {
   return style
 }
 
+function sortColumns(list_columns, order_lv1, order_lv2) {
+  // ---- helper: parse order config ----
+  const parseOrder = (order) => {
+    if (order === 'asc' || order === 'desc') {
+      return { type: order }
+    }
+    // cho phép truyền string CSV hoặc array
+    const list = Array.isArray(order)
+      ? order
+      : String(order).split(',').map(v => v.trim())
+    return { type: 'custom', list }
+  }
+
+  const lv1Order = parseOrder(order_lv1)
+  const lv2Order = parseOrder(order_lv2)
+
+  // ---- parse columns ----
+  const parsed = list_columns.map(c => {
+    const [lv1, lv2] = c.split('_')
+    return { raw: c, lv1, lv2 }
+  })
+
+  // ---- group by level1 ----
+  const groupMap = new Map()
+  parsed.forEach(item => {
+    if (!groupMap.has(item.lv1)) groupMap.set(item.lv1, [])
+    groupMap.get(item.lv1).push(item)
+  })
+
+  // ---- sort level1 keys ----
+  let lv1Keys = Array.from(groupMap.keys())
+
+  if (lv1Order.type === 'asc') {
+    lv1Keys.sort((a, b) => a.localeCompare(b))
+  } else if (lv1Order.type === 'desc') {
+    lv1Keys.sort((a, b) => b.localeCompare(a))
+  } else {
+    const idx = new Map(lv1Order.list.map((v, i) => [v, i]))
+    lv1Keys.sort((a, b) => (idx.get(a) ?? 9999) - (idx.get(b) ?? 9999))
+  }
+
+  // ---- sort level2 inside each group ----
+  const result = []
+
+  lv1Keys.forEach(lv1 => {
+    const rows = groupMap.get(lv1)
+
+    if (lv2Order.type === 'asc') {
+      rows.sort((a, b) => a.lv2.localeCompare(b.lv2))
+    } else if (lv2Order.type === 'desc') {
+      rows.sort((a, b) => b.lv2.localeCompare(a.lv2))
+    } else {
+      const idx = new Map(lv2Order.list.map((v, i) => [v.padStart(2, '0'), i]))
+      rows.sort(
+        (a, b) =>
+          (idx.get(a.lv2) ?? 9999) - (idx.get(b.lv2) ?? 9999)
+      )
+    }
+
+    rows.forEach(r => result.push(r.raw))
+  })
+
+  return result
+}
+
+
 /**
  * Chuyển đổi cấu hình tuỳ chỉnh và danh sách cột pivot thành AG Grid columnDefs.
  * @param {Array<string>} dimensionColumns
@@ -78,6 +146,8 @@ function createColumnDefs(
 
   console.log('filteredDimensionColumns', filteredDimensionColumns)
   console.log('filteredMeasureColumns', filteredMeasureColumns)
+
+  console.log('filteredMeasureColumns', sortColumns(filteredMeasureColumns, order_lv1, order_lv2))
 
   // 2. Map custom config
   const configMap = new Map()
@@ -1267,6 +1337,12 @@ document.addEventListener('DOMContentLoaded', () => {
             break
           case 'list_exclude_column_config':
             list_exclude_column_config = item[1].formattedValue.split(',')
+            break
+          case 'order_lv1':
+            order_lv1 = item[1].formattedValue
+            break
+          case 'order_lv2':
+            order_lv2 = item[1].formattedValue
             break
         }
       })
