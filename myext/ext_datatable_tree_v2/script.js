@@ -12,6 +12,7 @@ let dimensionColumns
 let measureColumns
 let pivotDataOutput
 let pivot_column_config
+let formated_columns
 let numericCols
 
 let agGridColumnDefs
@@ -127,14 +128,82 @@ function sortColumns(list_columns, order_lv1, order_lv2) {
  * @param {Array<string>} measureColumns
  * @param {Array<object>} customConfig
  * @param {Array<string>} excludeColumns - Danh sách cột cần loại bỏ
+ * @param {string json} formatedColumns - Danh sách cột được format dữ liệu
  * @returns {Array<object>}
  */
 function createColumnDefs(
   dimensionColumns,
   measureColumns,
   customConfig,
-  excludeColumns = []
+  excludeColumns = [],
+  formatedColumns
 ) {
+  const columnFormatMatchers = []
+
+  if (formatedColumns) {
+    try {
+      const formats =
+        typeof formatedColumns === 'string'
+          ? JSON.parse(formatedColumns)
+          : formatedColumns
+
+      formats.forEach(f => {
+        if (!f.field || !f.formatType) return
+
+        let matcher
+
+        const pattern = f.field
+
+        if (pattern.startsWith('%') && pattern.endsWith('%')) {
+          // %abc% → contains
+          const key = pattern.slice(1, -1)
+          matcher = (field) => field.includes(key)
+        } else if (pattern.startsWith('%')) {
+          // %abc → endsWith
+          const key = pattern.slice(1)
+          matcher = (field) => field.endsWith(key)
+        } else if (pattern.endsWith('%')) {
+          // abc% → startsWith
+          const key = pattern.slice(0, -1)
+          matcher = (field) => field.startsWith(key)
+        } else {
+          // exact match
+          matcher = (field) => field === pattern
+        }
+
+        columnFormatMatchers.push({
+          matcher,
+          config: f
+        })
+      })
+    } catch (e) {
+      console.error('Invalid formatedColumns JSON', e)
+    }
+  }
+
+  function resolveFormatedColumns(field) {
+    let matched = null
+    let priority = -1
+
+    columnFormatMatchers.forEach(({ matcher, config }) => {
+      if (!matcher(field)) return
+
+      let p = 0
+      const pattern = config.field
+
+      if (!pattern.includes('%')) p = 4
+      else if (pattern.startsWith('%') && pattern.endsWith('%')) p = 1
+      else if (pattern.startsWith('%') || pattern.endsWith('%')) p = 2
+
+      if (p > priority) {
+        priority = p
+        matched = config
+      }
+    })
+
+    return matched
+  }
+
   // 1. Lọc dimension và measure
   const filteredDimensionColumns = dimensionColumns.filter(
     (field) => !field.startsWith('tree_lv') && !excludeColumns.includes(field)
@@ -146,10 +215,9 @@ function createColumnDefs(
 
   const filteredMeasureColumns = sortColumns(measureColumns.filter((field) => !excludeColumns.includes(field)), order_lv1, order_lv2)
 
-  console.log('filteredDimensionColumns', filteredDimensionColumns)
-  console.log('filteredMeasureColumns', filteredMeasureColumns)
-
-  console.log('filteredMeasureColumns', sortColumns(filteredMeasureColumns, order_lv1, order_lv2))
+  // console.log('filteredDimensionColumns', filteredDimensionColumns)
+  // console.log('filteredMeasureColumns', filteredMeasureColumns)
+  // console.log('filteredMeasureColumns', sortColumns(filteredMeasureColumns, order_lv1, order_lv2))
 
   // 2. Map custom config
   const configMap = new Map()
@@ -230,6 +298,17 @@ function createColumnDefs(
         ...customProps
       }
     }
+
+    // Override formatedColumns ở đây (support wildcard %)
+    const formatConfig = resolveFormatedColumns(field)
+
+    if (formatConfig && FORMATTERS[formatConfig.formatType]) {
+      columnDef.valueFormatter = FORMATTERS[formatConfig.formatType](formatConfig)
+      columnDef.type = 'numericColumn'
+      columnDef.filter = 'agNumberColumnFilter'
+      columnDef.cellStyle = { textAlign: 'right' }
+    }
+
 
     // Ensure headerName
     if (!columnDef.headerName) {
@@ -1066,7 +1145,8 @@ function loadAndRender(worksheet) {
     agGridColumnDefs = createColumnDefs(
       pivotDataOutput.dimensionColumns,
       pivotDataOutput.measureColumns,
-      pivot_column_config
+      pivot_column_config,
+      formated_columns
     )
 
     console.log('agGridColumnDefs', agGridColumnDefs);
@@ -1350,6 +1430,9 @@ document.addEventListener('DOMContentLoaded', () => {
           case 'order_lv2':
             order_lv2 = item[1].formattedValue
             break
+          case 'formated_columns':
+            formated_columns = item[1].formattedValue
+            break
         }
       })
 
@@ -1358,6 +1441,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('list_column_measure', list_column_measure)
       console.log('pivot_column_config', pivot_column_config)
       console.log('list_exclude_column_config', list_exclude_column_config)
+      console.log('formated_columns', formated_columns)
 
       if (!pivot_column_config) {
         pivot_column_config = JSON.parse(
