@@ -215,9 +215,9 @@ function createColumnDefs(
 
   const filteredMeasureColumns = sortColumns(measureColumns.filter((field) => !excludeColumns.includes(field)), order_lv1, order_lv2)
 
-  // console.log('filteredDimensionColumns', filteredDimensionColumns)
-  // console.log('filteredMeasureColumns', filteredMeasureColumns)
-  // console.log('filteredMeasureColumns', sortColumns(filteredMeasureColumns, order_lv1, order_lv2))
+  console.log('filteredDimensionColumns', filteredDimensionColumns)
+  console.log('filteredMeasureColumns', filteredMeasureColumns)
+  console.log('filteredMeasureColumns', sortColumns(filteredMeasureColumns, order_lv1, order_lv2))
 
   // 2. Map custom config
   const configMap = new Map()
