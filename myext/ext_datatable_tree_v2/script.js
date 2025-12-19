@@ -136,16 +136,43 @@ function createColumnDefs(
   measureColumns,
   customConfig,
   excludeColumns = [],
-  formatedColumns
+  formated_columns
 ) {
+  const FORMATTERS = {
+    percent: (opts = {}) => (params) => {
+      const v = Number(params.value)
+      if (isNaN(v)) return params.value ?? ''
+      const precision = opts.precision ?? 2
+      return `${(v * 100).toFixed(precision)} %`
+    },
+
+    currency: (opts = {}) => (params) => {
+      const v = Number(params.value)
+      if (isNaN(v)) return params.value ?? ''
+      return v.toLocaleString('en-US', {
+        style: 'currency',
+        currency: opts.currency || 'VND',
+        maximumFractionDigits: opts.precision ?? 0
+      })
+    },
+
+    number: (opts = {}) => (params) => {
+      const v = Number(params.value)
+      if (isNaN(v)) return params.value ?? ''
+      return v.toLocaleString('en-US', {
+        maximumFractionDigits: opts.precision ?? 2
+      })
+    }
+  }
+
   const columnFormatMatchers = []
 
-  if (formatedColumns) {
+  if (formated_columns) {
     try {
       const formats =
-        typeof formatedColumns === 'string'
-          ? JSON.parse(formatedColumns)
-          : formatedColumns
+        typeof formated_columns === 'string'
+          ? JSON.parse(formated_columns)
+          : formated_columns
 
       formats.forEach(f => {
         if (!f.field || !f.formatType) return
@@ -177,9 +204,12 @@ function createColumnDefs(
         })
       })
     } catch (e) {
-      console.error('Invalid formatedColumns JSON', e)
+      console.error('Invalid formated_columns JSON', e)
     }
   }
+
+  // console.log("columnFormatMatchers", columnFormatMatchers);
+  
 
   function resolveFormatedColumns(field) {
     let matched = null
@@ -260,6 +290,7 @@ function createColumnDefs(
       filteredDimensionColumns.includes(field) || field === 'name'
     const isMeasure = filteredMeasureColumns.includes(field)
 
+    // Default
     let columnDef = {
       field,
       headerName: field.replace(/_/g, '\n'),
@@ -305,10 +336,11 @@ function createColumnDefs(
     if (formatConfig && FORMATTERS[formatConfig.formatType]) {
       columnDef.valueFormatter = FORMATTERS[formatConfig.formatType](formatConfig)
       columnDef.type = 'numericColumn'
-      columnDef.filter = 'agNumberColumnFilter'
       columnDef.cellStyle = { textAlign: 'right' }
-    }
 
+      // console.log('columnDef',columnDef);
+      
+    }
 
     // Ensure headerName
     if (!columnDef.headerName) {
@@ -1141,11 +1173,14 @@ function loadAndRender(worksheet) {
     maxTreeLevel = getMaxTreeLevel(nestedData)
     currentExpandedLevel = 1 // ban đầu chỉ hiển thị root
 
+    console.log('formated_columns 2', formated_columns);
+    
     // 7. Build cấu hình để truyền vào AG Grid
     agGridColumnDefs = createColumnDefs(
       pivotDataOutput.dimensionColumns,
       pivotDataOutput.measureColumns,
       pivot_column_config,
+      list_exclude_column_config,
       formated_columns
     )
 
@@ -1441,7 +1476,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('list_column_measure', list_column_measure)
       console.log('pivot_column_config', pivot_column_config)
       console.log('list_exclude_column_config', list_exclude_column_config)
-      console.log('formated_columns', formated_columns)
+      console.log('formated_columns 1', formated_columns)
 
       if (!pivot_column_config) {
         pivot_column_config = JSON.parse(
