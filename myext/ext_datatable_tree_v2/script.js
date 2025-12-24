@@ -6,6 +6,7 @@ let list_column_measure
 let list_exclude_column_config
 let order_lv1
 let order_lv2
+let leaf_in_tree
 let datanew
 let newnestedData
 let dimensionColumns
@@ -525,22 +526,37 @@ function buildTree(data) {
       currentLevel = parent.children
     })
 
-    // 3️⃣ Cấp cuối cùng -> thêm dòng dữ liệu leaf (động theo keys)
-    const leafNode = {
-      id: ++idCounter,
-      name: null,
-      level: treeLevels.length + 1,
-      leaf: true
-    }
+    if (leaf_in_tree === "0") {
 
-    // ✅ Copy toàn bộ field KHÔNG thuộc tree_lv vào leaf
-    for (const [key, val] of Object.entries(row)) {
-      if (!key.startsWith('tree_lv')) {
-        leafNode[key] = val
+      // 3️⃣ Cấp cuối cùng -> thêm dòng dữ liệu leaf (động theo keys)
+      const leafNode = {
+        id: ++idCounter,
+        name: null,
+        level: treeLevels.length + 1,
+        leaf: true
       }
-    }
 
-    parent.children[`leaf_${idCounter}`] = leafNode
+      // ✅ Copy toàn bộ field KHÔNG thuộc tree_lv vào leaf
+      for (const [key, val] of Object.entries(row)) {
+        if (!key.startsWith('tree_lv')) {
+          leafNode[key] = val
+        }
+      }
+
+      parent.children[`leaf_${idCounter}`] = leafNode
+    } else {
+      // ✅ Không có ITEM → node tree cuối là leaf luôn
+      parent.leaf = true
+
+      for (const [key, val] of Object.entries(row)) {
+        if (!key.startsWith('tree_lv')) {
+          parent[key] = val
+        }
+      }
+
+      // ❗ không cần children nữa
+      delete parent.children
+    }
   }
 
   return Object.values(rootMap).map((n) => normalizeTree(n))
@@ -1468,6 +1484,9 @@ document.addEventListener('DOMContentLoaded', () => {
           case 'formated_columns':
             formated_columns = item[1].formattedValue
             break
+          case 'leaf_in_tree':
+            leaf_in_tree = item[1].formattedValue
+            break
         }
       })
 
@@ -1476,7 +1495,8 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('list_column_measure', list_column_measure)
       console.log('pivot_column_config', pivot_column_config)
       console.log('list_exclude_column_config', list_exclude_column_config)
-      console.log('formated_columns 1', formated_columns)
+      console.log('formated_columns', formated_columns)
+      console.log('leaf_in_tree', leaf_in_tree)
 
       if (!pivot_column_config) {
         pivot_column_config = JSON.parse(
