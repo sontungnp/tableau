@@ -36,7 +36,9 @@ const nameCellRenderer = (params) => {
 
   const indent = '<span class="tree-indent"></span>'.repeat(node.level - 1)
   if (node.leaf) {
-    return indent + '' + (node.name || '')
+    return (
+      indent + '<span class="tree-indent"></span>' + ' ' + (node.name || '')
+    )
   } else {
     const symbol = node.expanded ? '▾' : '▸'
     return (
@@ -51,9 +53,9 @@ const nameCellRenderer = (params) => {
 // Trả về style cho AG Grid, khiến số âm có màu đỏ
 const negativeCellStyle = (params) => {
   const style = { textAlign: 'right' }
-  if (params.value < 0) {
-    style.color = 'red'
-  }
+  // if (params.value < 0) {
+  //   style.color = 'red'
+  // }
   return style
 }
 
@@ -66,7 +68,9 @@ function sortColumns(list_columns, order_lv1, order_lv2) {
     // cho phép truyền string CSV hoặc array
     const list = Array.isArray(order)
       ? order
-      : String(order).split(',').map(v => v.trim())
+      : String(order)
+          .split(',')
+          .map((v) => v.trim())
     return { type: 'custom', list }
   }
 
@@ -74,14 +78,14 @@ function sortColumns(list_columns, order_lv1, order_lv2) {
   const lv2Order = parseOrder(order_lv2)
 
   // ---- parse columns ----
-  const parsed = list_columns.map(c => {
+  const parsed = list_columns.map((c) => {
     const [lv1, lv2] = c.split('_')
     return { raw: c, lv1, lv2 }
   })
 
   // ---- group by level1 ----
   const groupMap = new Map()
-  parsed.forEach(item => {
+  parsed.forEach((item) => {
     if (!groupMap.has(item.lv1)) groupMap.set(item.lv1, [])
     groupMap.get(item.lv1).push(item)
   })
@@ -101,7 +105,7 @@ function sortColumns(list_columns, order_lv1, order_lv2) {
   // ---- sort level2 inside each group ----
   const result = []
 
-  lv1Keys.forEach(lv1 => {
+  lv1Keys.forEach((lv1) => {
     const rows = groupMap.get(lv1)
 
     if (lv2Order.type === 'asc') {
@@ -110,18 +114,14 @@ function sortColumns(list_columns, order_lv1, order_lv2) {
       rows.sort((a, b) => b.lv2.localeCompare(a.lv2))
     } else {
       const idx = new Map(lv2Order.list.map((v, i) => [v.padStart(2, '0'), i]))
-      rows.sort(
-        (a, b) =>
-          (idx.get(a.lv2) ?? 9999) - (idx.get(b.lv2) ?? 9999)
-      )
+      rows.sort((a, b) => (idx.get(a.lv2) ?? 9999) - (idx.get(b.lv2) ?? 9999))
     }
 
-    rows.forEach(r => result.push(r.raw))
+    rows.forEach((r) => result.push(r.raw))
   })
 
   return result
 }
-
 
 /**
  * Chuyển đổi cấu hình tuỳ chỉnh và danh sách cột pivot thành AG Grid columnDefs.
@@ -140,30 +140,36 @@ function createColumnDefs(
   formated_columns
 ) {
   const FORMATTERS = {
-    percent: (opts = {}) => (params) => {
-      const v = Number(params.value)
-      if (isNaN(v)) return params.value ?? ''
-      const precision = opts.precision ?? 2
-      return `${(v * 100).toFixed(precision)} %`
-    },
+    percent:
+      (opts = {}) =>
+      (params) => {
+        const v = Number(params.value)
+        if (isNaN(v)) return params.value ?? ''
+        const precision = opts.precision ?? 2
+        return `${(v * 100).toFixed(precision)} %`
+      },
 
-    currency: (opts = {}) => (params) => {
-      const v = Number(params.value)
-      if (isNaN(v)) return params.value ?? ''
-      return v.toLocaleString('en-US', {
-        style: 'currency',
-        currency: opts.currency || 'VND',
-        maximumFractionDigits: opts.precision ?? 0
-      })
-    },
+    currency:
+      (opts = {}) =>
+      (params) => {
+        const v = Number(params.value)
+        if (isNaN(v)) return params.value ?? ''
+        return v.toLocaleString('en-US', {
+          style: 'currency',
+          currency: opts.currency || 'VND',
+          maximumFractionDigits: opts.precision ?? 0
+        })
+      },
 
-    number: (opts = {}) => (params) => {
-      const v = Number(params.value)
-      if (isNaN(v)) return params.value ?? ''
-      return v.toLocaleString('en-US', {
-        maximumFractionDigits: opts.precision ?? 2
-      })
-    }
+    number:
+      (opts = {}) =>
+      (params) => {
+        const v = Number(params.value)
+        if (isNaN(v)) return params.value ?? ''
+        return v.toLocaleString('en-US', {
+          maximumFractionDigits: opts.precision ?? 2
+        })
+      }
   }
 
   const columnFormatMatchers = []
@@ -175,7 +181,7 @@ function createColumnDefs(
           ? JSON.parse(formated_columns)
           : formated_columns
 
-      formats.forEach(f => {
+      formats.forEach((f) => {
         if (!f.field || !f.formatType) return
 
         let matcher
@@ -210,7 +216,6 @@ function createColumnDefs(
   }
 
   // console.log("columnFormatMatchers", columnFormatMatchers);
-  
 
   function resolveFormatedColumns(field) {
     let matched = null
@@ -244,11 +249,18 @@ function createColumnDefs(
   //   .filter((field) => !excludeColumns.includes(field))
   //   .sort() // Sắp xếp tăng dần theo thứ tự alphabet
 
-  const filteredMeasureColumns = sortColumns(measureColumns.filter((field) => !excludeColumns.includes(field)), order_lv1, order_lv2)
+  const filteredMeasureColumns = sortColumns(
+    measureColumns.filter((field) => !excludeColumns.includes(field)),
+    order_lv1,
+    order_lv2
+  )
 
   console.log('filteredDimensionColumns', filteredDimensionColumns)
   console.log('filteredMeasureColumns', filteredMeasureColumns)
-  console.log('filteredMeasureColumns', sortColumns(filteredMeasureColumns, order_lv1, order_lv2))
+  console.log(
+    'filteredMeasureColumns',
+    sortColumns(filteredMeasureColumns, order_lv1, order_lv2)
+  )
 
   // 2. Map custom config
   const configMap = new Map()
@@ -335,12 +347,12 @@ function createColumnDefs(
     const formatConfig = resolveFormatedColumns(field)
 
     if (formatConfig && FORMATTERS[formatConfig.formatType]) {
-      columnDef.valueFormatter = FORMATTERS[formatConfig.formatType](formatConfig)
+      columnDef.valueFormatter =
+        FORMATTERS[formatConfig.formatType](formatConfig)
       columnDef.type = 'numericColumn'
       columnDef.cellStyle = { textAlign: 'right' }
 
       // console.log('columnDef',columnDef);
-      
     }
 
     // Ensure headerName
@@ -526,8 +538,7 @@ function buildTree(data) {
       currentLevel = parent.children
     })
 
-    if (leaf_in_tree === "0") {
-
+    if (leaf_in_tree === '0') {
       // 3️⃣ Cấp cuối cùng -> thêm dòng dữ liệu leaf (động theo keys)
       const leafNode = {
         id: ++idCounter,
@@ -690,53 +701,52 @@ function toggleNode(nodeId) {
 // }
 
 function copySelectedRows() {
-  const selectedNodes = [];
+  const selectedNodes = []
   gridApi.forEachNodeAfterFilterAndSort((node) => {
-    if (node.isSelected()) selectedNodes.push(node);
-  });
+    if (node.isSelected()) selectedNodes.push(node)
+  })
 
   if (selectedNodes.length === 0) {
-    alert('⚠️ Chưa chọn dòng nào!');
-    return;
+    alert('⚠️ Chưa chọn dòng nào!')
+    return
   }
 
   // Lấy danh sách cột đang hiển thị (flattened, bao gồm các cột con)
-  const displayedCols = gridApi.getAllDisplayedColumns();
+  const displayedCols = gridApi.getAllDisplayedColumns()
 
   // Build text cần copy
   const text = selectedNodes
     .map((node) => {
       return displayedCols
         .map((col) => {
-          let v = node.data[col.getColId()];
+          let v = node.data[col.getColId()]
 
-          if (v === null || v === undefined) return '';
-          if (typeof v === 'object') return ''; // tránh [object Object]
+          if (v === null || v === undefined) return ''
+          if (typeof v === 'object') return '' // tránh [object Object]
 
-          return v.toString();
+          return v.toString()
         })
-        .join('\t');
+        .join('\t')
     })
-    .join('\n');
+    .join('\n')
 
   // Copy vào clipboard
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  textarea.style.position = 'fixed';
-  textarea.style.top = '-9999px';
-  document.body.appendChild(textarea);
-  textarea.focus();
-  textarea.select();
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.style.position = 'fixed'
+  textarea.style.top = '-9999px'
+  document.body.appendChild(textarea)
+  textarea.focus()
+  textarea.select()
 
   try {
-    document.execCommand('copy');
+    document.execCommand('copy')
   } catch (err) {
-    alert('❌ Không thể copy.');
+    alert('❌ Không thể copy.')
   }
 
-  document.body.removeChild(textarea);
+  document.body.removeChild(textarea)
 }
-
 
 // ======= 3️⃣ TÍNH TỔNG =======
 function calcTotalsTree(nodes, numericCols) {
@@ -1189,8 +1199,8 @@ function loadAndRender(worksheet) {
     maxTreeLevel = getMaxTreeLevel(nestedData)
     currentExpandedLevel = 1 // ban đầu chỉ hiển thị root
 
-    console.log('formated_columns 2', formated_columns);
-    
+    console.log('formated_columns 2', formated_columns)
+
     // 7. Build cấu hình để truyền vào AG Grid
     agGridColumnDefs = createColumnDefs(
       pivotDataOutput.dimensionColumns,
@@ -1200,8 +1210,7 @@ function loadAndRender(worksheet) {
       formated_columns
     )
 
-    console.log('agGridColumnDefs', agGridColumnDefs);
-    
+    console.log('agGridColumnDefs', agGridColumnDefs)
 
     // ======================
     // 6️⃣ Cấu hình AG Grid
