@@ -29,6 +29,8 @@ let nestedData = []
 let currentExpandedLevel = 1
 let maxTreeLevel = 1
 
+let levelSortRules
+
 // ⭐ Hàm cellRenderer tùy chỉnh cho cột 'name' (giữ nguyên)
 const nameCellRenderer = (params) => {
   const node = params.data
@@ -605,17 +607,45 @@ function aggregateTreeValues(nodes, numericCols) {
   }
 }
 
+function customValueComparator(orderList) {
+  const orderMap = new Map(orderList.map((v, i) => [v, i]))
+
+  return (a, b) => {
+    const ia = orderMap.has(a.name) ? orderMap.get(a.name) : Infinity
+    const ib = orderMap.has(b.name) ? orderMap.get(b.name) : Infinity
+    return ia - ib
+  }
+}
+
 // ======================
 // 3️⃣ Flatten tree (để hiển thị)
 // ======================
-function flattenTree(nodes) {
+// function flattenTree(nodes) {
+//   let result = []
+//   for (const n of nodes) {
+//     result.push(n)
+//     if (n.expanded && n.children) {
+//       result = result.concat(flattenTree(n.children))
+//     }
+//   }
+//   return result
+// }
+function flattenTree(nodes, level = 1) {
   let result = []
-  for (const n of nodes) {
-    result.push(n)
-    if (n.expanded && n.children) {
-      result = result.concat(flattenTree(n.children))
+
+  const orderList = levelSortRules[level]
+  const sortedNodes = orderList
+    ? [...nodes].sort(customValueComparator(orderList))
+    : nodes
+
+  for (const n of sortedNodes) {
+    result.push({ ...n, level })
+
+    if (n.expanded && n.children?.length) {
+      result = result.concat(flattenTree(n.children, level + 1))
     }
   }
+
   return result
 }
 
@@ -1194,7 +1224,7 @@ function loadAndRender(worksheet) {
 
     // 6. Flat tree
     let flatData = flattenTree(nestedData)
-    // console.log('flatData', flatData)
+    console.log('flatData', flatData)
 
     maxTreeLevel = getMaxTreeLevel(nestedData)
     currentExpandedLevel = 1 // ban đầu chỉ hiển thị root
@@ -1496,6 +1526,9 @@ document.addEventListener('DOMContentLoaded', () => {
           case 'leaf_in_tree':
             leaf_in_tree = item[1].formattedValue
             break
+          case 'level_sort_rules':
+            levelSortRules = JSON.parse(item[1].formattedValue)
+            break
         }
       })
 
@@ -1506,6 +1539,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('list_exclude_column_config', list_exclude_column_config)
       console.log('formated_columns', formated_columns)
       console.log('leaf_in_tree', leaf_in_tree)
+      console.log('levelSortRules', levelSortRules)
 
       if (!pivot_column_config) {
         pivot_column_config = JSON.parse(
