@@ -633,7 +633,7 @@ function customValueComparator(orderList) {
 function flattenTree(nodes, level = 1) {
   let result = []
 
-  const orderList = levelSortRules[level]
+  const orderList = levelSortRules?.[level]
   const sortedNodes = orderList
     ? [...nodes].sort(customValueComparator(orderList))
     : nodes
