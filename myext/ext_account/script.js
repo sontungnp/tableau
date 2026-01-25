@@ -6,7 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let popupData = {}
     let arrAllAccount = []
-    let objInitSelectedAccounts = {}
+    // let objInitSelectedAccounts = {}
+    let objInitSelectedAccounts = {
+        action: 'INIT',
+        arrSelectedItems: [],
+        strSelectedItems: 'ALL',
+        isAll: true
+      }
     let objSelectedAccounts = {}
     const dashboard = tableau.extensions.dashboardContent.dashboard
     let worksheets = dashboard.worksheets
