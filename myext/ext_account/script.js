@@ -8,11 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let arrAllAccount = []
     // let objInitSelectedAccounts = {}
     let objInitSelectedAccounts = {
-        action: 'INIT',
-        arrSelectedItems: [],
-        strSelectedItems: 'ALL',
-        isAll: true
-      }
+      action: 'INIT',
+      arrSelectedItems: [],
+      strSelectedItems: 'ALL',
+      isAll: true
+    }
     let objSelectedAccounts = {}
     const dashboard = tableau.extensions.dashboardContent.dashboard
     let worksheets = dashboard.worksheets
@@ -170,7 +170,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function clearAccFilters() {
       // thiết lập giá trị khởi tạo ban đầu
-      objSelectedAccounts = objInitSelectedAccounts
+      // objSelectedAccounts = objInitSelectedAccounts
+      objSelectedAccounts = {
+        action: 'INIT',
+        arrSelectedItems: [],
+        strSelectedItems: 'ALL',
+        isAll: true
+      }
 
       localStorage.setItem(
         'objSelectedAccounts',
