@@ -30,7 +30,7 @@ tableau.extensions.initializeDialogAsync().then(async (payload) => {
 
   // ===== Vẽ bảng từ arrAllAccount =====
   function renderTable(data) {
-    console.log('=========data', data)
+    // console.log('=========data', data)
 
     let tableHtml = `
     <table border="1" cellspacing="0" cellpadding="4" style="width:100%; border-collapse: collapse;">
