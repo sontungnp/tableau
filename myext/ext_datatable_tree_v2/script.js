@@ -30,6 +30,7 @@ let currentExpandedLevel = 1
 let maxTreeLevel = 1
 
 let levelSortRules
+let showGrandTotal = 1
 
 // ⭐ Hàm cellRenderer tùy chỉnh cho cột 'name' (giữ nguyên)
 const nameCellRenderer = (params) => {
@@ -308,11 +309,13 @@ function createColumnDefs(
     // Default
     let columnDef = {
       field,
-      headerName: field.replace(/_/g, '\n'),
+      headerName: field, //.replace(/_/g, '\n'),
       width: isDimensionOrName ? 250 : 200,
       wrapHeaderText: true,
       autoHeaderHeight: true
     }
+
+    // console.log('======== field, columnDef', field, columnDef)
 
     // Alignment & formatter
     if (isDimensionOrName) {
@@ -347,12 +350,16 @@ function createColumnDefs(
 
     // Override formatedColumns ở đây (support wildcard %)
     const formatConfig = resolveFormatedColumns(field)
+    // console.log('==========formatConfig: ', field, formatConfig)
 
     if (formatConfig && FORMATTERS[formatConfig.formatType]) {
       columnDef.valueFormatter =
         FORMATTERS[formatConfig.formatType](formatConfig)
       columnDef.type = 'numericColumn'
       columnDef.cellStyle = { textAlign: 'right' }
+      if (formatConfig.width) {
+        columnDef.width = formatConfig.width
+      }
 
       // console.log('columnDef',columnDef);
     }
@@ -366,6 +373,7 @@ function createColumnDefs(
   })
 
   agGridColumnDefs_flat = columnDefs
+  // console.log('==========columnDefs', columnDefs)
 
   // -----------------------------------------------------------
   // 5. GROUPING các measure columns dạng PREFIX_SUFFIX
@@ -392,7 +400,7 @@ function createColumnDefs(
       // Clone + override headerName
       const childDef = {
         ...originalDef,
-        headerName: suffix.padStart(2, '0')
+        headerName: suffix //.padStart(2, '0')
       }
 
       measureGroups[prefix].push(childDef)
@@ -1178,7 +1186,9 @@ function loadAndRender(worksheet) {
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
 
-    funcTionWait4ToUpdateTotal(1000)
+    if (showGrandTotal === 1) {
+      funcTionWait4ToUpdateTotal(1000)
+    }
 
     const cols = sumData.columns.map((c) => c.fieldName)
     const rows = sumData.data.map((r) =>
@@ -1307,11 +1317,15 @@ function loadAndRender(worksheet) {
       },
       onGridReady: (params) => {
         gridApi = params.api
-        funcTionWait4ToUpdateTotal(1000)
+        if (showGrandTotal === 1) {
+          funcTionWait4ToUpdateTotal(1000)
+        }
         console.log('run onGridReady.')
       },
       onFirstDataRendered: (params) => {
-        funcTionWait4ToUpdateTotal(1000)
+        if (showGrandTotal === 1) {
+          funcTionWait4ToUpdateTotal(1000)
+        }
         console.log('run onFirstDataRendered.')
       },
       onCellContextMenu: (params) => {
@@ -1529,6 +1543,9 @@ document.addEventListener('DOMContentLoaded', () => {
           case 'level_sort_rules':
             levelSortRules = JSON.parse(item[1].formattedValue)
             break
+          case 'show_grand_total':
+            showGrandTotal = item[1].formattedValue
+            break
         }
       })
 
@@ -1540,6 +1557,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('formated_columns', formated_columns)
       console.log('leaf_in_tree', leaf_in_tree)
       console.log('levelSortRules', levelSortRules)
+      console.log('showGrandTotal: ', showGrandTotal)
 
       if (!pivot_column_config) {
         pivot_column_config = JSON.parse(
