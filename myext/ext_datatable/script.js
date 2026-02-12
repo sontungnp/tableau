@@ -20,7 +20,7 @@ function formatDate(date) {
   })
 }
 
-// Hàm format số cho tổng cộng và ô không có valueFormatter
+// Hàm format số cho Grand Total và ô không có valueFormatter
 function formatNumber(num) {
   if (num == null || isNaN(Number(num))) return num
   const parsedNum = Number(num)
@@ -239,15 +239,21 @@ function loadAndRender(worksheet) {
       },
 
       getRowStyle: (params) => {
-        // Nếu là dòng pinned bottom (Tổng cộng)
+        // Nếu là dòng pinned bottom (Grand Total)
         if (params.node.rowPinned === 'bottom') {
           return {
             color: 'red', // chữ màu đỏ
             fontWeight: 'bold', // đậm cho nổi bật
-            backgroundColor: '#fff5f5' // nền nhẹ (tùy chọn)
+            backgroundColor: '#fff5f5', // nền nhẹ (tùy chọn)
+            height: 18
           }
         }
         return null
+      },
+
+      getRowHeight: (params) => {
+        if (params.data && params.data.name === 'Grand Total') return 15 // Hoặc 'auto'
+        return undefined // Mặc định
       },
 
       onCellClicked: (params) => {
@@ -356,7 +362,7 @@ function loadAndRender(worksheet) {
 
       const totals = calcTotals(allData, numericCols)
 
-      // 🟢 Tạo 1 dòng "tổng cộng"
+      // 🟢 Tạo 1 dòng "Grand Total"
       const totalRow = {}
       columnDefs.forEach((col) => {
         const field = col.field
@@ -364,7 +370,7 @@ function loadAndRender(worksheet) {
           // Format tổng số bằng hàm chung
           totalRow[field] = totals[field]
         } else if (field === columnDefs[0].field) {
-          totalRow[field] = 'Tổng cộng'
+          totalRow[field] = 'Grand Total'
         } else {
           totalRow[field] = ''
         }
