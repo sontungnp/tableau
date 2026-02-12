@@ -244,15 +244,16 @@ function loadAndRender(worksheet) {
           return {
             color: 'red', // chữ màu đỏ
             fontWeight: 'bold', // đậm cho nổi bật
-            backgroundColor: '#fff5f5', // nền nhẹ (tùy chọn)
-            height: 18
+            backgroundColor: '#fff5f5' // nền nhẹ (tùy chọn)
           }
         }
         return null
       },
 
       getRowHeight: (params) => {
-        if (params.data && params.data.name === 'Grand Total') return 15 // Hoặc 'auto'
+        if (params.node.rowPinned === 'bottom') {
+          return 25
+        } // Hoặc 'auto'
         return undefined // Mặc định
       },
 
