@@ -18,6 +18,14 @@
     <script src="../../lib/tableau.extensions.1.latest.js"></script>
     <script src="script.js"></script>
 
+    <!-- ===== -->
+     
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
       html,
       body {
@@ -193,11 +201,17 @@
 
         <!-- Bên phải: các nút chỉ hiển thị icon -->
         <div class="toolbar-right">
-          <button id="clearAllFilterBtn" title="Clear All Filter">🚫</button>
-          <button id="exportBtn" title="Export CSV">📤</button>
-          <button id="copyCellBtn" title="Copy selected cell">📋</button>
-          <button id="copyBtn" title="Copy selected rows">📄</button>
-          <button id="updateTotal" title="Update Total">🔄</button>
+          <button id="clearAllFilterBtn" title="Clear All Filter" style="display: none">🚫</button>
+          <button id="exportBtn" title="Export Excel">
+            <i class="fas fa-file-export"></i>
+          </button>
+          <button id="copyCellBtn" title="Copy selected cell">⎘</button>
+          <button id="copyRow" title="Copy selected rows">
+            <i class="fas fa-copy"></i>
+          </button>
+          <button id="updateTotal" title="Update Total" style="display: none">
+            <i class="fas fa-redo"></i>
+          </button>
         </div>
       </div>
 
