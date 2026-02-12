@@ -432,6 +432,61 @@ function loadAndRender(worksheet) {
       })
     }
 
+    function escapeExcelValue(value) {
+      if (value == null) return ''
+
+      let str = String(value)
+
+      // Escape dấu "
+      str = str.replace(/"/g, '""')
+
+      // Nếu có ký tự đặc biệt → bọc trong "
+      if (/[\"\t\n\r]/.test(str)) {
+        str = `"${str}"`
+      }
+
+      return str
+    }
+
+    // function copySelectedRows() {
+    //   const selectedNodes = []
+    //   gridApi.forEachNodeAfterFilterAndSort((node) => {
+    //     if (node.isSelected()) selectedNodes.push(node)
+    //   })
+
+    //   if (selectedNodes.length === 0) {
+    //     alert('⚠️ Chưa chọn dòng nào!')
+    //     return
+    //   }
+
+    //   const selectedData = selectedNodes.map((node) => node.data)
+    //   const text = selectedData
+    //     .map((row) => Object.values(row).join('\t'))
+    //     .join('\n')
+
+    //   const textarea = document.createElement('textarea')
+    //   textarea.value = text
+    //   textarea.style.position = 'fixed'
+    //   textarea.style.top = '-9999px'
+    //   document.body.appendChild(textarea)
+    //   textarea.focus()
+    //   textarea.select()
+
+    //   try {
+    //     const success = document.execCommand('copy')
+    //     if (success) {
+    //       console.log(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
+    //     } else {
+    //       console.log('⚠️ Copy không thành công.')
+    //     }
+    //   } catch (err) {
+    //     console.error('Copy lỗi:', err)
+    //     alert('❌ Không thể copy (trình duyệt không cho phép).')
+    //   }
+
+    //   document.body.removeChild(textarea)
+    // }
+
     function copySelectedRows() {
       const selectedNodes = []
       gridApi.forEachNodeAfterFilterAndSort((node) => {
@@ -443,32 +498,22 @@ function loadAndRender(worksheet) {
         return
       }
 
-      const selectedData = selectedNodes.map((node) => node.data)
-      const text = selectedData
-        .map((row) => Object.values(row).join('\t'))
+      const text = selectedNodes
+        .map((node) =>
+          Object.values(node.data)
+            .map(escapeExcelValue)
+            .join('\t')
+        )
         .join('\n')
 
-      const textarea = document.createElement('textarea')
-      textarea.value = text
-      textarea.style.position = 'fixed'
-      textarea.style.top = '-9999px'
-      document.body.appendChild(textarea)
-      textarea.focus()
-      textarea.select()
-
-      try {
-        const success = document.execCommand('copy')
-        if (success) {
-          console.log(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
-        } else {
-          console.log('⚠️ Copy không thành công.')
-        }
-      } catch (err) {
-        console.error('Copy lỗi:', err)
-        alert('❌ Không thể copy (trình duyệt không cho phép).')
-      }
-
-      document.body.removeChild(textarea)
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          console.log(`✅ Đã copy ${selectedNodes.length} dòng`)
+        })
+        .catch(err => {
+          console.error('Copy lỗi:', err)
+          alert('❌ Không thể copy')
+        })
     }
 
     document
