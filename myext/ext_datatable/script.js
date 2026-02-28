@@ -221,6 +221,7 @@ function loadAndRender(worksheet) {
     // Logic tính tổng này sẽ chỉ chạy sau khi filter/sort đã ổn định.
 
     const gridOptions = {
+      headerHeight: 32,
       theme: 'legacy',
       columnDefs,
       rowData: data,
@@ -487,6 +488,34 @@ function loadAndRender(worksheet) {
     //   document.body.removeChild(textarea)
     // }
 
+    // function copySelectedRows() {
+    //   const selectedNodes = []
+    //   gridApi.forEachNodeAfterFilterAndSort((node) => {
+    //     if (node.isSelected()) selectedNodes.push(node)
+    //   })
+
+    //   if (selectedNodes.length === 0) {
+    //     alert('⚠️ Chưa chọn dòng nào!')
+    //     return
+    //   }
+
+    //   const text = selectedNodes
+    //     .map((node) =>
+    //       Object.values(node.data).map(escapeExcelValue).join('\t')
+    //     )
+    //     .join('\n')
+
+    //   navigator.clipboard
+    //     .writeText(text)
+    //     .then(() => {
+    //       console.log(`✅ Đã copy ${selectedNodes.length} dòng`)
+    //     })
+    //     .catch((err) => {
+    //       console.error('Copy lỗi:', err)
+    //       alert('❌ Không thể copy')
+    //     })
+    // }
+
     function copySelectedRows() {
       const selectedNodes = []
       gridApi.forEachNodeAfterFilterAndSort((node) => {
@@ -498,22 +527,41 @@ function loadAndRender(worksheet) {
         return
       }
 
+      // Lấy danh sách cột đang hiển thị (flattened, bao gồm các cột con)
+      const displayedCols = gridApi.getAllDisplayedColumns()
+
+      // Build text cần copy
       const text = selectedNodes
-        .map((node) =>
-          Object.values(node.data)
-            .map(escapeExcelValue)
+        .map((node) => {
+          return displayedCols
+            .map((col) => {
+              let v = node.data[col.getColId()]
+
+              if (v === null || v === undefined) return ''
+              if (typeof v === 'object') return '' // tránh [object Object]
+
+              return v.toString()
+            })
             .join('\t')
-        )
+        })
         .join('\n')
 
-      navigator.clipboard.writeText(text)
-        .then(() => {
-          console.log(`✅ Đã copy ${selectedNodes.length} dòng`)
-        })
-        .catch(err => {
-          console.error('Copy lỗi:', err)
-          alert('❌ Không thể copy')
-        })
+      // Copy vào clipboard
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.top = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+
+      try {
+        document.execCommand('copy')
+      } catch (err) {
+        alert('❌ Không thể copy.')
+      }
+
+      document.body.removeChild(textarea)
     }
 
     document

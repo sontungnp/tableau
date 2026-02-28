@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
@@ -19,7 +19,7 @@
     <script src="script.js"></script>
 
     <!-- ===== -->
-     
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -190,6 +190,26 @@
       #filter-area button:hover {
         background: #d9ecff;
       }
+
+      /* .ag-header-cell {
+        padding-left: 4px !important; 
+        padding-right: 4px !important;
+        width: 30px !important;
+      } */
+
+      /* .ag-cell {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+        width: 30px !important;
+      } */
+
+      /* .ag-column-first {
+        width: 30px !important;
+      } */
+
+      /* .ag-header-cell {
+        width: 30px !important;
+      } */
     </style>
   </head>
 
@@ -202,17 +222,20 @@
             <span>🔍</span>
             <input type="text" id="searchBox" placeholder="Tìm kiếm..." />
           </div>
-          
         </div>
-
-        
 
         <!-- Bên phải: các nút chỉ hiển thị icon -->
         <div class="toolbar-right">
           <div class="extract-time">
             <label id="extractRefreshTime">extract refresh time: </label>
           </div>
-          <button id="clearAllFilterBtn" title="Clear All Filter" style="display: none">🚫</button>
+          <button
+            id="clearAllFilterBtn"
+            title="Clear All Filter"
+            style="display: none"
+          >
+            🚫
+          </button>
           <button id="exportBtn" title="Export Excel">
             <i class="fas fa-file-export"></i>
           </button>
@@ -231,13 +254,13 @@
           id="filter-area"
           style="margin-top: 2px; display: flex; flex-wrap: wrap; gap: 0px"
         > -->
-          <!-- <button id="updateTotal1" title="Copy selected rows">
+      <!-- <button id="updateTotal1" title="Copy selected rows">
             UpdateTotal
           </button>
           <button id="updateTotal2" title="Copy selected rows">
             UpdateTotal
           </button> -->
-        <!-- </div>
+      <!-- </div>
         <label id="extractRefreshTime">extract refresh time: </label>
       </div> -->
 

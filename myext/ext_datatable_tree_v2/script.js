@@ -838,33 +838,110 @@ function adjustGridHeight() {
 // ======================
 // Helper cho export: Flatten tree với path và tính max level (FIX: chỉ visible theo expanded, không thừa level cho leaf)
 // ======================
+// function exportFlattenWithPath(
+//   nodes,
+//   currentPath = [],
+//   result = [],
+//   maxLevelRef = { max: 0 }
+// ) {
+//   for (const node of nodes) {
+//     // Luôn push node hiện tại (vì nếu đến đây thì node này visible)
+//     if (!node.leaf && node.name) {
+//       // Non-leaf (cha): thêm name vào path
+//       const nodePath = [...currentPath, node.name]
+//       maxLevelRef.max = Math.max(maxLevelRef.max, nodePath.length)
+//       const row = { ...node, path: nodePath } // Copy node + path cho cha
+//       result.push(row)
+//     } else if (node.leaf) {
+//       // Leaf: dùng path của parent (không thêm level rỗng), copy data measures
+//       const leafRow = { ...node, path: currentPath } // Path không thêm ''
+//       result.push(leafRow)
+//     }
+
+//     // Recurse children CHỈ NẾU expanded (để chỉ lấy visible)
+//     // if (node.expanded && node.children && node.children.length > 0) { // 20260228 : TungNPS bo di de fix loi ko hien thi leaf
+//     if (node.expanded && node.children && node.children.length > 0) {
+//       exportFlattenWithPath(
+//         node.children,
+//         [...currentPath, node.name],
+//         result,
+//         maxLevelRef
+//       )
+//     }
+//   }
+//   return result
+// }
+
+// function exportFlattenWithPath(
+//   nodes,
+//   currentPath = [],
+//   result = [],
+//   maxLevelRef = { max: 0 }
+// ) {
+//   for (const node of nodes) {
+//     if (!node.leaf && node.name) {
+//       // Non-leaf (cha): thêm name vào path
+//       const nodePath = [...currentPath, node.name]
+//       maxLevelRef.max = Math.max(maxLevelRef.max, nodePath.length)
+//       const row = { ...node, path: nodePath }
+//       result.push(row)
+//     } else if (node.leaf) {
+//       // ✅ SỬA ĐỔI: Thêm node.name vào path của leaf
+//       const leafPath = [...currentPath, node.name]
+//       maxLevelRef.max = Math.max(maxLevelRef.max, leafPath.length)
+
+//       const leafRow = { ...node, path: leafPath }
+//       result.push(leafRow)
+//     }
+
+//     // Recurse children
+//     if (node.expanded && node.children && node.children.length > 0) {
+//       exportFlattenWithPath(
+//         node.children,
+//         [...currentPath, node.name], // Vẫn giữ logic cũ cho đệ quy để truyền path đúng
+//         result,
+//         maxLevelRef
+//       )
+//     }
+//   }
+//   return result
+// }
+
 function exportFlattenWithPath(
   nodes,
   currentPath = [],
   result = [],
-  maxLevelRef = { max: 0 }
+  maxLevelRef = { max: 0 },
+  level = 1 // Thêm tham số level mặc định là 1
 ) {
-  for (const node of nodes) {
-    // Luôn push node hiện tại (vì nếu đến đây thì node này visible)
+  // 1. Áp dụng logic sắp xếp giống như trong flattenTree
+  const orderList = levelSortRules?.[level]
+  const sortedNodes = orderList
+    ? [...nodes].sort(customValueComparator(orderList))
+    : nodes
+
+  // 2. Duyệt qua danh sách đã được sắp xếp
+  for (const node of sortedNodes) {
     if (!node.leaf && node.name) {
-      // Non-leaf (cha): thêm name vào path
       const nodePath = [...currentPath, node.name]
       maxLevelRef.max = Math.max(maxLevelRef.max, nodePath.length)
-      const row = { ...node, path: nodePath } // Copy node + path cho cha
+      const row = { ...node, path: nodePath }
       result.push(row)
     } else if (node.leaf) {
-      // Leaf: dùng path của parent (không thêm level rỗng), copy data measures
-      const leafRow = { ...node, path: currentPath } // Path không thêm ''
+      const leafPath = [...currentPath, node.name]
+      maxLevelRef.max = Math.max(maxLevelRef.max, leafPath.length)
+      const leafRow = { ...node, path: leafPath }
       result.push(leafRow)
     }
 
-    // Recurse children CHỈ NẾU expanded (để chỉ lấy visible)
+    // 3. Đệ quy cho children với level + 1
     if (node.expanded && node.children && node.children.length > 0) {
       exportFlattenWithPath(
         node.children,
         [...currentPath, node.name],
         result,
-        maxLevelRef
+        maxLevelRef,
+        level + 1 // Truyền level tiếp theo vào đây
       )
     }
   }
