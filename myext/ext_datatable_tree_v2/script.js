@@ -143,13 +143,29 @@ function createColumnDefs(
   formated_columns
 ) {
   const FORMATTERS = {
+    // percent:
+    //   (opts = {}) =>
+    //   (params) => {
+    //     const v = Number(params.value)
+    //     if (isNaN(v)) return params.value ?? ''
+    //     const precision = opts.precision ?? 2
+    //     return `${(v * 100).toFixed(precision)} %`
+    //   },
+
     percent:
       (opts = {}) =>
       (params) => {
         const v = Number(params.value)
         if (isNaN(v)) return params.value ?? ''
+
         const precision = opts.precision ?? 2
-        return `${(v * 100).toFixed(precision)} %`
+
+        return (
+          (v * 100).toLocaleString('en-US', {
+            minimumFractionDigits: precision,
+            maximumFractionDigits: precision
+          }) + ' %'
+        )
       },
 
     currency:
@@ -164,13 +180,27 @@ function createColumnDefs(
         })
       },
 
+    // number:
+    //   (opts = {}) =>
+    //   (params) => {
+    //     const v = Number(params.value)
+    //     if (isNaN(v)) return params.value ?? ''
+    //     return v.toLocaleString('en-US', {
+    //       maximumFractionDigits: opts.precision ?? 2
+    //     })
+    //   }
+
     number:
       (opts = {}) =>
       (params) => {
         const v = Number(params.value)
         if (isNaN(v)) return params.value ?? ''
+
+        const precision = opts.precision ?? 2
+
         return v.toLocaleString('en-US', {
-          maximumFractionDigits: opts.precision ?? 2
+          minimumFractionDigits: precision,
+          maximumFractionDigits: precision
         })
       }
   }
