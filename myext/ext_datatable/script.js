@@ -441,10 +441,21 @@ function loadAndRender(worksheet) {
       // Escape dấu "
       str = str.replace(/"/g, '""')
 
-      // Nếu có ký tự đặc biệt → bọc trong "
-      if (/[\"\t\n\r]/.test(str)) {
+      // Nếu có ký tự đặc biệt → wrap bằng "
+      if (/[\"\t\r\n]/.test(str)) {
         str = `"${str}"`
       }
+
+      return str
+    }
+
+    function sanitizeCell(value) {
+      if (value == null) return ''
+
+      let str = String(value)
+
+      // thay newline trong cell
+      str = str.replace(/\r?\n/g, ' ')
 
       return str
     }
@@ -540,7 +551,12 @@ function loadAndRender(worksheet) {
               if (v === null || v === undefined) return ''
               if (typeof v === 'object') return '' // tránh [object Object]
 
-              return v.toString()
+              return sanitizeCell(v)
+
+              // let strValue = v.toString()
+              // strValue = strValue.replace(/\n/g, ' ').replace(/\r/g, ' ')
+
+              // return strValue
             })
             .join('\t')
         })
