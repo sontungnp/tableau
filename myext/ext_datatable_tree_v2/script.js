@@ -31,6 +31,11 @@ let maxTreeLevel = 1
 
 let levelSortRules
 let showGrandTotal = 1
+let percent_columns
+const OPERATORS = {
+  divide: (a, b) => (b !== 0 ? a / b : 0),
+  ratio_complement: (a, b) => (b !== 0 ? 1 - a / b : 0)
+}
 
 // ⭐ Hàm cellRenderer tùy chỉnh cho cột 'name' (giữ nguyên)
 const nameCellRenderer = (params) => {
@@ -620,27 +625,95 @@ function normalizeTree(node) {
   return node
 }
 
-// 🔹 Cộng dồn giá trị từ con lên cha cho các cột measure
-function aggregateTreeValues(nodes, numericCols) {
-  for (const node of nodes) {
-    // Nếu có children → xử lý đệ quy
-    if (node.children && node.children.length > 0) {
-      aggregateTreeValues(node.children, numericCols)
+function evaluateExpression(expr, context) {
+  // replace A, B bằng giá trị thực
+  const replaced = expr.replace(/[A-Z]/g, (key) => {
+    return context[key] ?? 0
+  })
 
-      // Khởi tạo tổng của cha
+  try {
+    return Function(`"use strict"; return (${replaced})`)()
+  } catch {
+    return 0
+  }
+}
+
+function isFormulaColumn(col, rules) {
+  return rules.some((r) => col.endsWith(r.targetSuffix))
+}
+
+function getFormulaRule(col, rules) {
+  return rules.find((r) => col.endsWith(r.targetSuffix))
+}
+
+// 🔹 Cộng dồn giá trị từ con lên cha cho các cột measure
+// function aggregateTreeValues(nodes, numericCols) {
+//   console.log('aggregateTreeValues - numericCols', numericCols)
+
+//   for (const node of nodes) {
+//     // Nếu có children → xử lý đệ quy
+//     if (node.children && node.children.length > 0) {
+//       aggregateTreeValues(node.children, numericCols)
+
+//       // Khởi tạo tổng của cha
+//       numericCols.forEach((col) => {
+//         node[col] = 0
+//       })
+
+//       // Cộng dồn từ các con
+//       for (const child of node.children) {
+//         numericCols.forEach((col) => {
+//           const val = Number(child[col])
+//           if (!isNaN(val)) {
+//             node[col] += val
+//           }
+//         })
+//       }
+//     }
+//   }
+// }
+
+function aggregateTreeValues(nodes, numericCols, formulaRules = []) {
+  for (const node of nodes) {
+    if (node.children && node.children.length > 0) {
+      // 1. Đệ quy
+      aggregateTreeValues(node.children, numericCols, formulaRules)
+
+      // 2. Init
       numericCols.forEach((col) => {
         node[col] = 0
       })
 
-      // Cộng dồn từ các con
+      // 3. SUM (bỏ qua formula columns)
       for (const child of node.children) {
         numericCols.forEach((col) => {
+          if (isFormulaColumn(col, formulaRules)) return
+
           const val = Number(child[col])
-          if (!isNaN(val)) {
-            node[col] += val
-          }
+          if (!isNaN(val)) node[col] += val
         })
       }
+
+      // 4. FORMULA
+      numericCols.forEach((col) => {
+        const rule = getFormulaRule(col, formulaRules)
+        if (!rule) return
+
+        const prefix = col.replace(rule.targetSuffix, '')
+
+        const numerator = Number(node[prefix + rule.numeratorSuffix]) || 0
+        const denominator = Number(node[prefix + rule.denominatorSuffix]) || 0
+
+        const operatorFn = OPERATORS[rule.operator]
+
+        if (!operatorFn) {
+          console.warn('Unknown operator:', rule.operator)
+          node[col] = 0
+          return
+        }
+
+        node[col] = operatorFn(numerator, denominator)
+      })
     }
   }
 }
@@ -1336,8 +1409,11 @@ function loadAndRender(worksheet) {
     nestedData = buildTree(pivotDataOutput.pivotData)
     // console.log('nestedData', nestedData)
 
-    // ✅ Gọi hàm cộng dồn giá trị
-    aggregateTreeValues(nestedData, pivotDataOutput.measureColumns)
+    aggregateTreeValues(
+      nestedData,
+      pivotDataOutput.measureColumns,
+      percent_columns
+    )
 
     // 6. Flat tree
     let flatData = flattenTree(nestedData)
@@ -1653,6 +1729,10 @@ document.addEventListener('DOMContentLoaded', () => {
           case 'show_grand_total':
             showGrandTotal = item[1].formattedValue
             break
+          case 'percent_columns':
+            console.log('percent_columns: ', item[1].formattedValue)
+            percent_columns = JSON.parse(item[1].formattedValue)
+            break
         }
       })
 
@@ -1665,6 +1745,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('leaf_in_tree', leaf_in_tree)
       console.log('levelSortRules', levelSortRules)
       console.log('showGrandTotal: ', showGrandTotal)
+      console.log('percent_columns: ', percent_columns)
 
       if (!pivot_column_config) {
         pivot_column_config = JSON.parse(
