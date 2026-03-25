@@ -72,7 +72,9 @@ let state = {
   showGrandTotal: 1,
   percent_columns: [],
   expandListenersBound: false,
-  columnFormatMatchers: []
+  columnFormatMatchers: [],
+  font_size: '15px',
+  row_height: 28
 }
 
 // ======================
@@ -297,6 +299,14 @@ function createColumnDefs(
       columnDef.type = 'numericColumn'
       columnDef.cellStyle = { textAlign: 'right' }
       if (formatConfig.width) columnDef.width = formatConfig.width
+      // ✅ Thêm xử lý hide
+      if (formatConfig.hide === true) {
+        columnDef.hide = true
+      }
+      if (formatConfig.wrapText === true) {
+        columnDef.wrapText = true
+        columnDef.autoHeight = true // autoHeight cần đi kèm wrapText
+      }
     }
 
     if (!columnDef.headerName) columnDef.headerName = field
@@ -738,7 +748,12 @@ function loadAndRender(worksheet) {
     const gridOptions = {
       columnDefs: state.agGridColumnDefs,
       rowData: flatData,
-      defaultColDef: { filter: false, sortable: true, resizable: true },
+      defaultColDef: {
+        filter: false,
+        sortable: true,
+        resizable: true,
+        cellStyle: { fontSize: state.font_size }
+      },
       suppressFieldDotNotation: true,
       getRowStyle: (params) => {
         const node = params.data
@@ -752,6 +767,11 @@ function loadAndRender(worksheet) {
         if (node.children?.length)
           return { fontWeight: 'bold', backgroundColor: '#f7f7f7' }
         return null
+      },
+      getRowHeight: (params) => {
+        if (params.data && params.data.name === 'Grand Total')
+          return state.row_height
+        return state.row_height // Mặc định undefined
       },
       rowSelection: {
         mode: 'multiRow',
@@ -1123,6 +1143,15 @@ document.addEventListener('DOMContentLoaded', () => {
             break
           case 'percent_columns':
             state.percent_columns = JSON.parse(value)
+            break
+          case 'font_size':
+            console.log('font_size', state.font_size)
+
+            state.font_size = value
+            console.log('font_size', state.font_size)
+            break
+          case 'row_height':
+            state.row_height = value
             break
         }
       })
