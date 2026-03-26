@@ -74,7 +74,9 @@ let state = {
   expandListenersBound: false,
   columnFormatMatchers: [],
   font_size: '15px',
-  row_height: 28
+  row_height: 28,
+  fit_content: 0,
+  fit_window: 0
 }
 
 // ======================
@@ -213,6 +215,91 @@ function resolveFormatedColumns(field, matchers) {
   return matched
 }
 
+function getFixedWidthColumns() {
+  const fixedWidthFields = new Set()
+
+  // 1️⃣ Xử lý từ pivot_column_config (exact match)
+  if (state.pivot_column_config) {
+    state.pivot_column_config.forEach((col) => {
+      if (
+        col.field &&
+        col.width &&
+        col.width !== 'auto' &&
+        col.width !== undefined
+      ) {
+        fixedWidthFields.add(col.field)
+      }
+    })
+  }
+
+  // 2️⃣ Xử lý từ formated_columns (hỗ trợ wildcard %)
+  if (state.formated_columns) {
+    try {
+      const formats =
+        typeof state.formated_columns === 'string'
+          ? JSON.parse(state.formated_columns)
+          : state.formated_columns
+
+      formats.forEach((f) => {
+        // Nếu có width và không phải auto
+        if (f.width && f.width !== 'auto' && f.width !== undefined && f.field) {
+          const pattern = f.field
+
+          // Lưu pattern để sau này match với field thực tế
+          if (pattern.startsWith('%') && pattern.endsWith('%')) {
+            // %abc% → contains
+            const key = pattern.slice(1, -1)
+            fixedWidthFields.add({ type: 'contains', key, pattern })
+          } else if (pattern.startsWith('%')) {
+            // %abc → endsWith
+            const key = pattern.slice(1)
+            fixedWidthFields.add({ type: 'endsWith', key, pattern })
+          } else if (pattern.endsWith('%')) {
+            // abc% → startsWith
+            const key = pattern.slice(0, -1)
+            fixedWidthFields.add({ type: 'startsWith', key, pattern })
+          } else {
+            // exact match
+            fixedWidthFields.add({ type: 'exact', key: pattern, pattern })
+          }
+        }
+      })
+    } catch (e) {
+      console.error('Invalid formated_columns JSON', e)
+    }
+  }
+
+  return fixedWidthFields
+}
+
+// Hàm kiểm tra field có bị fixed width không
+function isFieldFixedWidth(field, fixedWidthColumns) {
+  for (const rule of fixedWidthColumns) {
+    // Nếu rule là string (từ pivot_column_config)
+    if (typeof rule === 'string') {
+      if (field === rule) return true
+      continue
+    }
+
+    // Nếu rule là object (từ formated_columns với wildcard)
+    switch (rule.type) {
+      case 'contains':
+        if (field.includes(rule.key)) return true
+        break
+      case 'startsWith':
+        if (field.startsWith(rule.key)) return true
+        break
+      case 'endsWith':
+        if (field.endsWith(rule.key)) return true
+        break
+      case 'exact':
+        if (field === rule.key) return true
+        break
+    }
+  }
+  return false
+}
+
 function createColumnDefs(
   dimensionColumns,
   measureColumns,
@@ -299,6 +386,12 @@ function createColumnDefs(
       columnDef.type = 'numericColumn'
       columnDef.cellStyle = { textAlign: 'right' }
       if (formatConfig.width) columnDef.width = formatConfig.width
+      if (formatConfig.minWidth) {
+        columnDef.minWidth = formatConfig.minWidth
+      }
+      if (formatConfig.maxWidth) {
+        columnDef.maxWidth = formatConfig.maxWidth
+      }
       // ✅ Thêm xử lý hide
       if (formatConfig.hide === true) {
         columnDef.hide = true
@@ -790,9 +883,109 @@ function loadAndRender(worksheet) {
       },
       onGridReady: (params) => {
         state.gridApi = params.api
-        updateFooterTotals()
+
+        // 1. Auto size tất cả columns để Fit nội dung trước
+        // params.api.autoSizeAllColumns()
+
+        // 2. Co giãn các cột để vừa với grid width, Đảm bảo tổng width không vượt quá grid
+        // params.api.sizeColumnsToFit()
+
+        // 3. Lắng nghe resize window để fit lại
+        // window.addEventListener('resize', () => {
+        //   params.api.sizeColumnsToFit()
+        // })
+
+        // ==========================================
+
+        // ✅ Lấy danh sách cột có width cố định từ cả 2 nguồn
+        // const fixedWidthColumns = getFixedWidthColumns()
+        // console.log('fixedWidthColumns: ', fixedWidthColumns)
+
+        // ✅ Lấy tất cả cột hiển thị
+        // const allColumns = params.api.getColumns()
+        // const visibleColumns = allColumns.filter((col) => col.isVisible())
+
+        // ✅ Phân loại cột cần auto fit
+        // const columnsToAutoFit = visibleColumns.filter((col) => {
+        //   const colId = col.getColId()
+        //   return !isFieldFixedWidth(colId, fixedWidthColumns)
+        // })
+
+        // console.log('columnsToAutoFit: ', columnsToAutoFit)
+
+        // ✅ Auto fit các cột không có width cố định
+        // if (columnsToAutoFit.length) {
+        //   params.api.autoSizeColumns(columnsToAutoFit)
+        // }
+
+        // ====================================
+
+        const fixedWidthColumns = getFixedWidthColumns()
+
+        // 1️⃣ Lấy tất cả cột hiển thị
+        const allColumns = params.api.getColumns()
+        const visibleColumns = allColumns.filter((col) => col.isVisible())
+
+        // 2️⃣ Phân loại cột
+        const fixedColumns = [] // Cột có width cố định
+        const autoFitColumns = [] // Cột cần auto fit
+
+        visibleColumns.forEach((col) => {
+          const colId = col.getColId()
+          if (isFieldFixedWidth(colId, fixedWidthColumns)) {
+            fixedColumns.push(col)
+          } else {
+            autoFitColumns.push(col)
+          }
+        })
+
+        console.log('fixedColumns: ', fixedColumns)
+        console.log('autoFitColumns: ', autoFitColumns)
+
+        // cấu hình để fit content các cột
+        if (state.fit_content == 1) {
+          console.log('Vao fit_content', state.fit_content)
+          // ✅ Auto fit các cột không có width cố định
+          if (autoFitColumns.length) {
+            params.api.autoSizeColumns(autoFitColumns)
+          }
+        }
+
+        // Cấu hình để fit window
+        if (state.fit_window == 1) {
+          console.log('Vao fit_window', state.fit_window)
+
+          // 3️⃣ Tạm thời khóa các cột cố định trước khi fit
+          const originalSuppressSizeToFit = {}
+          fixedColumns.forEach((col) => {
+            const colDef = col.getColDef()
+            originalSuppressSizeToFit[col.getId()] = colDef.suppressSizeToFit
+            colDef.suppressSizeToFit = true // Ngăn sizeColumnsToFit thay đổi cột này
+          })
+
+          // 4️⃣ Auto fit nội dung cho các cột không cố định
+          if (autoFitColumns.length) {
+            params.api.autoSizeColumns(autoFitColumns)
+          }
+
+          // 5️⃣ Fit tổng thể vào grid, nhưng chỉ ảnh hưởng cột không bị khóa
+          params.api.sizeColumnsToFit()
+
+          // 6️⃣ Khôi phục lại suppressSizeToFit
+          fixedColumns.forEach((col) => {
+            const colDef = col.getColDef()
+            colDef.suppressSizeToFit =
+              originalSuppressSizeToFit[col.getId()] || false
+          })
+        }
+
+        // ====================================
+
+        if (state.showGrandTotal == 1) updateFooterTotals()
       },
-      onFirstDataRendered: () => updateFooterTotals()
+      onFirstDataRendered: () => {
+        if (state.showGrandTotal == 1) updateFooterTotals()
+      }
     }
 
     const eGridDiv = document.querySelector('#gridContainer')
@@ -804,12 +997,19 @@ function loadAndRender(worksheet) {
 
     setupExpandButtons()
     setupEventListeners()
-    if (state.showGrandTotal == 1)
+    if (state.showGrandTotal == 1) {
+      console.log('vao day', state.showGrandTotal)
+
       setTimeout(() => document.getElementById('updateTotal')?.click(), 1000)
+    } else {
+      console.log('ko vao day', state.showGrandTotal)
+    }
   })
 }
 
 function updateFooterTotals() {
+  console.log('vao ham updateFooterTotals')
+
   if (!state.gridApi) return
 
   const allData = []
@@ -1139,6 +1339,8 @@ document.addEventListener('DOMContentLoaded', () => {
             state.levelSortRules = JSON.parse(value)
             break
           case 'show_grand_total':
+            console.log('nhan bien show_grand_total:', value)
+
             state.showGrandTotal = value
             break
           case 'percent_columns':
@@ -1152,6 +1354,12 @@ document.addEventListener('DOMContentLoaded', () => {
             break
           case 'row_height':
             state.row_height = value
+            break
+          case 'fit_content':
+            state.fit_content = value
+            break
+          case 'fit_window':
+            state.fit_window = value
             break
         }
       })
