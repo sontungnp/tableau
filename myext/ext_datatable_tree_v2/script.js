@@ -300,6 +300,106 @@ function isFieldFixedWidth(field, fixedWidthColumns) {
   return false
 }
 
+function applyColumnSizing() {
+  // 1. Auto size tất cả columns để Fit nội dung trước
+  // params.api.autoSizeAllColumns()
+
+  // 2. Co giãn các cột để vừa với grid width, Đảm bảo tổng width không vượt quá grid
+  // params.api.sizeColumnsToFit()
+
+  // 3. Lắng nghe resize window để fit lại
+  // window.addEventListener('resize', () => {
+  //   params.api.sizeColumnsToFit()
+  // })
+
+  // ==========================================
+
+  // ✅ Lấy danh sách cột có width cố định từ cả 2 nguồn
+  // const fixedWidthColumns = getFixedWidthColumns()
+  // console.log('fixedWidthColumns: ', fixedWidthColumns)
+
+  // ✅ Lấy tất cả cột hiển thị
+  // const allColumns = params.api.getColumns()
+  // const visibleColumns = allColumns.filter((col) => col.isVisible())
+
+  // ✅ Phân loại cột cần auto fit
+  // const columnsToAutoFit = visibleColumns.filter((col) => {
+  //   const colId = col.getColId()
+  //   return !isFieldFixedWidth(colId, fixedWidthColumns)
+  // })
+
+  // console.log('columnsToAutoFit: ', columnsToAutoFit)
+
+  // ✅ Auto fit các cột không có width cố định
+  // if (columnsToAutoFit.length) {
+  //   params.api.autoSizeColumns(columnsToAutoFit)
+  // }
+
+  // ====================================
+
+  if (!state.gridApi) return
+
+  const fixedWidthColumns = getFixedWidthColumns()
+
+  // 1️⃣ Lấy tất cả cột hiển thị
+  const allColumns = state.gridApi.getColumns()
+  const visibleColumns = allColumns.filter((col) => col.isVisible())
+
+  // 2️⃣ Phân loại cột
+  const fixedColumns = [] // Cột có width cố định
+  const autoFitColumns = [] // Cột cần auto fit
+
+  visibleColumns.forEach((col) => {
+    const colId = col.getColId()
+    if (isFieldFixedWidth(colId, fixedWidthColumns)) {
+      fixedColumns.push(col)
+    } else {
+      autoFitColumns.push(col)
+    }
+  })
+
+  console.log('fixedColumns: ', fixedColumns)
+  console.log('autoFitColumns: ', autoFitColumns)
+
+  // cấu hình để fit content các cột
+  if (state.fit_content == 1) {
+    console.log('Vao fit_content', state.fit_content)
+    // ✅ Auto fit các cột không có width cố định
+    if (autoFitColumns.length) {
+      state.gridApi.autoSizeColumns(autoFitColumns)
+    }
+  }
+
+  // Cấu hình để fit window
+  if (state.fit_window == 1) {
+    console.log('Vao fit_window', state.fit_window)
+
+    // 3️⃣ Tạm thời khóa các cột cố định trước khi fit
+    const originalSuppressSizeToFit = {}
+    fixedColumns.forEach((col) => {
+      const colDef = col.getColDef()
+      originalSuppressSizeToFit[col.getId()] = colDef.suppressSizeToFit
+      colDef.suppressSizeToFit = true // Ngăn sizeColumnsToFit thay đổi cột này
+    })
+
+    // 4️⃣ Auto fit nội dung cho các cột không cố định
+    if (autoFitColumns.length) {
+      state.gridApi.autoSizeColumns(autoFitColumns)
+    }
+
+    // 5️⃣ Fit tổng thể vào grid, nhưng chỉ ảnh hưởng cột không bị khóa
+    state.gridApi.sizeColumnsToFit()
+
+    // 6️⃣ Khôi phục lại suppressSizeToFit
+    fixedColumns.forEach((col) => {
+      const colDef = col.getColDef()
+      colDef.suppressSizeToFit = originalSuppressSizeToFit[col.getId()] || false
+    })
+  }
+
+  // ====================================
+}
+
 function createColumnDefs(
   dimensionColumns,
   measureColumns,
@@ -881,109 +981,21 @@ function loadAndRender(worksheet) {
           params.node.setSelected(true)
         }
       },
+      // onFilterChanged: () => {
+      //   applyColumnSizing()
+      // },
       onGridReady: (params) => {
         state.gridApi = params.api
 
-        // 1. Auto size tất cả columns để Fit nội dung trước
-        // params.api.autoSizeAllColumns()
-
-        // 2. Co giãn các cột để vừa với grid width, Đảm bảo tổng width không vượt quá grid
-        // params.api.sizeColumnsToFit()
-
-        // 3. Lắng nghe resize window để fit lại
-        // window.addEventListener('resize', () => {
-        //   params.api.sizeColumnsToFit()
-        // })
-
-        // ==========================================
-
-        // ✅ Lấy danh sách cột có width cố định từ cả 2 nguồn
-        // const fixedWidthColumns = getFixedWidthColumns()
-        // console.log('fixedWidthColumns: ', fixedWidthColumns)
-
-        // ✅ Lấy tất cả cột hiển thị
-        // const allColumns = params.api.getColumns()
-        // const visibleColumns = allColumns.filter((col) => col.isVisible())
-
-        // ✅ Phân loại cột cần auto fit
-        // const columnsToAutoFit = visibleColumns.filter((col) => {
-        //   const colId = col.getColId()
-        //   return !isFieldFixedWidth(colId, fixedWidthColumns)
-        // })
-
-        // console.log('columnsToAutoFit: ', columnsToAutoFit)
-
-        // ✅ Auto fit các cột không có width cố định
-        // if (columnsToAutoFit.length) {
-        //   params.api.autoSizeColumns(columnsToAutoFit)
-        // }
-
-        // ====================================
-
-        const fixedWidthColumns = getFixedWidthColumns()
-
-        // 1️⃣ Lấy tất cả cột hiển thị
-        const allColumns = params.api.getColumns()
-        const visibleColumns = allColumns.filter((col) => col.isVisible())
-
-        // 2️⃣ Phân loại cột
-        const fixedColumns = [] // Cột có width cố định
-        const autoFitColumns = [] // Cột cần auto fit
-
-        visibleColumns.forEach((col) => {
-          const colId = col.getColId()
-          if (isFieldFixedWidth(colId, fixedWidthColumns)) {
-            fixedColumns.push(col)
-          } else {
-            autoFitColumns.push(col)
-          }
-        })
-
-        console.log('fixedColumns: ', fixedColumns)
-        console.log('autoFitColumns: ', autoFitColumns)
-
-        // cấu hình để fit content các cột
-        if (state.fit_content == 1) {
-          console.log('Vao fit_content', state.fit_content)
-          // ✅ Auto fit các cột không có width cố định
-          if (autoFitColumns.length) {
-            params.api.autoSizeColumns(autoFitColumns)
-          }
-        }
-
-        // Cấu hình để fit window
-        if (state.fit_window == 1) {
-          console.log('Vao fit_window', state.fit_window)
-
-          // 3️⃣ Tạm thời khóa các cột cố định trước khi fit
-          const originalSuppressSizeToFit = {}
-          fixedColumns.forEach((col) => {
-            const colDef = col.getColDef()
-            originalSuppressSizeToFit[col.getId()] = colDef.suppressSizeToFit
-            colDef.suppressSizeToFit = true // Ngăn sizeColumnsToFit thay đổi cột này
-          })
-
-          // 4️⃣ Auto fit nội dung cho các cột không cố định
-          if (autoFitColumns.length) {
-            params.api.autoSizeColumns(autoFitColumns)
-          }
-
-          // 5️⃣ Fit tổng thể vào grid, nhưng chỉ ảnh hưởng cột không bị khóa
-          params.api.sizeColumnsToFit()
-
-          // 6️⃣ Khôi phục lại suppressSizeToFit
-          fixedColumns.forEach((col) => {
-            const colDef = col.getColDef()
-            colDef.suppressSizeToFit =
-              originalSuppressSizeToFit[col.getId()] || false
-          })
-        }
-
-        // ====================================
+        // ✅ Gọi áp dụng sizing
+        applyColumnSizing()
 
         if (state.showGrandTotal == 1) updateFooterTotals()
       },
       onFirstDataRendered: () => {
+        // ✅ Đảm bảo sizing lại sau khi data rendered lần đầu
+        applyColumnSizing()
+
         if (state.showGrandTotal == 1) updateFooterTotals()
       }
     }
@@ -993,6 +1005,11 @@ function loadAndRender(worksheet) {
     else {
       state.gridApi.setGridOption('rowData', flatData)
       state.gridApi.setGridOption('columnDefs', state.agGridColumnDefs)
+
+      // ✅ Gọi lại fit sizing sau khi cập nhật
+      setTimeout(() => {
+        applyColumnSizing()
+      }, 500)
     }
 
     setupExpandButtons()
