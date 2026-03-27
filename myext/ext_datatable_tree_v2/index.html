@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
@@ -260,6 +260,27 @@
       .ag-theme-quartz .ag-header-group-cell-label {
         line-height: var(--ag-header-height);
         font-size: 13px;
+      }
+
+      /* Vị trí của toolbar */
+      .toolbar {
+        order: 1;
+      }
+      #gridContainer {
+        order: 2;
+      }
+
+      /* Chỉnh độ to nhỏ của checkbox các row */
+      /* Thu nhỏ checkbox */
+      .ag-theme-quartz .ag-checkbox-input-wrapper {
+        transform: scale(0.7); /* chỉnh 0.5 → 0.8 tùy mắt */
+      }
+
+      /* Căn giữa checkbox cho đẹp */
+      .ag-theme-quartz .ag-selection-checkbox {
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     </style>
   </head>

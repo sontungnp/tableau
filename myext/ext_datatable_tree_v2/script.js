@@ -76,7 +76,9 @@ let state = {
   font_size: '15px',
   row_height: 28,
   fit_content: 0,
-  fit_window: 0
+  fit_window: 0,
+  grandTotalPosition: 'bottom', // 'top' hoặc 'bottom', mặc định 'bottom'
+  toolbar_position: 'top'
 }
 
 // ======================
@@ -1057,7 +1059,17 @@ function updateFooterTotals() {
   })
 
   totalRow.leaf = true
-  state.gridApi.setGridOption('pinnedBottomRowData', [totalRow])
+
+  // 👈 Xử lý hiển thị theo vị trí
+  if (state.grandTotalPosition === 'top') {
+    // Hiển thị ở trên cùng: dùng pinnedTopRowData
+    state.gridApi.setGridOption('pinnedTopRowData', [totalRow])
+    state.gridApi.setGridOption('pinnedBottomRowData', []) // Xóa bottom nếu có
+  } else {
+    // Hiển thị ở dưới cùng (mặc định): dùng pinnedBottomRowData
+    state.gridApi.setGridOption('pinnedBottomRowData', [totalRow])
+    state.gridApi.setGridOption('pinnedTopRowData', []) // Xóa top nếu có
+  }
 }
 
 function setupExpandButtons() {
@@ -1203,15 +1215,41 @@ function setupExportExcel() {
     )
     const maxTreeLevel = maxLevelRef.max
 
-    const pinnedRows =
-      state.gridApi.getPinnedBottomRowCount() > 0
-        ? Array.from(
-            { length: state.gridApi.getPinnedBottomRowCount() },
-            (_, i) => state.gridApi.getPinnedBottomRow(i).data
-          )
-        : []
+    // 👈 Lấy cả top và bottom nếu có
+    let pinnedRows = []
 
-    const allExportRows = [...exportRows, ...pinnedRows]
+    // Lấy pinned top rows nếu có
+    if (
+      state.grandTotalPosition === 'top' &&
+      state.gridApi.getPinnedTopRowCount() > 0
+    ) {
+      pinnedRows = Array.from(
+        { length: state.gridApi.getPinnedTopRowCount() },
+        (_, i) => state.gridApi.getPinnedTopRow(i).data
+      )
+    }
+
+    // Lấy pinned bottom rows nếu có
+    if (
+      state.grandTotalPosition === 'bottom' &&
+      state.gridApi.getPinnedBottomRowCount() > 0
+    ) {
+      pinnedRows = Array.from(
+        { length: state.gridApi.getPinnedBottomRowCount() },
+        (_, i) => state.gridApi.getPinnedBottomRow(i).data
+      )
+    }
+
+    // 👈 Sắp xếp thứ tự rows cho export
+    let allExportRows = [...exportRows]
+
+    if (state.grandTotalPosition === 'top') {
+      // Grand Total ở trên cùng
+      allExportRows = [...pinnedRows, ...exportRows]
+    } else {
+      // Grand Total ở dưới cùng
+      allExportRows = [...exportRows, ...pinnedRows]
+    }
     const currentColumnDefs = state.gridApi.getColumnDefs()
     const otherColumnDefs = currentColumnDefs.slice(1)
 
@@ -1377,6 +1415,21 @@ document.addEventListener('DOMContentLoaded', () => {
             break
           case 'fit_window':
             state.fit_window = value
+            break
+          case 'grand_total_position': // 👈 Thêm case mới
+            state.grandTotalPosition = value || 'bottom'
+            break
+          case 'toolbar_position': // 👈 Thêm case mới
+            const toolbar = document.querySelector('.toolbar')
+            const grid = document.getElementById('gridContainer')
+            state.toolbar_position = value || 'down'
+            if (state.toolbar_position === 'down') {
+              toolbar.style.order = 2
+              grid.style.order = 1
+            } else {
+              toolbar.style.order = 1
+              grid.style.order = 2
+            }
             break
         }
       })
