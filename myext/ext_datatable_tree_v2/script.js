@@ -1009,7 +1009,7 @@ function loadAndRender(worksheet) {
       // ✅ Gọi lại fit sizing sau khi cập nhật
       setTimeout(() => {
         applyColumnSizing()
-      }, 500)
+      }, 200)
     }
 
     setupExpandButtons()
