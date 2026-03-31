@@ -28,7 +28,7 @@ function formatNumber(num) {
   return parsedNum.toLocaleString('en-US', { maximumFractionDigits: 2 })
 }
 
-// 🎯 Hàm Pivot Measure Names/Values
+// Hàm Pivot Measure Names/Values
 function pivotMeasureValues(table, fieldFormat = 'snake_case') {
   // 🔹 Hàm chuyển format cho key field
   const formatField = (str) => {
@@ -265,14 +265,6 @@ function loadAndRender(worksheet) {
         params.node.setSelected(true)
       },
 
-      // sự kiện click vào 1 dòng
-      // onRowClicked: (event) => {
-      //   // Bỏ chọn tất cả dòng khác
-      //   gridApi.deselectAll()
-      //   // Chọn dòng hiện tại
-      //   event.node.setSelected(true)
-      // },
-
       domLayout: 'normal',
       // Thêm sự kiện sau khi grid đã render xong dữ liệu (tùy chọn)
       onGridReady: (params) => {
@@ -294,25 +286,15 @@ function loadAndRender(worksheet) {
     const eGridDiv = document.querySelector('#myGrid')
 
     if (!gridApi) {
-      // 🟢 Khởi tạo lần đầu
       gridApi = agGrid.createGrid(eGridDiv, gridOptions)
     } else {
-      // 🟢 Cập nhật (Tối ưu: Chỉ dùng setRowData và tránh set columnDefs nếu có thể)
-
-      // Cập nhật columnDefs CHỈ KHI CẦN (nếu cấu trúc worksheet thay đổi)
-      // Trong trường hợp này, vì pivot tạo ra cột động, ta vẫn phải cập nhật, nhưng
-      // ag-Grid sẽ tự tối ưu nếu cấu trúc tương tự.
       gridApi.setGridOption('columnDefs', columnDefs)
 
-      // Tối ưu quan trọng: dùng setRowData
-      // gridApi.setRowData(data)
       gridApi.setGridOption('rowData', data)
 
-      // Đảm bảo tổng được tính lại sau khi set dữ liệu mới
       funcTionWait4ToUpdateTotal(1000)
     }
 
-    // ⏰ Thời gian Render ag-Grid
     const endTime = performance.now()
     console.log(
       `[${new Date().toISOString()}] Render Time (Total JS): ${(
@@ -320,7 +302,6 @@ function loadAndRender(worksheet) {
       ).toFixed(2)}ms`
     )
 
-    // ======= 5️⃣ TÌM KIẾM (Chỉ khởi tạo listener 1 lần) =======
     const searchBox = document.getElementById('searchBox')
     if (searchBox && !searchBox.hasListener) {
       searchBox.addEventListener('input', function () {
@@ -335,7 +316,6 @@ function loadAndRender(worksheet) {
       }, secondsamt)
     }
 
-    // ======= 7️⃣ DÒNG TỔNG (Giữ nguyên, cần chạy sau khi filter/sort ổn định) =======
     function calcTotals(data, numericCols) {
       const totals = {}
       numericCols.forEach((col) => {
@@ -364,7 +344,6 @@ function loadAndRender(worksheet) {
 
       const totals = calcTotals(allData, numericCols)
 
-      // 🟢 Tạo 1 dòng "Grand Total"
       const totalRow = {}
       columnDefs.forEach((col) => {
         const field = col.field
@@ -378,15 +357,9 @@ function loadAndRender(worksheet) {
         }
       })
 
-      // ✅ Gán dòng này thành pinned bottom row
       gridApi.setGridOption('pinnedBottomRowData', [totalRow])
     }
 
-    // --- Các hàm và listener khác (chỉ khởi tạo 1 lần) ---
-    // const isListenersInitialized = document.body.getAttribute(
-    //   'data-listeners-initialized'
-    // )
-    // if (!isListenersInitialized) {
     document
       .getElementById('updateTotal')
       .addEventListener('click', updateFooterTotals)
@@ -404,8 +377,6 @@ function loadAndRender(worksheet) {
         gridApi.onFilterChanged()
         funcTionWait4ToUpdateTotal(1000)
       })
-
-    // Giữ nguyên các hàm renderActiveFilters, copySelectedRows, copyCellBtn, copyBtn...
 
     function renderActiveFilters() {
       if (!gridApi) return
@@ -460,73 +431,6 @@ function loadAndRender(worksheet) {
       return str
     }
 
-    // function copySelectedRows() {
-    //   const selectedNodes = []
-    //   gridApi.forEachNodeAfterFilterAndSort((node) => {
-    //     if (node.isSelected()) selectedNodes.push(node)
-    //   })
-
-    //   if (selectedNodes.length === 0) {
-    //     alert('⚠️ Chưa chọn dòng nào!')
-    //     return
-    //   }
-
-    //   const selectedData = selectedNodes.map((node) => node.data)
-    //   const text = selectedData
-    //     .map((row) => Object.values(row).join('\t'))
-    //     .join('\n')
-
-    //   const textarea = document.createElement('textarea')
-    //   textarea.value = text
-    //   textarea.style.position = 'fixed'
-    //   textarea.style.top = '-9999px'
-    //   document.body.appendChild(textarea)
-    //   textarea.focus()
-    //   textarea.select()
-
-    //   try {
-    //     const success = document.execCommand('copy')
-    //     if (success) {
-    //       console.log(`✅ Đã copy ${selectedData.length} dòng vào clipboard!`)
-    //     } else {
-    //       console.log('⚠️ Copy không thành công.')
-    //     }
-    //   } catch (err) {
-    //     console.error('Copy lỗi:', err)
-    //     alert('❌ Không thể copy (trình duyệt không cho phép).')
-    //   }
-
-    //   document.body.removeChild(textarea)
-    // }
-
-    // function copySelectedRows() {
-    //   const selectedNodes = []
-    //   gridApi.forEachNodeAfterFilterAndSort((node) => {
-    //     if (node.isSelected()) selectedNodes.push(node)
-    //   })
-
-    //   if (selectedNodes.length === 0) {
-    //     alert('⚠️ Chưa chọn dòng nào!')
-    //     return
-    //   }
-
-    //   const text = selectedNodes
-    //     .map((node) =>
-    //       Object.values(node.data).map(escapeExcelValue).join('\t')
-    //     )
-    //     .join('\n')
-
-    //   navigator.clipboard
-    //     .writeText(text)
-    //     .then(() => {
-    //       console.log(`✅ Đã copy ${selectedNodes.length} dòng`)
-    //     })
-    //     .catch((err) => {
-    //       console.error('Copy lỗi:', err)
-    //       alert('❌ Không thể copy')
-    //     })
-    // }
-
     function copySelectedRows() {
       const selectedNodes = []
       gridApi.forEachNodeAfterFilterAndSort((node) => {
@@ -538,10 +442,8 @@ function loadAndRender(worksheet) {
         return
       }
 
-      // Lấy danh sách cột đang hiển thị (flattened, bao gồm các cột con)
       const displayedCols = gridApi.getAllDisplayedColumns()
 
-      // Build text cần copy
       const text = selectedNodes
         .map((node) => {
           return displayedCols
@@ -549,20 +451,14 @@ function loadAndRender(worksheet) {
               let v = node.data[col.getColId()]
 
               if (v === null || v === undefined) return ''
-              if (typeof v === 'object') return '' // tránh [object Object]
+              if (typeof v === 'object') return ''
 
               return sanitizeCell(v)
-
-              // let strValue = v.toString()
-              // strValue = strValue.replace(/\n/g, ' ').replace(/\r/g, ' ')
-
-              // return strValue
             })
             .join('\t')
         })
         .join('\n')
 
-      // Copy vào clipboard
       const textarea = document.createElement('textarea')
       textarea.value = text
       textarea.style.position = 'fixed'
@@ -620,7 +516,6 @@ function loadAndRender(worksheet) {
   })
 }
 
-// Khi DOM ready
 document.addEventListener('DOMContentLoaded', () => {
   tableau.extensions.initializeAsync().then(() => {
     const worksheet =
@@ -650,10 +545,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     refreshExtractTime()
 
-    // Load lần đầu
     loadAndRender(worksheet)
 
-    // ======= 6️⃣ EXPORT EXCEL (Chỉ khởi tạo listener 1 lần) =======
     const exportBtn = document.getElementById('exportBtn')
     if (exportBtn && !exportBtn.hasListener) {
       exportBtn.addEventListener('click', function () {
@@ -668,7 +561,6 @@ document.addEventListener('DOMContentLoaded', () => {
       exportBtn.hasListener = true
     }
 
-    // Lắng nghe filter và parameter change
     worksheet.addEventListener(tableau.TableauEventType.FilterChanged, () => {
       refreshExtractTime()
       loadAndRender(worksheet)
@@ -685,7 +577,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       })
 
-    // ✅ Tính toán chiều cao khả dụng của extension
     function adjustGridHeight() {
       const toolbar = document.querySelector('.toolbar')
       const notebar = document.querySelector('.notebar')
@@ -704,13 +595,11 @@ document.addEventListener('DOMContentLoaded', () => {
         gridContainer.style.height = `${gridHeight}px`
       }
 
-      // Kích hoạt ag-Grid điều chỉnh lại layout
       if (gridApi) {
         gridApi.sizeColumnsToFit()
       }
     }
 
-    // Gọi khi load trang và khi resize
     adjustGridHeight()
     window.addEventListener('resize', adjustGridHeight)
   })
