@@ -1166,7 +1166,10 @@ function setupExpandButtons() {
   state.expandListenersBound = true
 }
 
+let eventListenersBound = false
 function setupEventListeners() {
+  if (eventListenersBound) return
+  eventListenersBound = true
   document
     .getElementById('clearAllFilterBtn')
     ?.addEventListener('click', () => {
@@ -1199,7 +1202,10 @@ function setupEventListeners() {
   setupExportExcel()
 }
 
+let exportListenerBound = false
 function setupExportExcel() {
+  // if (exportListenerBound) return
+  exportListenerBound = true
   document.getElementById('exportExcel')?.addEventListener('click', () => {
     if (!state.gridApi || !state.nestedData?.length) {
       alert('⚠️ Không có dữ liệu để export!')
